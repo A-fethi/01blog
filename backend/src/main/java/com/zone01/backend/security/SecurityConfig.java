@@ -16,7 +16,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 // Define which requests are allowed without authentication
                 .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/login", "/register").permitAll() // 👈 allow login/register
+                .requestMatchers("/api/auth/login", "/api/auth/register").permitAll() // 👈 allow login/register
                 .anyRequest().authenticated() // all others need authentication
                 )
                 // Disable default login form
