@@ -6,6 +6,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+
 @Configuration
 public class SecurityConfig {
 
@@ -16,11 +17,15 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 // Define which requests are allowed without authentication
                 .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/login", "/api/auth/register").permitAll() // 👈 allow login/register
+                .requestMatchers("/", "/api/auth/register", "/api/auth/login").permitAll() // 👈 allow login/register
                 .anyRequest().authenticated() // all others need authentication
                 )
                 // Disable default login form
-                .formLogin(login -> login.disable())
+                .formLogin(form -> form
+                .loginPage("/api/auth/login")
+                .defaultSuccessUrl("/", true)
+                .permitAll()
+                )
                 // Disable HTTP Basic auth
                 .httpBasic(basic -> basic.disable());
         return http.build();
