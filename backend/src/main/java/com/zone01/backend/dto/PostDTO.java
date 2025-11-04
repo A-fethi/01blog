@@ -1,11 +1,11 @@
-package com.zone01.backend.dto;
+// package com.zone01.backend.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+// import lombok.AllArgsConstructor;
+// import lombok.Data;
+// import lombok.NoArgsConstructor;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class PostDTO {
-}
+// @Data
+// @AllArgsConstructor
+// @NoArgsConstructor
+// public class PostDTO {
+// }

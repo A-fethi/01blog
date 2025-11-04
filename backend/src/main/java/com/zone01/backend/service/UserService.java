@@ -1,6 +1,7 @@
 package com.zone01.backend.service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -33,6 +34,10 @@ public class UserService {
 
         User savedUser = userRepository.save(user);
         return savedUser;
+    }
+
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
     }
 
     public Optional<User> findByUsername(String username) {
