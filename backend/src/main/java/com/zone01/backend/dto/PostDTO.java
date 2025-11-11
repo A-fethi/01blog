@@ -18,6 +18,7 @@ public class PostDTO {
     private Long authorId;
     private String authorUsername;
     private LocalDateTime createdAt;
+    private LocalDateTime updateAt;
 
     public PostDTO(Post post) {
         this.id = post.getId();
@@ -26,5 +27,6 @@ public class PostDTO {
         this.authorId = post.getAuthor().getId();
         this.authorUsername = post.getAuthor().getUsername();
         this.createdAt = post.getCreatedAt();
+        this.updateAt = post.getUpdatedAt();
     }
 }
