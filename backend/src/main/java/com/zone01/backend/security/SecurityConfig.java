@@ -24,7 +24,8 @@ public class SecurityConfig {
                         "/api/users/{id}",
                         "/api/posts",
                         "/api/posts/user/{id}",
-                        "/api/comments/post/{postId}"
+                        "/api/comments/post/{postId}",
+                        "/api/likes/post/{postId}"
                 ).permitAll() // 👈 allow login/register
                 .anyRequest().authenticated() // all others need authentication
                 )

@@ -31,7 +31,7 @@ public class CommentService {
         comment.setPost(post);
         comment.setAuthor(user);
         comment.setCreatedAt(java.time.LocalDateTime.now());
-        // comment.setUpdatedAt(java.time.LocalDateTime.now());
+        comment.setUpdatedAt(java.time.LocalDateTime.now());
         return commentRepository.save(comment);
     }
 

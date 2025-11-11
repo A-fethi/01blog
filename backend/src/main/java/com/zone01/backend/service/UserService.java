@@ -31,6 +31,7 @@ public class UserService {
         user.setEmail(registerDTO.getEmail());
         user.setPassword(passwordEncoder.encode(registerDTO.getPassword()));
         user.setCreatedAt(LocalDateTime.now());
+        user.setUpdatedAt(java.time.LocalDateTime.now());
 
         User savedUser = userRepository.save(user);
         return savedUser;
@@ -55,5 +56,13 @@ public class UserService {
     @Transactional
     public void deleteUser(Long userId) {
         userRepository.deleteById(userId);
+    }
+
+    public boolean existsByUsername(String username) {
+        return userRepository.existsByUsername(username);
+    }
+
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email);
     }
 }

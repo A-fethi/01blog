@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.zone01.backend.dto.RegisterDTO;
@@ -36,7 +37,7 @@ public class AuthController {
         info.put("message", "Send POST request to register");
         info.put("method", "POST");
         info.put("endpoint", "/api/auth/register");
-        
+
         return ResponseEntity.ok(info);
     }
 
@@ -53,7 +54,7 @@ public class AuthController {
         info.put("message", "Send POST request to login");
         info.put("method", "POST");
         info.put("endpoint", "/api/auth/login");
-        
+
         return ResponseEntity.ok(info);
     }
 
@@ -76,7 +77,25 @@ public class AuthController {
     public ResponseEntity<Map<String, String>> logout() {
         Map<String, String> response = new HashMap<>();
         response.put("message", "Logout successful");
-        
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/check-username")
+    public ResponseEntity<Map<String, Boolean>> checkUsername(@RequestParam String username) {
+        boolean available = !userService.existsByUsername(username);
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("available", available);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/check-email")
+    public ResponseEntity<Map<String, Boolean>> checkEmail(@RequestParam String email) {
+        boolean available = !userService.existsByEmail(email);
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("available", available);
+
         return ResponseEntity.ok(response);
     }
 }

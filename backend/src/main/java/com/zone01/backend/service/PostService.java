@@ -34,6 +34,7 @@ public class PostService {
         post.setContent(postDTO.getContent());
         post.setAuthor(author);
         post.setCreatedAt(LocalDateTime.now());
+        post.setUpdatedAt(java.time.LocalDateTime.now());
 
         return postRepository.save(post);
     }
@@ -48,6 +49,6 @@ public class PostService {
 
     public Post getPostById(Long id) {
         return postRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Post not found"));
+                .orElseThrow();
     }
 }

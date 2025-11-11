@@ -21,7 +21,7 @@ import com.zone01.backend.service.UserService;
 public class CommentController {
 
     private final CommentService commentService;
-    private UserService userService;
+    private final UserService userService;
 
     public CommentController(CommentService commentService, UserService userService) {
         this.commentService = commentService;
@@ -48,5 +48,4 @@ public class CommentController {
 
         return ResponseEntity.ok(commentDTOs);
     }
-
 }
