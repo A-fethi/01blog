@@ -26,6 +26,10 @@ public class CommentService {
     public Comment createComment(User user, Long postId, CommentDTO commentDTO) {
         Post post = postService.getPostById(postId);
 
+        if (commentDTO.getContent() == null || commentDTO.getContent().trim().isEmpty()) {
+            throw new IllegalArgumentException("Comment content cannot be empty");
+        }
+        
         Comment comment = new Comment();
         comment.setContent(commentDTO.getContent());
         comment.setPost(post);

@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 
 import com.zone01.backend.entity.Post;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,7 +15,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PostDTO {
     private Long id;
+
+    @NotBlank(message = "Title is required")
+    @Size(max = 200, message = "Title cannot exceed 200 characters")
     private String title;
+
+    @NotBlank(message = "Content is required")
     private String content;
     private Long authorId;
     private String authorUsername;

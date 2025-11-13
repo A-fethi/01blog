@@ -123,6 +123,16 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @ExceptionHandler(PostNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handlePostNotFound(PostNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", ex.getMessage()));
+    }
+
+    @ExceptionHandler(UnauthorizedActionException.class)
+    public ResponseEntity<Map<String, String>> handleUnauthorized(UnauthorizedActionException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", ex.getMessage()));
+    }
+
     private Map<String, Object> createErrorBody(
             HttpStatus status,
             String error,

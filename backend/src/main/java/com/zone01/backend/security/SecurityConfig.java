@@ -26,14 +26,11 @@ public class SecurityConfig {
                 // Define which requests are allowed without authentication
                 .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/",
-                        "/api/auth/register",
-                        "/api/auth/login",
-                        "/api/users",
-                        "/api/users/{id}",
-                        "/api/posts",
-                        "/api/posts/user/{id}",
-                        "/api/comments/post/{postId}",
-                        "/api/likes/post/{postId}"
+                        "/api/auth/**",
+                        "/api/users/**",
+                        "/api/posts/**",
+                        "/api/comments/**",
+                        "/api/likes/**"
                 ).permitAll() // 👈 allow login/register
                 .anyRequest().authenticated() // all others need authentication
                 )

@@ -11,6 +11,7 @@ import jakarta.transaction.Transactional;
 
 @Service
 public class LikeService {
+
     private final LikeRepository likeRepository;
     private final PostService postService;
 
@@ -24,7 +25,7 @@ public class LikeService {
         Post post = postService.getPostById(postId);
 
         if (likeRepository.existsByUserAndPost(user, post)) {
-            System.err.println("Post already liked");
+            throw new IllegalStateException("You already liked this post");
         }
 
         Like like = new Like(user, post);
@@ -34,8 +35,9 @@ public class LikeService {
     @Transactional
     public void unlikePost(Long postId, User user) {
         Post post = postService.getPostById(postId);
-        Like like = likeRepository.findByUserAndPost(user, post).orElseThrow();
-        
+        Like like = likeRepository.findByUserAndPost(user, post)
+                .orElseThrow(() -> new IllegalStateException("You haven't liked this post yet"));
+
         likeRepository.delete(like);
     }
 }

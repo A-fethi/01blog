@@ -47,7 +47,6 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginDTO loginDTO) {
-        System.out.println(">>> POST /api/auth/login called with username: " + loginDTO.getUsername());
         User user = userService.loginUser(loginDTO.getUsername(), loginDTO.getPassword());
         UserDTO userDTO = new UserDTO(user);
         return ResponseEntity.ok(userDTO);

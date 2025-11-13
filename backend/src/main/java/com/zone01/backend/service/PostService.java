@@ -8,6 +8,9 @@ import org.springframework.stereotype.Service;
 import com.zone01.backend.dto.PostDTO;
 import com.zone01.backend.entity.Post;
 import com.zone01.backend.entity.User;
+import com.zone01.backend.exception.PostNotFoundException;
+import com.zone01.backend.exception.UnauthorizedActionException;
+import com.zone01.backend.exception.UserNotFoundException;
 import com.zone01.backend.repository.PostRepository;
 import com.zone01.backend.repository.UserRepository;
 
@@ -27,7 +30,7 @@ public class PostService {
     @Transactional
     public Post createPost(Long userId, PostDTO postDTO) {
         User author = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException(userId));
 
         Post post = new Post();
         post.setTitle(postDTO.getTitle());
@@ -37,6 +40,34 @@ public class PostService {
         post.setUpdatedAt(java.time.LocalDateTime.now());
 
         return postRepository.save(post);
+    }
+
+    @Transactional
+    public Post updatePost(Long postId, User loggedUser, PostDTO postDTO) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new PostNotFoundException(postId));
+
+        if (!post.getAuthor().getId().equals(loggedUser.getId())) {
+            throw new UnauthorizedActionException("You cannot edit this post");
+        }
+
+        post.setTitle(postDTO.getTitle());
+        post.setContent(postDTO.getContent());
+        post.setUpdatedAt(LocalDateTime.now());
+
+        return postRepository.save(post);
+    }
+
+    @Transactional
+    public void deletePost(Long postId, User loggedUser) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new PostNotFoundException(postId));
+
+        if (!post.getAuthor().getId().equals(loggedUser.getId())) {
+            throw new UnauthorizedActionException("You cannot delete this post");
+        }
+
+        postRepository.delete(post);
     }
 
     public List<Post> getAllPosts() {
@@ -49,6 +80,6 @@ public class PostService {
 
     public Post getPostById(Long id) {
         return postRepository.findById(id)
-                .orElseThrow();
+                .orElseThrow(() -> new PostNotFoundException(id));
     }
 }
