@@ -5,8 +5,6 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,12 +12,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.zone01.backend.dto.LoginDTO;
 import com.zone01.backend.dto.RegisterDTO;
 import com.zone01.backend.dto.UserDTO;
 import com.zone01.backend.entity.User;
 import com.zone01.backend.service.UserService;
-
-import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -32,43 +29,26 @@ public class AuthController {
     }
 
     @GetMapping("/register")
-    public ResponseEntity<Map<String, String>> registerInfo() {
-        Map<String, String> info = new HashMap<>();
-        info.put("message", "Send POST request to register");
-        info.put("method", "POST");
-        info.put("endpoint", "/api/auth/register");
-
-        return ResponseEntity.ok(info);
+    public ResponseEntity<String> registerInfo() {
+        return ResponseEntity.ok("User Registered Successfully");
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UserDTO> register(@Valid @RequestBody RegisterDTO registerDTO) {
+    public ResponseEntity<UserDTO> register(@RequestBody RegisterDTO registerDTO) {
         User user = userService.registerUser(registerDTO);
         UserDTO userDTO = new UserDTO(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(userDTO);
     }
 
     @GetMapping("/login")
-    public ResponseEntity<Map<String, String>> loginInfo() {
-        Map<String, String> info = new HashMap<>();
-        info.put("message", "Send POST request to login");
-        info.put("method", "POST");
-        info.put("endpoint", "/api/auth/login");
-
-        return ResponseEntity.ok(info);
+    public ResponseEntity<String> loginInfo() {
+        return ResponseEntity.ok("User LoggedIn Successfully");
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UserDTO> login() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null || !auth.isAuthenticated()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
-        String username = auth.getName();
-        User user = userService.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
+    public ResponseEntity<?> login(@RequestBody LoginDTO loginDTO) {
+        System.out.println(">>> POST /api/auth/login called with username: " + loginDTO.getUsername());
+        User user = userService.loginUser(loginDTO.getUsername(), loginDTO.getPassword());
         UserDTO userDTO = new UserDTO(user);
         return ResponseEntity.ok(userDTO);
     }
