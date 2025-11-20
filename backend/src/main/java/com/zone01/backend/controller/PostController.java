@@ -17,9 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.zone01.backend.dto.PostDTO;
 import com.zone01.backend.entity.Post;
 import com.zone01.backend.entity.User;
-import com.zone01.backend.exception.UserNotFoundException;
+import com.zone01.backend.security.AppUserDetails;
 import com.zone01.backend.service.PostService;
-import com.zone01.backend.service.UserService;
 
 import jakarta.validation.Valid;
 
@@ -28,11 +27,9 @@ import jakarta.validation.Valid;
 public class PostController {
 
     private final PostService postService;
-    private final UserService userService;
 
-    public PostController(PostService postService, UserService userService) {
+    public PostController(PostService postService) {
         this.postService = postService;
-        this.userService = userService;
     }
 
     @GetMapping
@@ -53,28 +50,28 @@ public class PostController {
     @PostMapping
     public ResponseEntity<PostDTO> createPost(
             @Valid @RequestBody PostDTO postDTO,
-            @AuthenticationPrincipal User user) {
+            @AuthenticationPrincipal AppUserDetails auth) {
 
-        User loggedUser = userService.findByUsername(user.getUsername()).orElseThrow();
+        User loggedUser = auth.getUser();
         Post newPost = postService.createPost(loggedUser.getId(), postDTO);
         return ResponseEntity.ok(new PostDTO(newPost));
     }
 
     @PutMapping("/{postId}")
-    public ResponseEntity<PostDTO> updatePost(
-            @PathVariable Long postId,
-            @Valid @RequestBody PostDTO postDTO,
-            @AuthenticationPrincipal User user) {
-        User loggedUser = userService.findByUsername(user.getUsername())
-                .orElseThrow(() -> new UserNotFoundException(postId));
-        return ResponseEntity.ok(new PostDTO(postService.updatePost(postId, loggedUser, postDTO)));
-    }
+        public ResponseEntity<PostDTO> updatePost(
+                @PathVariable Long postId,
+                @Valid @RequestBody PostDTO postDTO,
+                @AuthenticationPrincipal AppUserDetails auth) {
+            User loggedUser = auth.getUser();
+            return ResponseEntity.ok(new PostDTO(postService.updatePost(postId, loggedUser, postDTO)));
+            }
 
     @DeleteMapping("/{postId}")
     public ResponseEntity<PostDTO> deletePost(
             @PathVariable long postId,
-            @AuthenticationPrincipal User user) {
-        postService.deletePost(postId, user);
+            @AuthenticationPrincipal AppUserDetails auth) {
+        User loggedUser = auth.getUser();
+        postService.deletePost(postId, loggedUser);
         return ResponseEntity.noContent().build();
     }
 

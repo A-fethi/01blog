@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,11 +24,9 @@ import com.zone01.backend.dto.LoginDTO;
 import com.zone01.backend.dto.RegisterDTO;
 import com.zone01.backend.dto.UserDTO;
 import com.zone01.backend.entity.User;
+import com.zone01.backend.security.AppUserDetails;
 import com.zone01.backend.service.UserService;
 import com.zone01.backend.util.JwtUtil;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-
 
 import jakarta.validation.Valid;
 
@@ -102,19 +101,12 @@ public class AuthController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<UserDTO> getCurrentUser() {
-        // Get authentication from SecurityContext (set by JWT filter)
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        
-        if (auth == null || !auth.isAuthenticated()) {
+    public ResponseEntity<UserDTO> getCurrentUser(@AuthenticationPrincipal AppUserDetails auth) {
+        if (auth == null || auth.getUser() == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        
-        String username = auth.getName();
-        User user = userService.findByUsername(username)
-            .orElseThrow(() -> new RuntimeException("User not found"));
-        
-        UserDTO userDTO = new UserDTO(user);
+
+        UserDTO userDTO = new UserDTO(auth.getUser());
         return ResponseEntity.ok(userDTO);
     }
 
