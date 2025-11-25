@@ -1,0 +1,112 @@
+<!-- Top Navigation Bar -->
+<header class="top-nav">
+  <div class="nav-left">
+    <div class="logo">01</div>
+    <div class="search-bar">
+      <i class="icon"><mat-icon>search</mat-icon></i>
+      <input type="text" placeholder="Search 01Blog">
+    </div>
+  </div>
+
+  <div class="nav-center">
+    <a href="#" class="nav-tab active" title="Feed"><i class="icon"><mat-icon color="red">home</mat-icon></i></a>
+    <a href="#" class="nav-tab" title="Notifications"><i class="icon"><mat-icon>notifications</mat-icon></i></a>
+    <a href="#" class="nav-tab" title="Messages"><i class="icon"><mat-icon>question_answer</mat-icon></i></a>
+  </div>
+
+  <div class="nav-right">
+    <div class="user-menu">
+        <i class="icon"><mat-icon>account_box</mat-icon></i>
+    </div>
+  </div>
+</header>
+
+<div class="home-container">
+  <!-- Left Sidebar: Navigation & Profile -->
+  <aside class="sidebar left-sidebar">
+    <div class="profile-card">
+      <img>
+      <div class="profile-info">
+        <h3>currentUser.name</h3>
+        <p>currentUser.handle</p>
+      </div>
+    </div>
+
+    <nav class="main-nav">
+      <a href="#" class="nav-item active">
+        <i class="icon"><mat-icon>home</mat-icon></i> Feed
+      </a>
+      <a href="#" class="nav-item">
+        <i class="icon"><mat-icon>account_circle</mat-icon></i> My Block
+      </a>
+      <a href="#" class="nav-item">
+        <i class="icon"><mat-icon>diversity_3</mat-icon></i> Subscriptions
+      </a>
+      <a href="#" class="nav-item">
+        <i class="icon"><mat-icon>settings</mat-icon></i> Settings
+      </a>
+      <a href="#" class="nav-item admin-link">
+        <i class="icon"><mat-icon>admin_panel_settings</mat-icon></i> Admin Panel
+      </a>
+    </nav>
+  </aside>
+
+  <!-- Center Column: Feed -->
+  <main class="feed-container">
+    <!-- Create Post Widget -->
+    <div class="create-post-card">
+      <div class="create-post-top">
+        <img>
+        <input type="text" placeholder="Share your learning journey">
+      </div>
+      <div class="create-post-actions">
+        <button class="action-btn"><i class="icon"><mat-icon>add_photo_alternate</mat-icon></i> Media</button>
+      </div>
+    </div>
+
+    <!-- Posts Feed -->
+    <div class="posts-list">
+      <div class="post-card">
+        <div class="post-header">
+          <img class="user-avatar-small">
+          <div class="post-meta">
+            <h4>author name</h4>
+            <span class="timestamp">time</span>
+          </div>
+          <button class="more-options"><mat-icon>more_horiz</mat-icon></button>
+        </div>
+
+        <div class="post-content">
+          <p>content</p>
+        </div>
+
+        <div class="post-stats">
+          <span>Likes</span>
+          <span>Comments</span>
+        </div>
+
+        <div class="post-actions">
+          <button class="action-btn"><i class="icon"><mat-icon>favorite_border</mat-icon></i> Like</button>
+          <button class="action-btn"><i class="icon"><mat-icon>comment</mat-icon></i> Comment</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Right Sidebar: Suggestions -->
+  <aside class="sidebar right-sidebar">
+    <div class="suggestions-container">
+      <h3>Who to follow</h3>
+      <div class="suggestion-list">
+        <div class="suggestion-item">
+          <img>
+          <div class="suggestion-info">
+            <h4>suggestion.name</h4>
+            <p>suggestion.handle</p>
+          </div>
+          <button class="follow-btn">Follow</button>
+        </div>
+      </div>
+    </div>
+  </aside>
+</div>

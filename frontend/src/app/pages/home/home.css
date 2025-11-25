@@ -1,0 +1,558 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  background-color: #f0f2f5;
+  font-family: 'Segoe UI', Helvetica, Arial, sans-serif;
+  color: #050505;
+}
+
+.icon mat-icon,
+mat-icon {
+  color: #65676b;
+  font-size: 24px;
+}
+
+.icon mat-icon,
+mat-icon {
+  transition: color 0.2s ease;
+}
+
+.nav-tab .icon mat-icon {
+  color: #65676b;
+}
+
+.nav-tab.active .icon mat-icon {
+  color: #1877f2;
+}
+
+.nav-tab:hover .icon mat-icon {
+  color: #1877f2;
+}
+
+.nav-item .icon mat-icon {
+  color: #65676b;
+}
+
+.nav-item:hover .icon mat-icon {
+  color: #4b4d52;
+}
+
+.nav-item.active .icon mat-icon {
+  color: #1877f2;
+}
+
+.create-post-card .action-btn .icon mat-icon {
+  color: #65676b;
+}
+
+.create-post-card .action-btn:hover .icon mat-icon {
+  color: #1877f2;
+}
+
+.post-actions .action-btn .icon mat-icon {
+  color: #65676b;
+}
+
+.post-actions .action-btn:hover .icon mat-icon {
+  color: #1877f2;
+}
+
+.more-options mat-icon {
+  color: #65676b;
+}
+
+.more-options:hover mat-icon {
+  color: #1877f2;
+}
+
+.suggestion-item .icon mat-icon {
+  color: #65676b;
+}
+
+.suggestion-item:hover .icon mat-icon {
+  color: #1877f2;
+}
+
+
+/* --- Top Navigation Bar --- */
+.top-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 56px;
+  background-color: white;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 16px;
+  z-index: 100;
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+  min-width: 280px;
+}
+
+.logo {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(to bottom, #1877f2, #1877f2);
+  border-radius: 50%;
+  color: white;
+  font-size: 28px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 16px;
+  cursor: pointer;
+}
+
+.search-bar {
+  background-color: #f0f2f5;
+  border-radius: 20px;
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  width: 240px;
+}
+
+.search-bar input {
+  border: none;
+  background: transparent;
+  outline: none;
+  margin-left: 8px;
+  font-size: 15px;
+  width: 100%;
+}
+
+.nav-center {
+  display: flex;
+  gap: 8px;
+  height: 100%;
+}
+
+.nav-tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 110px;
+  height: 100%;
+  border-bottom: 3px solid transparent;
+  color: #65676b;
+  font-size: 24px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.nav-tab:hover {
+  background-color: #f0f2f5;
+  border-radius: 8px;
+}
+
+.nav-tab.active {
+  color: #1877f2;
+  border-bottom-color: #1877f2;
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 280px;
+  gap: 8px;
+}
+
+.icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #e4e6eb;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 20px;
+}
+
+.icon-btn:hover {
+  background-color: #d8dadf;
+}
+
+/* --- Main Layout --- */
+.home-container {
+  display: flex;
+  justify-content: space-between;
+  max-width: 1920px;
+  margin: 0 auto;
+  padding-top: 76px;
+  /* 56px header + 20px spacing */
+  height: 100vh;
+  overflow: hidden;
+  /* Prevent body scroll, handle per-column */
+}
+
+/* --- Sidebars --- */
+.sidebar {
+  width: 280px;
+  padding: 0 16px;
+  height: calc(100vh - 76px);
+  overflow-y: auto;
+  position: sticky;
+  top: 76px;
+}
+
+.left-sidebar {
+  min-width: 280px;
+}
+
+.right-sidebar {
+  min-width: 280px;
+}
+
+/* Hide scrollbar for sidebars but keep functionality */
+.sidebar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background-color: #bcc0c4;
+  border-radius: 4px;
+}
+
+.sidebar:hover::-webkit-scrollbar-thumb {
+  background-color: #8d949e;
+}
+
+/* --- Profile Card (Left) --- */
+.profile-card {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.profile-card:hover {
+  background-color: #e4e6eb;
+}
+
+.profile-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  margin-right: 12px;
+}
+
+.profile-info h3 {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.profile-info p {
+  font-size: 13px;
+  color: #65676b;
+  margin: 0;
+}
+
+/* --- Navigation (Left) --- */
+.main-nav {
+  margin-top: 16px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 10px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #050505;
+  font-weight: 600;
+  font-size: 15px;
+  transition: background-color 0.2s;
+  margin-bottom: 4px;
+}
+
+.nav-item:hover {
+  background-color: #e4e6eb;
+}
+
+.nav-item .icon {
+  margin-right: 12px;
+  font-size: 20px;
+  width: 36px;
+  text-align: center;
+}
+
+/* --- Feed (Center) --- */
+.feed-container {
+  flex-grow: 1;
+  max-width: 680px;
+  padding: 0 32px;
+  overflow-y: auto;
+  height: calc(100vh - 76px);
+  /* Hide scrollbar */
+  scrollbar-width: none;
+}
+
+.feed-container::-webkit-scrollbar {
+  display: none;
+}
+
+/* --- Create Post Widget --- */
+.create-post-card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  padding: 12px 16px;
+  margin-bottom: 20px;
+}
+
+.create-post-top {
+  display: flex;
+  align-items: center;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e4e6eb;
+}
+
+.user-avatar-small {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 12px;
+}
+
+.create-post-top input {
+  flex-grow: 1;
+  background-color: #f0f2f5;
+  border: none;
+  border-radius: 20px;
+  padding: 10px 16px;
+  font-size: 15px;
+  outline: none;
+  color: #050505;
+}
+
+.create-post-top input:hover {
+  background-color: #e4e6eb;
+}
+
+.create-post-actions {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 12px;
+}
+
+.action-btn {
+  flex: 1;
+  background: none;
+  border: none;
+  padding: 8px;
+  border-radius: 8px;
+  color: #65676b;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background-color 0.2s;
+}
+
+.action-btn:hover {
+  background-color: #f0f2f5;
+}
+
+/* --- Post Card --- */
+.post-card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  padding-bottom: 4px;
+}
+
+.post-header {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  margin-bottom: 4px;
+}
+
+.post-meta {
+  flex-grow: 1;
+}
+
+.post-meta h4 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.post-meta .timestamp {
+  font-size: 13px;
+  color: #65676b;
+}
+
+.more-options {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: #65676b;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+}
+
+.more-options:hover {
+  background-color: #f0f2f5;
+}
+
+.post-content {
+  padding: 4px 16px 16px;
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.post-stats {
+  padding: 10px 16px;
+  border-bottom: 1px solid #e4e6eb;
+  display: flex;
+  justify-content: space-between;
+  color: #65676b;
+  font-size: 14px;
+}
+
+.post-actions {
+  display: flex;
+  padding: 4px;
+  margin: 0 12px;
+}
+
+/* --- Suggestions (Right) --- */
+.suggestions-container {
+  padding-right: 8px;
+}
+
+.suggestions-container h3 {
+  font-size: 16px;
+  color: #65676b;
+  margin-bottom: 16px;
+}
+
+.suggestion-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.suggestion-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  margin-right: 12px;
+}
+
+.suggestion-info {
+  flex-grow: 1;
+}
+
+.suggestion-info h4 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.suggestion-info p {
+  margin: 0;
+  font-size: 13px;
+  color: #65676b;
+}
+
+.follow-btn {
+  background: none;
+  border: none;
+  color: #1877f2;
+  /* Facebook Blue */
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 6px 8px;
+  border-radius: 4px;
+}
+
+.follow-btn:hover {
+  background-color: #e7f3ff;
+}
+
+/* --- Responsive Adjustments --- */
+
+/* Tablet (Hide Right Sidebar) */
+@media (max-width: 1100px) {
+  .home-container {
+    justify-content: center;
+  }
+
+  .right-sidebar {
+    display: none;
+  }
+
+  .nav-center {
+    display: none;
+    /* Hide center tabs on tablet/mobile */
+  }
+
+  .nav-left,
+  .nav-right {
+    min-width: auto;
+  }
+
+  .search-bar {
+    width: 40px;
+    padding: 0;
+    justify-content: center;
+    background: transparent;
+  }
+
+  .search-bar input {
+    display: none;
+  }
+
+  .search-bar .icon {
+    background: #f0f2f5;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+/* Mobile (Hide Left Sidebar too) */
+@media (max-width: 768px) {
+  .left-sidebar {
+    display: none;
+  }
+
+  .feed-container {
+    padding: 0 10px;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .top-nav {
+    padding: 0 10px;
+  }
+
+  .nav-right .user-avatar-small {
+    margin-right: 0;
+  }
+}
