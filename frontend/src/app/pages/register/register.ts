@@ -4,6 +4,7 @@ import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-register',
@@ -18,7 +19,11 @@ export class Register {
     loading = false;
     error: string | null = null;
 
-    constructor(private authService: AuthService, private router: Router) {}
+    constructor(
+      private authService: AuthService,
+      private router: Router,
+      private notificationService: NotificationService
+    ) {}
 
     onSubmit() {
         this.loading = true;
@@ -31,11 +36,25 @@ export class Register {
         }).subscribe({
             next: () => {
                 this.loading = false;
+                this.notificationService.success('Account created successfully. You can now log in.');
                 this.router.navigate(['/login']);
             },
             error: (err) => {
                 this.loading = false;
-                this.error = err.error.message;
+                // Backend errors may have shape: { message, error, errors: {...} }
+                const fieldErrors = err?.error?.errors;
+                if (fieldErrors && typeof fieldErrors === 'object') {
+                  const firstKey = Object.keys(fieldErrors)[0];
+                  this.error = fieldErrors[firstKey] ?? 'Invalid input data';
+                } else {
+                  this.error =
+                    err?.error?.message ||
+                    err?.error?.details ||
+                    err?.error?.error ||
+                    'Registration failed';
+                }
+
+                this.notificationService.error(this.error);
             },
         });
     }

@@ -3,6 +3,7 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-login',
@@ -16,7 +17,11 @@ export class Login {
   loading = false;
   error: string | null = null;
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private notificationService: NotificationService
+  ) {}
 
   onSubmit() {
     this.loading = true;
@@ -28,11 +33,19 @@ export class Login {
     }).subscribe({
       next: () => {
         this.loading = false;
+        this.notificationService.success('Logged in successfully');
         this.router.navigate(['/']);
       },
       error: (err) => {
         this.loading = false;
-        this.error = err.error.message;
+        // Backend returns: { "error": "Invalid username or password" }
+        // Fallback to a generic message if the shape changes.
+        this.error =
+          err?.error?.message ||
+          err?.error?.error ||
+          'Invalid username or password';
+
+        this.notificationService.error(this.error);
       },
     });
   }
