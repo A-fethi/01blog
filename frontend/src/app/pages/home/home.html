@@ -9,14 +9,41 @@
   </div>
 
   <div class="nav-center">
-    <a href="#" class="nav-tab active" title="Feed"><i class="icon"><mat-icon color="red">home</mat-icon></i></a>
-    <a href="#" class="nav-tab" title="Notifications"><i class="icon"><mat-icon>notifications</mat-icon></i></a>
-    <a href="#" class="nav-tab" title="Messages"><i class="icon"><mat-icon>question_answer</mat-icon></i></a>
+    <a href="#" class="nav-tab active" title="Feed">
+      <i class="icon"><mat-icon color="red">home</mat-icon></i>
+    </a>
+    <a href="#" class="nav-tab" title="Notifications" *ngIf="authService.isLoggedIn()">
+      <i class="icon"><mat-icon>notifications</mat-icon></i>
+    </a>
+    <a href="#" class="nav-tab" title="Messages" *ngIf="authService.isLoggedIn()">
+      <i class="icon"><mat-icon>question_answer</mat-icon></i>
+    </a>
   </div>
 
   <div class="nav-right">
-    <div class="user-menu">
-        <i class="icon"><mat-icon>account_box</mat-icon></i>
+    <!-- Logged-in: avatar icon + dropdown -->
+    <button
+      class="user-menu-btn"
+      *ngIf="authService.isLoggedIn(); else loggedOutButton"
+      (click)="onProfileClick()"
+    >
+      <mat-icon>account_box</mat-icon>
+    </button>
+
+    <!-- Not logged in: Login / Sign up button -->
+    <ng-template #loggedOutButton>
+      <button class="user-menu-btn" (click)="onProfileClick()">
+        Login / Sign up
+      </button>
+    </ng-template>
+
+    <!-- User menu panel (only when logged in) -->
+    <div
+      class="user-menu-panel"
+      *ngIf="authService.isLoggedIn() && showUserMenu"
+    >
+      <button class="user-menu-item" (click)="onLogout()">Logout</button>
+      <button class="user-menu-item">Profile</button>
     </div>
   </div>
 </header>
@@ -57,10 +84,18 @@
     <div class="create-post-card">
       <div class="create-post-top">
         <img>
-        <input type="text" placeholder="Share your learning journey">
+        <input
+          type="text"
+          [placeholder]="authService.isLoggedIn() ? 'Share your learning journey' : 'You must log in to post'"
+          [(ngModel)]="newPostContent"
+          [disabled]="!authService.isLoggedIn()"
+        />
+        <button class="share-post-btn" (click)="onSharePost()">Share</button>
       </div>
       <div class="create-post-actions">
-        <button class="action-btn"><i class="icon"><mat-icon>add_photo_alternate</mat-icon></i> Media</button>
+        <button class="action-btn">
+          <i class="icon"><mat-icon>add_photo_alternate</mat-icon></i> Media
+        </button>
       </div>
     </div>
 
@@ -86,8 +121,44 @@
         </div>
 
         <div class="post-actions">
-          <button class="action-btn"><i class="icon"><mat-icon>favorite_border</mat-icon></i> Like</button>
-          <button class="action-btn"><i class="icon"><mat-icon>comment</mat-icon></i> Comment</button>
+          <button class="action-btn" (click)="onLike()">
+            <i class="icon">
+              <mat-icon *ngIf="!isLiked">favorite_border</mat-icon>
+              <mat-icon *ngIf="isLiked">favorite</mat-icon>
+            </i>
+            Like
+          </button>
+          <button class="action-btn" (click)="onComment()">
+            <i class="icon"><mat-icon>comment</mat-icon></i> Comment
+          </button>
+        </div>
+
+        <!-- Comments section (visible to everyone) -->
+        <div class="comments-section" *ngIf="showComments">
+          <div class="comment-item" *ngFor="let c of comments">
+            <div class="comment-author">{{ c.author }}</div>
+            <div class="comment-text">{{ c.text }}</div>
+            <div class="comment-time">{{ c.time }}</div>
+          </div>
+
+          <!-- Comment input only for logged-in users -->
+          <div class="add-comment" *ngIf="authService.isLoggedIn(); else loginToComment">
+            <input
+              type="text"
+              placeholder="Write a comment..."
+              [(ngModel)]="newComment"
+            />
+            <button class="comment-submit-btn" (click)="onSubmitComment()">
+              Comment
+            </button>
+          </div>
+
+          <!-- Message for guests -->
+          <ng-template #loginToComment>
+            <div class="login-to-comment">
+              Log in to add a comment.
+            </div>
+          </ng-template>
         </div>
       </div>
     </div>

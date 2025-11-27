@@ -1,18 +1,33 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
+  background: linear-gradient(135deg, rgba(24, 119, 242, 0.9), rgba(139, 69, 19, 0.8)),
+              url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=2071&q=80') center/cover no-repeat;
+  background-attachment: fixed;
+}
+
 .auth-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: calc(100vh - 200px);
+  height: 100vh;
   padding: 2rem 1.5rem;
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
 }
 
 .auth-card {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(15px);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   padding: 3rem;
   width: 100%;
   max-width: 450px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
 }
 
 .auth-header {
@@ -111,4 +126,36 @@
   .auth-header h1 {
     font-size: 1.5rem;
   }
+}
+
+.btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background-color: #1877f2;
+  color: #ffffff;
+}
+
+.btn-primary:hover {
+  background-color: #1664d9;
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+}
+
+.btn-primary:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.btn-full {
+  width: 100%;
 }

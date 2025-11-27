@@ -3,6 +3,7 @@ package com.zone01.backend.controller;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -51,6 +52,10 @@ public class PostController {
     public ResponseEntity<PostDTO> createPost(
             @Valid @RequestBody PostDTO postDTO,
             @AuthenticationPrincipal AppUserDetails auth) {
+
+        if (auth == null || auth.getUser() == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
 
         User loggedUser = auth.getUser();
         Post newPost = postService.createPost(loggedUser.getId(), postDTO);
