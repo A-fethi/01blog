@@ -22,7 +22,9 @@ public class AppUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.emptyList();
+        return Collections.singletonList(
+            () -> "ROLE_" + user.getRole().name()
+        );
     }
 
     @Override

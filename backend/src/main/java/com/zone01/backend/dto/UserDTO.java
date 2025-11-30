@@ -1,9 +1,7 @@
 package com.zone01.backend.dto;
 
 import java.time.LocalDateTime;
-
 import com.zone01.backend.entity.User;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,6 +13,7 @@ public class UserDTO {
     private Long id;
     private String username;
     private String email;
+    private String role;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -22,6 +21,7 @@ public class UserDTO {
         this.id = user.getId();
         this.username = user.getUsername();
         this.email = user.getEmail();
+        this.role = user.getRole().name();
         this.createdAt = (LocalDateTime) user.getCreatedAt();
         this.updatedAt = user.getUpdatedAt();
     }

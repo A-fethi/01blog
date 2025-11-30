@@ -8,6 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.zone01.backend.dto.RegisterDTO;
+import com.zone01.backend.entity.Role;
 import com.zone01.backend.entity.User;
 import com.zone01.backend.exception.EmailAlreadyExistsException;
 import com.zone01.backend.exception.InvalidCredentialsException;
@@ -57,8 +58,14 @@ public class UserService {
         user.setEmail(registerDTO.getEmail());
         user.setPassword(passwordEncoder.encode(registerDTO.getPassword()));
         user.setCreatedAt(LocalDateTime.now());
-        user.setUpdatedAt(java.time.LocalDateTime.now());
+        user.setUpdatedAt(LocalDateTime.now());
 
+        long userCount = userRepository.count();
+        if (userCount == 0) {
+            user.setRole(Role.ADMIN);
+        } else {
+            user.setRole(Role.USER);
+        }
         User savedUser = userRepository.save(user);
         return savedUser;
     }
