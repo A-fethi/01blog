@@ -54,8 +54,8 @@
     <div class="profile-card">
       <img>
       <div class="profile-info">
-        <h3>currentUser.name</h3>
-        <p>currentUser.handle</p>
+        <h3>{{currentUser.name}}</h3>
+        <p>{{currentUser.handle}}</p>
       </div>
     </div>
 
@@ -72,7 +72,7 @@
       <a href="#" class="nav-item">
         <i class="icon"><mat-icon>settings</mat-icon></i> Settings
       </a>
-      <a href="#" class="nav-item admin-link">
+      <a href="#" class="nav-item admin-link" *ngIf="authService.isLoggedIn() && authService.IsAdmin()">
         <i class="icon"><mat-icon>admin_panel_settings</mat-icon></i> Admin Panel
       </a>
     </nav>

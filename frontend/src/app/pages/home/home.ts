@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { NotificationService } from '../../services/notification.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -12,12 +13,19 @@ import { NotificationService } from '../../services/notification.service';
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
-export class Home {
+export class Home implements OnInit, OnDestroy {
   newPostContent = '';
   showComments = false;
   newComment = '';
   showUserMenu = false;
   isLiked = false;
+
+  currentUser: any = {
+    name: 'Guest',
+    handle: '@guest'
+  };
+
+  private userSubscription?: Subscription;
 
   comments = [
     { author: 'Alice', text: 'Nice post!', time: '2h ago' },
@@ -28,7 +36,29 @@ export class Home {
     public authService: AuthService,
     private router: Router,
     private notificationService: NotificationService
-  ) {}
+  ) { }
+
+  ngOnInit() {
+    this.userSubscription = this.authService.currentUser$.subscribe({
+      next: (user) => {
+        if (user) {
+          this.currentUser = {
+            name: user.username,
+            handle: '@' + user.username
+          };
+        } else {
+          this.currentUser = {
+            name: 'Guest',
+            handle: '@guest'
+          };
+        }
+      }
+    });
+  }
+
+  ngOnDestroy() {
+    this.userSubscription?.unsubscribe();
+  }
 
   private requireLogin(): boolean {
     if (!this.authService.isLoggedIn()) {
@@ -82,6 +112,5 @@ export class Home {
   onLogout() {
     this.authService.logout();
     this.showUserMenu = false;
-    // Don't redirect - keep user on home page
   }
 }
