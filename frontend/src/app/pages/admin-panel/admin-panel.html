@@ -1,0 +1,178 @@
+<!-- Admin Dashboard Header -->
+<header class="admin-header">
+    <div class="header-content">
+        <div class="header-left">
+            <button class="back-btn" (click)="goBack()">
+                <mat-icon>arrow_back</mat-icon>
+            </button>
+            <h1>Admin Dashboard</h1>
+        </div>
+        <div class="header-right">
+            <mat-icon>admin_panel_settings</mat-icon>
+        </div>
+    </div>
+</header>
+
+<!-- Stats Cards -->
+<section class="stats-section">
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon users">
+                <mat-icon>people</mat-icon>
+            </div>
+            <div class="stat-info">
+                <h3>{{ stats.totalUsers }}</h3>
+                <p>Total Users</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon posts">
+                <mat-icon>article</mat-icon>
+            </div>
+            <div class="stat-info">
+                <h3>{{ stats.totalPosts || 0 }}</h3>
+                <p>Total Posts</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon reports">
+                <mat-icon>flag</mat-icon>
+            </div>
+            <div class="stat-info">
+                <h3>{{ stats.totalReports || 0 }}</h3>
+                <p>Reports</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon active">
+                <mat-icon>verified_user</mat-icon>
+            </div>
+            <div class="stat-info">
+                <h3>{{ stats.regularUsers }}</h3>
+                <p>Regular Users</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Main Content -->
+<main class="admin-main">
+    <!-- Tabs Navigation -->
+    <div class="tabs-container">
+        <button class="tab-btn" [class.active]="activeTab === 'users'" (click)="setActiveTab('users')">
+            <mat-icon>people</mat-icon>
+            Users
+        </button>
+        <button class="tab-btn" [class.active]="activeTab === 'posts'" (click)="setActiveTab('posts')">
+            <mat-icon>article</mat-icon>
+            Posts
+        </button>
+        <button class="tab-btn" [class.active]="activeTab === 'reports'" (click)="setActiveTab('reports')">
+            <mat-icon>flag</mat-icon>
+            Reports
+        </button>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="search-container">
+        <mat-icon>search</mat-icon>
+        <input type="text" placeholder="Search users by name or email..." (input)="onSearch($event)"
+            [value]="searchQuery" />
+    </div>
+
+    <!-- Users Tab Content -->
+    <div class="tab-content" *ngIf="activeTab === 'users'">
+        <div class="content-header">
+            <h2>User Management</h2>
+            <p>Manage all registered users</p>
+        </div>
+
+        <div class="loading-spinner" *ngIf="isLoading">
+            <mat-icon class="spinning">refresh</mat-icon>
+            <p>Loading users...</p>
+        </div>
+
+        <div class="users-table" *ngIf="!isLoading">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Joined</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let user of filteredUsers">
+                        <td>{{ user.id }}</td>
+                        <td>
+                            <div class="user-cell">
+                                <div class="user-avatar">
+                                    {{ user.username.charAt(0).toUpperCase() }}
+                                </div>
+                                <span>{{ user.username }}</span>
+                            </div>
+                        </td>
+                        <td>{{ user.email }}</td>
+                        <td>
+                            <span class="role-badge" [class.admin]="user.role === 'ADMIN'">
+                                {{ user.role }}
+                            </span>
+                        </td>
+                        <td>{{ formatDate(user.createdAt) }}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="action-btn ban-btn" (click)="banUser(user.id, user.username)"
+                                    [disabled]="user.role === 'ADMIN'" title="Ban User">
+                                    <mat-icon>block</mat-icon>
+                                </button>
+                                <button class="action-btn delete-btn" (click)="deleteUser(user.id, user.username)"
+                                    [disabled]="user.role === 'ADMIN'" title="Delete User">
+                                    <mat-icon>delete</mat-icon>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="empty-state" *ngIf="filteredUsers.length === 0">
+                <mat-icon>search_off</mat-icon>
+                <p>No users found</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Posts Tab Content -->
+    <div class="tab-content" *ngIf="activeTab === 'posts'">
+        <div class="content-header">
+            <h2>Post Management</h2>
+            <p>Manage all posts and content</p>
+        </div>
+
+        <div class="coming-soon">
+            <mat-icon>construction</mat-icon>
+            <h3>Coming Soon</h3>
+            <p>Post management features will be available soon</p>
+        </div>
+    </div>
+
+    <!-- Reports Tab Content -->
+    <div class="tab-content" *ngIf="activeTab === 'reports'">
+        <div class="content-header">
+            <h2>Reports Management</h2>
+            <p>Review and handle user reports</p>
+        </div>
+
+        <div class="coming-soon">
+            <mat-icon>construction</mat-icon>
+            <h3>Coming Soon</h3>
+            <p>Report management features will be available soon</p>
+        </div>
+    </div>
+</main>

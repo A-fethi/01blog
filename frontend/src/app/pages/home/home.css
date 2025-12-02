@@ -152,6 +152,160 @@ mat-icon {
   background-color: #f0f2f5;
   border-radius: 8px;
 }
+:host {
+  display: block;
+  min-height: 100vh;
+  background-color: #f0f2f5;
+  font-family: 'Segoe UI', Helvetica, Arial, sans-serif;
+  color: #050505;
+}
+
+.icon mat-icon,
+mat-icon {
+  color: #65676b;
+  font-size: 24px;
+}
+
+.icon mat-icon,
+mat-icon {
+  transition: color 0.2s ease;
+}
+
+.nav-tab .icon mat-icon {
+  color: #65676b;
+}
+
+.nav-tab.active .icon mat-icon {
+  color: #1877f2;
+}
+
+.nav-tab:hover .icon mat-icon {
+  color: #1877f2;
+}
+
+.nav-item .icon mat-icon {
+  color: #65676b;
+}
+
+.nav-item:hover .icon mat-icon {
+  color: #4b4d52;
+}
+
+.nav-item.active .icon mat-icon {
+  color: #1877f2;
+}
+
+.create-post-card .action-btn .icon mat-icon {
+  color: #65676b;
+}
+
+.create-post-card .action-btn:hover .icon mat-icon {
+  color: #1877f2;
+}
+
+.post-actions .action-btn .icon mat-icon {
+  color: #65676b;
+}
+
+.post-actions .action-btn:hover .icon mat-icon {
+  color: #1877f2;
+}
+
+.more-options mat-icon {
+  color: #65676b;
+}
+
+.more-options:hover mat-icon {
+  color: #1877f2;
+}
+
+.suggestion-item .icon mat-icon {
+  color: #65676b;
+}
+
+.suggestion-item:hover .icon mat-icon {
+  color: #1877f2;
+}
+
+
+/* --- Top Navigation Bar --- */
+.top-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 56px;
+  background-color: white;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 16px;
+  z-index: 100;
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+  min-width: 280px;
+}
+
+.logo {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(to bottom, #1877f2, #1877f2);
+  border-radius: 50%;
+  color: white;
+  font-size: 28px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 16px;
+  cursor: pointer;
+}
+
+.search-bar {
+  background-color: #f0f2f5;
+  border-radius: 20px;
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  width: 240px;
+}
+
+.search-bar input {
+  border: none;
+  background: transparent;
+  outline: none;
+  margin-left: 8px;
+  font-size: 15px;
+  width: 100%;
+}
+
+.nav-center {
+  display: flex;
+  gap: 8px;
+  height: 100%;
+}
+
+.nav-tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 110px;
+  height: 100%;
+  border-bottom: 3px solid transparent;
+  color: #65676b;
+  font-size: 24px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.nav-tab:hover {
+  background-color: #f0f2f5;
+  border-radius: 8px;
+}
 
 .nav-tab.active {
   color: #1877f2;
@@ -164,6 +318,7 @@ mat-icon {
   justify-content: flex-end;
   min-width: 280px;
   gap: 8px;
+  position: relative;
 }
 
 .icon-btn {
@@ -647,4 +802,99 @@ mat-icon {
   color: #65676b;
   background-color: #f0f2f5;
   border-radius: 8px;
+}
+
+/* --- Share Button --- */
+.share-post-btn {
+  background-color: #1877f2;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0 16px;
+  height: 36px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-left: 8px;
+  transition: background-color 0.2s;
+}
+
+.share-post-btn:hover {
+  background-color: #1664d9;
+}
+
+.share-post-btn:disabled {
+  background-color: #e4e6eb;
+  color: #bcc0c4;
+  cursor: not-allowed;
+}
+
+/* --- User Menu & Login Button --- */
+.user-menu-btn {
+  height: 40px;
+  border-radius: 20px;
+  border: none;
+  background-color: #e4e6eb;
+  color: #050505;
+  font-weight: 600;
+  padding: 0 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  transition: background-color 0.2s;
+}
+
+.user-menu-btn:hover {
+  background-color: #d8dadf;
+}
+
+/* Icon-only variant (Circle) - for logged in user icon */
+.user-menu-btn:has(mat-icon) {
+  width: 40px;
+  padding: 0;
+  border-radius: 50%;
+}
+
+/* Login/Signup variant (Primary) - for logged out state */
+.user-menu-btn:not(:has(mat-icon)) {
+  background-color: #1877f2;
+  color: white;
+}
+
+.user-menu-btn:not(:has(mat-icon)):hover {
+  background-color: #1664d9;
+}
+
+/* --- User Menu Dropdown --- */
+.user-menu-panel {
+  position: absolute;
+  top: 52px;
+  right: 0;
+  width: 200px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  z-index: 1000;
+  border: 1px solid #e4e6eb;
+}
+
+.user-menu-item {
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  color: #050505;
+  transition: background-color 0.2s;
+}
+
+.user-menu-item:hover {
+  background-color: #f0f2f5;
 }

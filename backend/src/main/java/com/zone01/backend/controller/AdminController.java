@@ -44,7 +44,7 @@ public class AdminController {
     }
 
     @GetMapping("/stats")
-    @PreAuthorize("haseRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Map<String, Object>> getDashboardStats(
             @AuthenticationPrincipal AppUserDetails auth) {
         if (auth == null || auth.getUser().getRole() != Role.ADMIN) {

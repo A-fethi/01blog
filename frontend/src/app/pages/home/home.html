@@ -22,11 +22,7 @@
 
   <div class="nav-right">
     <!-- Logged-in: avatar icon + dropdown -->
-    <button
-      class="user-menu-btn"
-      *ngIf="authService.isLoggedIn(); else loggedOutButton"
-      (click)="onProfileClick()"
-    >
+    <button class="user-menu-btn" *ngIf="authService.isLoggedIn(); else loggedOutButton" (click)="onProfileClick()">
       <mat-icon>account_box</mat-icon>
     </button>
 
@@ -38,12 +34,9 @@
     </ng-template>
 
     <!-- User menu panel (only when logged in) -->
-    <div
-      class="user-menu-panel"
-      *ngIf="authService.isLoggedIn() && showUserMenu"
-    >
-      <button class="user-menu-item" (click)="onLogout()">Logout</button>
+    <div class="user-menu-panel" *ngIf="authService.isLoggedIn() && showUserMenu">
       <button class="user-menu-item">Profile</button>
+      <button class="user-menu-item" (click)="onLogout()">Logout</button>
     </div>
   </div>
 </header>
@@ -72,7 +65,7 @@
       <a href="#" class="nav-item">
         <i class="icon"><mat-icon>settings</mat-icon></i> Settings
       </a>
-      <a href="#" class="nav-item admin-link" *ngIf="authService.isLoggedIn() && authService.IsAdmin()">
+      <a routerLink="/admin" class="nav-item admin-link" *ngIf="authService.isLoggedIn() && authService.IsAdmin()">
         <i class="icon"><mat-icon>admin_panel_settings</mat-icon></i> Admin Panel
       </a>
     </nav>
@@ -84,12 +77,9 @@
     <div class="create-post-card">
       <div class="create-post-top">
         <img>
-        <input
-          type="text"
+        <input type="text"
           [placeholder]="authService.isLoggedIn() ? 'Share your learning journey' : 'You must log in to post'"
-          [(ngModel)]="newPostContent"
-          [disabled]="!authService.isLoggedIn()"
-        />
+          [(ngModel)]="newPostContent" [disabled]="!authService.isLoggedIn()" />
         <button class="share-post-btn" (click)="onSharePost()">Share</button>
       </div>
       <div class="create-post-actions">
@@ -143,11 +133,7 @@
 
           <!-- Comment input only for logged-in users -->
           <div class="add-comment" *ngIf="authService.isLoggedIn(); else loginToComment">
-            <input
-              type="text"
-              placeholder="Write a comment..."
-              [(ngModel)]="newComment"
-            />
+            <input type="text" placeholder="Write a comment..." [(ngModel)]="newComment" />
             <button class="comment-submit-btn" (click)="onSubmitComment()">
               Comment
             </button>

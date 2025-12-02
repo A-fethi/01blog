@@ -21,7 +21,8 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final CustomUserDetailsService userDetailsService;
 
-    public SecurityConfig(CustomUserDetailsService userDetailsService, JwtAuthenticationFilter jwtAuthenticationFilter) {
+    public SecurityConfig(CustomUserDetailsService userDetailsService,
+            JwtAuthenticationFilter jwtAuthenticationFilter) {
         this.userDetailsService = userDetailsService;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
@@ -29,31 +30,31 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                // Enable CORS
+                .cors(cors -> cors.configure(http))
                 // Disable CSRF for testing with Postman
                 .csrf(csrf -> csrf.disable())
                 // Define which requests are allowed without authentication
                 .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/",
-                        "/api/auth/**",
-                        "/api/users/**",
-                        "/api/posts/**",
-                        "/api/comments/**",
-                        "/api/likes/**"
-                ).permitAll() // 👈 allow login/register
-                .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                .anyRequest().authenticated() // all others need authentication
+                        .requestMatchers("/",
+                                "/api/auth/**",
+                                "/api/users/**",
+                                "/api/posts/**",
+                                "/api/comments/**",
+                                "/api/likes/**")
+                        .permitAll() // 👈 allow login/register
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .anyRequest().authenticated() // all others need authentication
                 )
                 // Disable default login form
                 .formLogin(form -> form.disable())
                 // Disable HTTP Basic auth
                 .httpBasic(basic -> basic.disable())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(
                         jwtAuthenticationFilter,
-                        UsernamePasswordAuthenticationFilter.class
-                );
+                        UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
@@ -73,8 +74,7 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration config
-    ) throws Exception {
+            AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 }
