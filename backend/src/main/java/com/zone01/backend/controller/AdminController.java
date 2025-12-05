@@ -11,24 +11,32 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import com.zone01.backend.dto.PostDTO;
+import com.zone01.backend.dto.ReportDTO;
 import com.zone01.backend.dto.UserDTO;
 import com.zone01.backend.entity.Role;
 import com.zone01.backend.entity.User;
 import com.zone01.backend.security.AppUserDetails;
+import com.zone01.backend.service.PostService;
+import com.zone01.backend.service.ReportService;
 import com.zone01.backend.service.UserService;
 
 @RestController
 @RequestMapping("/api/admin")
+@PreAuthorize("hasRole('ADMIN')")
 public class AdminController {
 
     private final UserService userService;
+    private final PostService postService;
+    private final ReportService reportService;
 
-    public AdminController(UserService userService) {
+    public AdminController(UserService userService, PostService postService, ReportService reportService) {
         this.userService = userService;
+        this.postService = postService;
+        this.reportService = reportService;
     }
 
     @GetMapping("/users")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<UserDTO>> getAllUsers(
             @AuthenticationPrincipal AppUserDetails auth) {
         if (auth == null || auth.getUser().getRole() != Role.ADMIN) {
@@ -44,7 +52,6 @@ public class AdminController {
     }
 
     @GetMapping("/stats")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Map<String, Object>> getDashboardStats(
             @AuthenticationPrincipal AppUserDetails auth) {
         if (auth == null || auth.getUser().getRole() != Role.ADMIN) {
@@ -54,13 +61,12 @@ public class AdminController {
 
         long totalUsers = userService.getAllUsers().size();
         stats.put("totalUsers", totalUsers);
-        stats.put("regularUsers", totalUsers - 1L);
+        stats.put("regularUsers", Math.max(totalUsers - 1L, 0L));
 
         return ResponseEntity.ok(stats);
     }
 
     @DeleteMapping("/users/{userId}")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Map<String, String>> deleteUser(
             @PathVariable Long userId,
             @AuthenticationPrincipal AppUserDetails auth) {
@@ -84,5 +90,37 @@ public class AdminController {
         Map<String, String> success = new HashMap<>();
         success.put("success", "User deleted successfully");
         return ResponseEntity.ok(success);
+    }
+
+    @PostMapping("/users/{userId}/ban")
+    public ResponseEntity<UserDTO> banUser(@PathVariable Long userId) {
+        User user = userService.banUser(userId);
+        return ResponseEntity.ok(new UserDTO(user));
+    }
+
+    @PostMapping("/users/{userId}/unban")
+    public ResponseEntity<UserDTO> unbanUser(@PathVariable Long userId) {
+        User user = userService.unbanUser(userId);
+        return ResponseEntity.ok(new UserDTO(user));
+    }
+
+    @GetMapping("/posts")
+    public ResponseEntity<List<PostDTO>> getAllPosts() {
+        return ResponseEntity.ok(postService.getAllPosts());
+    }
+
+    @DeleteMapping("/posts/{postId}")
+    public ResponseEntity<Map<String, String>> deletePost(@PathVariable Long postId) {
+        postService.deletePostAsAdmin(postId);
+        return ResponseEntity.ok(Map.of("success", "Post removed"));
+    }
+
+    @GetMapping("/reports")
+    public ResponseEntity<List<ReportDTO>> getReports() {
+        List<ReportDTO> reports = reportService.getAllReports()
+                .stream()
+                .map(ReportDTO::new)
+                .toList();
+        return ResponseEntity.ok(reports);
     }
 }
