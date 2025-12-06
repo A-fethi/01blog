@@ -12,6 +12,7 @@ import com.zone01.backend.entity.Role;
 import com.zone01.backend.entity.User;
 import com.zone01.backend.exception.EmailAlreadyExistsException;
 import com.zone01.backend.exception.InvalidCredentialsException;
+import com.zone01.backend.exception.UserNotFoundException;
 import com.zone01.backend.exception.UsernameAlreadyExistsException;
 import com.zone01.backend.exception.WeakPasswordException;
 import com.zone01.backend.repository.UserRepository;
@@ -86,6 +87,16 @@ public class UserService {
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
+    }
+
+    public User requireById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
+    }
+
+    public User requireByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException(username));
     }
 
     public Optional<User> findByUsername(String username) {
