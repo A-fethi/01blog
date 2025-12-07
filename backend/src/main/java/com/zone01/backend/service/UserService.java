@@ -123,4 +123,20 @@ public class UserService {
     public boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
     }
+
+    @Transactional
+    public User banUser(Long userId) {
+        User user = requireById(userId);
+        user.setBanned(true);
+        user.setUpdatedAt(LocalDateTime.now());
+        return userRepository.save(user);
+    }
+
+    @Transactional
+    public User unbanUser(Long userId) {
+        User user = requireById(userId);
+        user.setBanned(false);
+        user.setUpdatedAt(LocalDateTime.now());
+        return userRepository.save(user);
+    }
 }

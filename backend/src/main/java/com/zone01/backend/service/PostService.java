@@ -70,6 +70,13 @@ public class PostService {
         postRepository.delete(post);
     }
 
+    @Transactional
+    public void deletePostAsAdmin(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new PostNotFoundException(postId));
+        postRepository.delete(post);
+    }
+    
     public List<Post> getAllPosts() {
         return postRepository.findAllByOrderByCreatedAtDesc();
     }
