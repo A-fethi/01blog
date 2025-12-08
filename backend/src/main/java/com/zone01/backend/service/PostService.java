@@ -2,15 +2,19 @@ package com.zone01.backend.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
 import com.zone01.backend.dto.PostDTO;
+import com.zone01.backend.entity.MediaType;
 import com.zone01.backend.entity.Post;
 import com.zone01.backend.entity.User;
 import com.zone01.backend.exception.PostNotFoundException;
 import com.zone01.backend.exception.UnauthorizedActionException;
 import com.zone01.backend.exception.UserNotFoundException;
+import com.zone01.backend.repository.CommentRepository;
+import com.zone01.backend.repository.LikeRepository;
 import com.zone01.backend.repository.PostRepository;
 import com.zone01.backend.repository.UserRepository;
 
@@ -21,10 +25,23 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final LikeRepository likeRepository;
+    private final CommentRepository commentRepository;
+    private final SubscriptionService subscriptionService;
+    private final NotificationService notificationService;
 
-    public PostService(PostRepository postRepository, UserRepository userRepository) {
+    public PostService(PostRepository postRepository,
+            UserRepository userRepository,
+            LikeRepository likeRepository,
+            CommentRepository commentRepository,
+            SubscriptionService subscriptionService,
+            NotificationService notificationService) {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
+        this.likeRepository = likeRepository;
+        this.commentRepository = commentRepository;
+        this.subscriptionService = subscriptionService;
+        this.notificationService = notificationService;
     }
 
     @Transactional
@@ -35,11 +52,16 @@ public class PostService {
         Post post = new Post();
         post.setTitle(postDTO.getTitle());
         post.setContent(postDTO.getContent());
+        post.setMediaUrl(postDTO.getMediaUrl());
+        post.setMediaPreviewUrl(postDTO.getMediaPreviewUrl());
+        post.setMediaType(postDTO.getMediaType());
         post.setAuthor(author);
         post.setCreatedAt(LocalDateTime.now());
         post.setUpdatedAt(java.time.LocalDateTime.now());
 
-        return postRepository.save(post);
+        Post saved = postRepository.save(post);
+        notificationService.notifySubscribers(saved, subscriptionService.getSubscriberUsers(author));
+        return saved;
     }
 
     @Transactional
@@ -53,6 +75,9 @@ public class PostService {
 
         post.setTitle(postDTO.getTitle());
         post.setContent(postDTO.getContent());
+        post.setMediaUrl(postDTO.getMediaUrl());
+        post.setMediaPreviewUrl(postDTO.getMediaPreviewUrl());
+        post.setMediaType(postDTO.getMediaType());
         post.setUpdatedAt(LocalDateTime.now());
 
         return postRepository.save(post);
@@ -76,7 +101,7 @@ public class PostService {
                 .orElseThrow(() -> new PostNotFoundException(postId));
         postRepository.delete(post);
     }
-    
+
     public List<Post> getAllPosts() {
         return postRepository.findAllByOrderByCreatedAtDesc();
     }
@@ -85,8 +110,55 @@ public class PostService {
         return postRepository.findByAuthorId(userId);
     }
 
+    public long countPostsByUser(Long userId) {
+        return postRepository.countByAuthorId(userId);
+    }
+
+    public List<PostDTO> getPostsByUsername(String username) {
+        return postRepository.findByAuthorUsernameOrderByCreatedAtDesc(username)
+                .stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
+    }
+
+    public List<PostDTO> getFeedPosts(User user) {
+        var followedIds = subscriptionService.getFollowedAuthorIds(user);
+        if (followedIds.isEmpty()) {
+            return List.of();
+        }
+        return postRepository.findByAuthorIdInOrderByCreatedAtDesc(followedIds)
+                .stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
+    }
+
     public Post getPostById(Long id) {
         return postRepository.findById(id)
                 .orElseThrow(() -> new PostNotFoundException(id));
+    }
+
+    public PostDTO getPostDetails(Long id) {
+        return toDto(getPostById(id));
+    }
+
+    private PostDTO toDto(Post post) {
+        long likes = likeRepository.countByPostId(post.getId());
+        long comments = commentRepository.countByPostId(post.getId());
+        PostDTO postDTO = new PostDTO(post);
+        if (postDTO.getMediaType() == null && postDTO.getMediaUrl() != null) {
+            postDTO.setMediaType(guessMediaType(postDTO.getMediaUrl()));
+        }
+        return postDTO.withCounts(likes, comments);
+    }
+
+    private MediaType guessMediaType(String mediaUrl) {
+        if (mediaUrl == null) {
+            return null;
+        }
+        String lower = mediaUrl.toLowerCase();
+        if (lower.endsWith(".mp4") || lower.endsWith(".mov") || lower.endsWith(".avi") || lower.contains("video")) {
+            return MediaType.VIDEO;
+        }
+        return MediaType.IMAGE;
     }
 }

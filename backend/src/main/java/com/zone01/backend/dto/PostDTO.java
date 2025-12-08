@@ -2,6 +2,7 @@ package com.zone01.backend.dto;
 
 import java.time.LocalDateTime;
 
+import com.zone01.backend.entity.MediaType;
 import com.zone01.backend.entity.Post;
 
 import jakarta.validation.constraints.NotBlank;
@@ -24,6 +25,11 @@ public class PostDTO {
     private String content;
     private Long authorId;
     private String authorUsername;
+    private String mediaUrl;
+    private String mediaPreviewUrl;
+    private MediaType mediaType;
+    private Long likeCount;
+    private Long commentCount;
     private LocalDateTime createdAt;
     private LocalDateTime updateAt;
 
@@ -33,7 +39,16 @@ public class PostDTO {
         this.content = post.getContent();
         this.authorId = post.getAuthor().getId();
         this.authorUsername = post.getAuthor().getUsername();
+        this.mediaUrl = post.getMediaUrl();
+        this.mediaPreviewUrl = post.getMediaPreviewUrl();
+        this.mediaType = post.getMediaType();
         this.createdAt = post.getCreatedAt();
         this.updateAt = post.getUpdatedAt();
+    }
+
+    public PostDTO withCounts(long likes, long comments) {
+        this.likeCount = likes;
+        this.commentCount = comments;
+        return this;
     }
 }

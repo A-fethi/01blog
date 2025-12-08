@@ -22,4 +22,10 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findByAuthorOrderByCreatedAtDesc(User author);
 
     long countByAuthor(User author);
+
+    long countByAuthorId(Long authorId);
+
+    List<Post> findByAuthorUsernameOrderByCreatedAtDesc(String username);
+
+    List<Post> findByAuthorIdInOrderByCreatedAtDesc(List<Long> authorIds);
 }
