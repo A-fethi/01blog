@@ -58,6 +58,7 @@ public class UserService {
         user.setUsername(registerDTO.getUsername());
         user.setEmail(registerDTO.getEmail());
         user.setPassword(passwordEncoder.encode(registerDTO.getPassword()));
+        user.setAvatarUrl(registerDTO.getAvatarUrl());
         user.setCreatedAt(LocalDateTime.now());
         user.setUpdatedAt(LocalDateTime.now());
 
@@ -122,6 +123,14 @@ public class UserService {
 
     public boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
+    }
+
+    @Transactional
+    public User updateProfile(Long userId, String avatarUrl) {
+        User user = requireById(userId);
+        user.setAvatarUrl(avatarUrl);
+        user.setUpdatedAt(LocalDateTime.now());
+        return userRepository.save(user);
     }
 
     @Transactional

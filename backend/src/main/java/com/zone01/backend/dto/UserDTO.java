@@ -14,6 +14,10 @@ public class UserDTO {
     private String username;
     private String email;
     private String role;
+    private String avatarUrl;
+    private boolean banned;
+    private Long postCount;
+    private Long subscriberCount;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -22,7 +26,15 @@ public class UserDTO {
         this.username = user.getUsername();
         this.email = user.getEmail();
         this.role = user.getRole().name();
-        this.createdAt = (LocalDateTime) user.getCreatedAt();
+        this.avatarUrl = user.getAvatarUrl();
+        this.banned = user.isBanned();
+        this.createdAt = user.getCreatedAt();
         this.updatedAt = user.getUpdatedAt();
+    }
+
+    public UserDTO withStats(long posts, long subscribers) {
+        this.postCount = posts;
+        this.subscriberCount = subscribers;
+        return this;
     }
 }

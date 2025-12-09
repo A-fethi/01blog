@@ -1,6 +1,7 @@
 package com.zone01.backend.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,4 +22,7 @@ public class RegisterDTO {
     @NotBlank(message = "Password is required")
     // @Size(min = 8, message = "Password must be at least 8 characters")
     private String password;
+
+    @Size(max = 400, message = "Avatar URL cannot exceed 400 characters")
+    private String avatarUrl;
 }
