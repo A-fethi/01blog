@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, signal, computed, effect, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
@@ -13,82 +13,88 @@ import { NotificationService } from '../../services/notification.service';
     templateUrl: './admin-panel.html',
     styleUrl: './admin-panel.css'
 })
-export class AdminPanelComponent implements OnInit {
-    stats: AdminStats = {
+export class AdminPanelComponent {
+    private readonly adminService = inject(AdminService);
+    readonly authService = inject(AuthService);  // Changed from private to public
+    private readonly router = inject(Router);
+    private readonly notificationService = inject(NotificationService);
+
+    readonly stats = signal<AdminStats>({
         totalUsers: 0,
         regularUsers: 0,
         totalPosts: 0,
         totalReports: 0
-    };
+    });
 
-    users: UserDTO[] = [];
-    filteredUsers: UserDTO[] = [];
+    readonly users = signal<UserDTO[]>([]);
+    readonly activeTab = signal<'users' | 'posts' | 'reports'>('users');
+    readonly searchQuery = signal('');
+    readonly isLoading = signal(false);
 
-    activeTab: 'users' | 'posts' | 'reports' = 'users';
-    searchQuery = '';
-    isLoading = false;
+    // Computed: Automatically filters users based on search query
+    readonly filteredUsers = computed(() => {
+        const query = this.searchQuery().toLowerCase();
+        if (!query) return this.users();
 
-    constructor(
-        private adminService: AdminService,
-        private authService: AuthService,
-        private router: Router,
-        private notificationService: NotificationService
-    ) { }
+        return this.users().filter(user =>
+            user.username.toLowerCase().includes(query) ||
+            user.email.toLowerCase().includes(query)
+        );
+    });
 
-    ngOnInit() {
-        if (!this.authService.IsAdmin()) {
-            this.notificationService.error('Access denied. Admin privileges required.');
-            this.router.navigate(['/']);
-            return;
-        }
+    constructor() {
+        // Wait for auth to finish loading, then check admin status
+        effect(() => {
+            const isLoading = this.authService.isLoading();
+            const isAdmin = this.authService.isAdmin();
 
-        this.loadDashboardData();
+            // Only check admin status after loading is complete
+            if (!isLoading) {
+                if (!isAdmin) {
+                    this.notificationService.error('Access denied. Admin privileges required.');
+                    this.router.navigate(['/']);
+                    return;
+                }
+
+                // Load dashboard data only once when auth is ready
+                if (this.users().length === 0 && !this.isLoading()) {
+                    this.loadDashboardData();
+                }
+            }
+        });
     }
 
-    loadDashboardData() {
-        this.isLoading = true;
+    private loadDashboardData() {
+        this.isLoading.set(true);
 
         this.adminService.getDashboardStats().subscribe({
-            next: (stats) => {
-                this.stats = stats;
-            },
-            error: (err) => {
+            next: stats => this.stats.set(stats),
+            error: err => {
                 console.error('Failed to load stats:', err);
                 this.notificationService.error('Failed to load dashboard statistics');
             }
         });
 
         this.adminService.getAllUsers().subscribe({
-            next: (users) => {
-                this.users = users;
-                this.filteredUsers = users;
-                this.isLoading = false;
+            next: users => {
+                this.users.set(users);
+                this.isLoading.set(false);
             },
-            error: (err) => {
+            error: err => {
                 console.error('Failed to load users:', err);
                 this.notificationService.error('Failed to load users');
-                this.isLoading = false;
+                this.isLoading.set(false);
             }
         });
     }
 
     setActiveTab(tab: 'users' | 'posts' | 'reports') {
-        this.activeTab = tab;
+        this.activeTab.set(tab);
     }
 
     onSearch(event: Event) {
-        const query = (event.target as HTMLInputElement).value.toLowerCase();
-        this.searchQuery = query;
-
-        if (!query) {
-            this.filteredUsers = this.users;
-            return;
-        }
-
-        this.filteredUsers = this.users.filter(user =>
-            user.username.toLowerCase().includes(query) ||
-            user.email.toLowerCase().includes(query)
-        );
+        const query = (event.target as HTMLInputElement).value;
+        this.searchQuery.set(query);
     }
 
     deleteUser(userId: number, username: string) {
@@ -101,7 +107,7 @@ export class AdminPanelComponent implements OnInit {
                 this.notificationService.success(`User "${username}" deleted successfully`);
                 this.loadDashboardData();
             },
-            error: (err) => {
+            error: err => {
                 console.error('Failed to delete user:', err);
                 this.notificationService.error(err.error?.error || 'Failed to delete user');
             }
@@ -118,7 +124,7 @@ export class AdminPanelComponent implements OnInit {
                 this.notificationService.success(`User "${username}" banned successfully`);
                 this.loadDashboardData();
             },
-            error: (err) => {
+            error: err => {
                 console.error('Failed to ban user:', err);
                 this.notificationService.error('Failed to ban user');
             }

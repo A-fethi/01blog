@@ -1,7 +1,8 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap, BehaviorSubject } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 
+// Interfaces
 export interface LoginRequest {
     username: string;
     password: string;
@@ -10,12 +11,7 @@ export interface LoginRequest {
 export interface LoginResponse {
     token: string;
     type: string;
-    user: {
-        id: number;
-        username: string;
-        email: string;
-        role: string;
-    }
+    user: UserDTO;
 }
 
 export interface RegisterRequest {
@@ -31,73 +27,61 @@ export interface UserDTO {
     role: string;
 }
 
-
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-    private baseUrl = 'http://localhost:8080/api/auth';
-    private currentUserSubject = new BehaviorSubject<UserDTO | null>(null);
-    public currentUser$ = this.currentUserSubject.asObservable();
+    private readonly http = inject(HttpClient);
+    private readonly baseUrl = 'http://localhost:8080/api/auth';
 
-    constructor(private http: HttpClient) {
-        if (this.isLoggedIn()) {
+    // Signals - Angular 21's recommended reactive primitive
+    readonly currentUser = signal<UserDTO | null>(null);
+    readonly isLoading = signal<boolean>(false);  // NEW: Track loading state
+    readonly isLoggedIn = computed(() => !!this.currentUser());
+    readonly isAdmin = computed(() => this.currentUser()?.role === 'ADMIN');
+    readonly token = signal<string | null>(this.getStoredToken());
+
+    constructor() {
+        // Load user data if token exists
+        if (this.token()) {
             this.loadCurrentUser();
         }
     }
 
     login(payload: LoginRequest): Observable<LoginResponse> {
-        const url = `${this.baseUrl}/login`;
-        return this.http.post<LoginResponse>(url, payload).pipe(
-            tap((res) => {
-                if (res && res.token) {
-                    localStorage.setItem('auth_token', res.token);
-                    this.currentUserSubject.next(res.user);
-                }
+        return this.http.post<LoginResponse>(`${this.baseUrl}/login`, payload).pipe(
+            tap(res => {
+                this.token.set(res.token);
+                this.currentUser.set(res.user);
+                localStorage.setItem('auth_token', res.token);
             })
         );
     }
 
     register(payload: RegisterRequest): Observable<RegisterRequest> {
-        const url = `${this.baseUrl}/register`;
-        return this.http.post<RegisterRequest>(url, payload);
+        return this.http.post<RegisterRequest>(`${this.baseUrl}/register`, payload);
     }
 
-    logout() {
+    logout(): void {
+        this.token.set(null);
+        this.currentUser.set(null);
         localStorage.removeItem('auth_token');
-        this.currentUserSubject.next(null);
     }
 
-    getToken(): string | null {
+    private getStoredToken(): string | null {
         return localStorage.getItem('auth_token');
     }
 
-    isLoggedIn(): boolean {
-        return !!this.getToken();
-    }
-
-    IsAdmin(): boolean {
-        const user = this.currentUserSubject.value;
-        return user?.role === 'ADMIN';
-    }
-
-    getCurrentUser(): Observable<UserDTO> {
-        const url = `${this.baseUrl}/me`;
-        return this.http.get<UserDTO>(url).pipe(
-            tap((user) => {
-                this.currentUserSubject.next(user);
-            })
-        );
-    }
-
     private loadCurrentUser(): void {
-        this.getCurrentUser().subscribe({
-            error: (err) => {
-                console.error('Failed to load current user:', err);
+        this.isLoading.set(true);  // Start loading
+        this.http.get<UserDTO>(`${this.baseUrl}/me`).subscribe({
+            next: user => {
+                this.currentUser.set(user);
+                this.isLoading.set(false);  // Done loading
+            },
+            error: err => {
+                console.error('Failed to load user:', err);
                 this.logout();
+                this.isLoading.set(false);  // Done loading (with error)
             }
         });
-    }
-
-    getCurrentUserValue(): UserDTO | null {
-        return this.currentUserSubject.value;
     }
 }

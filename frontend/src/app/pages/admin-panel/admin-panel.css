@@ -1,3 +1,44 @@
+/* --- Loading Overlay  --- */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.loading-spinner {
+  text-align: center;
+}
+
+.spinner-icon {
+  font-size: 64px !important;
+  width: 64px;
+  height: 64px;
+  color: #1976d2;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-spinner p {
+  margin-top: 16px;
+  font-size: 18px;
+  color: #666;
+  font-weight: 500;
+}
 /* Admin Dashboard Styles */
 
 :host {
@@ -484,3 +525,4 @@ tbody tr:hover {
     font-size: 0.75rem;
   }
 }
+

@@ -1,11 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, signal, computed, inject } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { NotificationService } from '../../services/notification.service';
-import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -13,52 +12,35 @@ import { Subscription } from 'rxjs';
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
-export class Home implements OnInit, OnDestroy {
-  newPostContent = '';
-  showComments = false;
-  newComment = '';
-  showUserMenu = false;
-  isLiked = false;
+export class Home {
+  // Inject dependencies - cleaner than constructor injection
+  readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
+  private readonly notificationService = inject(NotificationService);
 
-  currentUser: any = {
-    name: 'Guest',
-    handle: '@guest'
-  };
+  // Signals for reactive state management
+  readonly newPostContent = signal('');
+  readonly showComments = signal(false);
+  readonly newComment = signal('');
+  readonly showUserMenu = signal(false);
+  readonly isLiked = signal(false);
 
-  private userSubscription?: Subscription;
+  // Computed signal - automatically updates when currentUser changes
+  readonly currentUser = computed(() => {
+    const user = this.authService.currentUser();
+    return user ? {
+      name: user.username,
+      handle: '@' + user.username
+    } : {
+      name: 'Guest',
+      handle: '@guest'
+    };
+  });
 
-  comments = [
+  readonly comments = signal([
     { author: 'Alice', text: 'Nice post!', time: '2h ago' },
     { author: 'Bob', text: 'Very helpful, thanks.', time: '1h ago' }
-  ];
-
-  constructor(
-    public authService: AuthService,
-    private router: Router,
-    private notificationService: NotificationService
-  ) { }
-
-  ngOnInit() {
-    this.userSubscription = this.authService.currentUser$.subscribe({
-      next: (user) => {
-        if (user) {
-          this.currentUser = {
-            name: user.username,
-            handle: '@' + user.username
-          };
-        } else {
-          this.currentUser = {
-            name: 'Guest',
-            handle: '@guest'
-          };
-        }
-      }
-    });
-  }
-
-  ngOnDestroy() {
-    this.userSubscription?.unsubscribe();
-  }
+  ]);
 
   private requireLogin(): boolean {
     if (!this.authService.isLoggedIn()) {
@@ -71,11 +53,11 @@ export class Home implements OnInit, OnDestroy {
   onSharePost() {
     if (!this.requireLogin()) return;
 
-    const content = this.newPostContent.trim();
+    const content = this.newPostContent().trim();
     if (!content) return;
 
     console.log('Share post:', content);
-    this.newPostContent = '';
+    this.newPostContent.set('');
   }
 
   onLike() {
@@ -83,22 +65,21 @@ export class Home implements OnInit, OnDestroy {
       this.notificationService.info('Please log in to like posts');
       return;
     }
-    this.isLiked = !this.isLiked;
-    console.log('Like clicked, liked =', this.isLiked);
+    this.isLiked.update(liked => !liked);
   }
 
-  onComment() {
-    this.showComments = !this.showComments;
+  toggleComments() {
+    this.showComments.update(show => !show);
   }
 
   onSubmitComment() {
     if (!this.requireLogin()) return;
 
-    const content = this.newComment.trim();
+    const content = this.newComment().trim();
     if (!content) return;
 
     console.log('New comment:', content);
-    this.newComment = '';
+    this.newComment.set('');
   }
 
   onProfileClick() {
@@ -106,11 +87,11 @@ export class Home implements OnInit, OnDestroy {
       this.router.navigate(['/login']);
       return;
     }
-    this.showUserMenu = !this.showUserMenu;
+    this.showUserMenu.update(show => !show);
   }
 
   onLogout() {
     this.authService.logout();
-    this.showUserMenu = false;
+    this.showUserMenu.set(false);
   }
 }

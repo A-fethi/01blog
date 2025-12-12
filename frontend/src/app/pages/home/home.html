@@ -1,169 +1,180 @@
-<!-- Top Navigation Bar -->
-<header class="top-nav">
-  <div class="nav-left">
-    <div class="logo">01</div>
-    <div class="search-bar">
-      <i class="icon"><mat-icon>search</mat-icon></i>
-      <input type="text" placeholder="Search 01Blog">
+<!-- Loading Overlay - Shows while auth is loading -->
+<div class="loading-overlay" *ngIf="authService.isLoading()">
+  <div class="loading-spinner">
+    <mat-icon class="spinner-icon">refresh</mat-icon>
+    <p>Loading...</p>
+  </div>
+</div>
+
+<!-- Main Content - Only shown when not loading -->
+<div class="main-content" *ngIf="!authService.isLoading()">
+  <!-- Top Navigation Bar -->
+  <header class="top-nav">
+    <div class="nav-left">
+      <div class="logo">01</div>
+      <div class="search-bar">
+        <i class="icon"><mat-icon>search</mat-icon></i>
+        <input type="text" placeholder="Search 01Blog">
+      </div>
     </div>
-  </div>
 
-  <div class="nav-center">
-    <a href="#" class="nav-tab active" title="Feed">
-      <i class="icon"><mat-icon color="red">home</mat-icon></i>
-    </a>
-    <a href="#" class="nav-tab" title="Notifications" *ngIf="authService.isLoggedIn()">
-      <i class="icon"><mat-icon>notifications</mat-icon></i>
-    </a>
-    <a href="#" class="nav-tab" title="Messages" *ngIf="authService.isLoggedIn()">
-      <i class="icon"><mat-icon>question_answer</mat-icon></i>
-    </a>
-  </div>
+    <div class="nav-center">
+      <a href="#" class="nav-tab active" title="Feed">
+        <i class="icon"><mat-icon color="red">home</mat-icon></i>
+      </a>
+      <a href="#" class="nav-tab" title="Notifications" *ngIf="authService.isLoggedIn()">
+        <i class="icon"><mat-icon>notifications</mat-icon></i>
+      </a>
+      <a href="#" class="nav-tab" title="Messages" *ngIf="authService.isLoggedIn()">
+        <i class="icon"><mat-icon>question_answer</mat-icon></i>
+      </a>
+    </div>
 
-  <div class="nav-right">
-    <!-- Logged-in: avatar icon + dropdown -->
-    <button class="user-menu-btn" *ngIf="authService.isLoggedIn(); else loggedOutButton" (click)="onProfileClick()">
-      <mat-icon>account_box</mat-icon>
-    </button>
-
-    <!-- Not logged in: Login / Sign up button -->
-    <ng-template #loggedOutButton>
-      <button class="user-menu-btn" (click)="onProfileClick()">
-        Login / Sign up
+    <div class="nav-right">
+      <!-- Logged-in: avatar icon + dropdown -->
+      <button class="user-menu-btn" *ngIf="authService.isLoggedIn(); else loggedOutButton" (click)="onProfileClick()">
+        <mat-icon>account_box</mat-icon>
       </button>
-    </ng-template>
 
-    <!-- User menu panel (only when logged in) -->
-    <div class="user-menu-panel" *ngIf="authService.isLoggedIn() && showUserMenu">
-      <button class="user-menu-item">Profile</button>
-      <button class="user-menu-item" (click)="onLogout()">Logout</button>
-    </div>
-  </div>
-</header>
-
-<div class="home-container">
-  <!-- Left Sidebar: Navigation & Profile -->
-  <aside class="sidebar left-sidebar">
-    <div class="profile-card">
-      <img>
-      <div class="profile-info">
-        <h3>{{currentUser.name}}</h3>
-        <p>{{currentUser.handle}}</p>
-      </div>
-    </div>
-
-    <nav class="main-nav">
-      <a href="#" class="nav-item active">
-        <i class="icon"><mat-icon>home</mat-icon></i> Feed
-      </a>
-      <a href="#" class="nav-item">
-        <i class="icon"><mat-icon>account_circle</mat-icon></i> My Block
-      </a>
-      <a href="#" class="nav-item">
-        <i class="icon"><mat-icon>diversity_3</mat-icon></i> Subscriptions
-      </a>
-      <a href="#" class="nav-item">
-        <i class="icon"><mat-icon>settings</mat-icon></i> Settings
-      </a>
-      <a routerLink="/admin" class="nav-item admin-link" *ngIf="authService.isLoggedIn() && authService.IsAdmin()">
-        <i class="icon"><mat-icon>admin_panel_settings</mat-icon></i> Admin Panel
-      </a>
-    </nav>
-  </aside>
-
-  <!-- Center Column: Feed -->
-  <main class="feed-container">
-    <!-- Create Post Widget -->
-    <div class="create-post-card">
-      <div class="create-post-top">
-        <img>
-        <input type="text"
-          [placeholder]="authService.isLoggedIn() ? 'Share your learning journey' : 'You must log in to post'"
-          [(ngModel)]="newPostContent" [disabled]="!authService.isLoggedIn()" />
-        <button class="share-post-btn" (click)="onSharePost()">Share</button>
-      </div>
-      <div class="create-post-actions">
-        <button class="action-btn">
-          <i class="icon"><mat-icon>add_photo_alternate</mat-icon></i> Media
+      <!-- Not logged in: Login / Sign up button -->
+      <ng-template #loggedOutButton>
+        <button class="user-menu-btn" (click)="onProfileClick()">
+          Login / Sign up
         </button>
+      </ng-template>
+
+      <!-- User menu panel (only when logged in) -->
+      <div class="user-menu-panel" *ngIf="authService.isLoggedIn() && showUserMenu()">
+        <button class="user-menu-item">Profile</button>
+        <button class="user-menu-item" (click)="onLogout()">Logout</button>
       </div>
     </div>
+  </header>
 
-    <!-- Posts Feed -->
-    <div class="posts-list">
-      <div class="post-card">
-        <div class="post-header">
-          <img class="user-avatar-small">
-          <div class="post-meta">
-            <h4>author name</h4>
-            <span class="timestamp">time</span>
-          </div>
-          <button class="more-options"><mat-icon>more_horiz</mat-icon></button>
+  <div class="home-container">
+    <!-- Left Sidebar: Navigation & Profile -->
+    <aside class="sidebar left-sidebar">
+      <div class="profile-card">
+        <img>
+        <div class="profile-info">
+          <h3>{{currentUser().name}}</h3>
+          <p>{{currentUser().handle}}</p>
         </div>
+      </div>
 
-        <div class="post-content">
-          <p>content</p>
+      <nav class="main-nav">
+        <a href="#" class="nav-item active">
+          <i class="icon"><mat-icon>home</mat-icon></i> Feed
+        </a>
+        <a href="#" class="nav-item">
+          <i class="icon"><mat-icon>account_circle</mat-icon></i> My Block
+        </a>
+        <a href="#" class="nav-item">
+          <i class="icon"><mat-icon>diversity_3</mat-icon></i> Subscriptions
+        </a>
+        <a href="#" class="nav-item">
+          <i class="icon"><mat-icon>settings</mat-icon></i> Settings
+        </a>
+        <a routerLink="/admin" class="nav-item admin-link" *ngIf="authService.isLoggedIn() && authService.isAdmin()">
+          <i class="icon"><mat-icon>admin_panel_settings</mat-icon></i> Admin Panel
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Center Column: Feed -->
+    <main class="feed-container">
+      <!-- Create Post Widget -->
+      <div class="create-post-card">
+        <div class="create-post-top">
+          <img>
+          <input type="text"
+            [placeholder]="authService.isLoggedIn() ? 'Share your learning journey' : 'You must log in to post'"
+            [(ngModel)]="newPostContent" [disabled]="!authService.isLoggedIn()" />
+          <button class="share-post-btn" (click)="onSharePost()">Share</button>
         </div>
-
-        <div class="post-stats">
-          <span>Likes</span>
-          <span>Comments</span>
-        </div>
-
-        <div class="post-actions">
-          <button class="action-btn" (click)="onLike()">
-            <i class="icon">
-              <mat-icon *ngIf="!isLiked">favorite_border</mat-icon>
-              <mat-icon *ngIf="isLiked">favorite</mat-icon>
-            </i>
-            Like
+        <div class="create-post-actions">
+          <button class="action-btn">
+            <i class="icon"><mat-icon>add_photo_alternate</mat-icon></i> Media
           </button>
-          <button class="action-btn" (click)="onComment()">
-            <i class="icon"><mat-icon>comment</mat-icon></i> Comment
-          </button>
         </div>
+      </div>
 
-        <!-- Comments section (visible to everyone) -->
-        <div class="comments-section" *ngIf="showComments">
-          <div class="comment-item" *ngFor="let c of comments">
-            <div class="comment-author">{{ c.author }}</div>
-            <div class="comment-text">{{ c.text }}</div>
-            <div class="comment-time">{{ c.time }}</div>
+      <!-- Posts Feed -->
+      <div class="posts-list">
+        <div class="post-card">
+          <div class="post-header">
+            <img class="user-avatar-small">
+            <div class="post-meta">
+              <h4>author name</h4>
+              <span class="timestamp">time</span>
+            </div>
+            <button class="more-options"><mat-icon>more_horiz</mat-icon></button>
           </div>
 
-          <!-- Comment input only for logged-in users -->
-          <div class="add-comment" *ngIf="authService.isLoggedIn(); else loginToComment">
-            <input type="text" placeholder="Write a comment..." [(ngModel)]="newComment" />
-            <button class="comment-submit-btn" (click)="onSubmitComment()">
-              Comment
+          <div class="post-content">
+            <p>content</p>
+          </div>
+
+          <div class="post-stats">
+            <span>Likes</span>
+            <span>Comments</span>
+          </div>
+
+          <div class="post-actions">
+            <button class="action-btn" (click)="onLike()">
+              <i class="icon">
+                <mat-icon *ngIf="!isLiked()">favorite_border</mat-icon>
+                <mat-icon *ngIf="isLiked()">favorite</mat-icon>
+              </i>
+              Like
+            </button>
+            <button class="action-btn" (click)="toggleComments()">
+              <i class="icon"><mat-icon>comment</mat-icon></i> Comment
             </button>
           </div>
 
-          <!-- Message for guests -->
-          <ng-template #loginToComment>
-            <div class="login-to-comment">
-              Log in to add a comment.
+          <!-- Comments section (visible to everyone) -->
+          <div class="comments-section" *ngIf="showComments()">
+            <div class="comment-item" *ngFor="let c of comments()">
+              <div class="comment-author">{{ c.author }}</div>
+              <div class="comment-text">{{ c.text }}</div>
+              <div class="comment-time">{{ c.time }}</div>
             </div>
-          </ng-template>
-        </div>
-      </div>
-    </div>
-  </main>
 
-  <!-- Right Sidebar: Suggestions -->
-  <aside class="sidebar right-sidebar">
-    <div class="suggestions-container">
-      <h3>Who to follow</h3>
-      <div class="suggestion-list">
-        <div class="suggestion-item">
-          <img>
-          <div class="suggestion-info">
-            <h4>suggestion.name</h4>
-            <p>suggestion.handle</p>
+            <!-- Comment input only for logged-in users -->
+            <div class="add-comment" *ngIf="authService.isLoggedIn(); else loginToComment">
+              <input type="text" placeholder="Write a comment..." [(ngModel)]="newComment" />
+              <button class="comment-submit-btn" (click)="onSubmitComment()">
+                Comment
+              </button>
+            </div>
+
+            <!-- Message for guests -->
+            <ng-template #loginToComment>
+              <div class="login-to-comment">
+                Log in to add a comment.
+              </div>
+            </ng-template>
           </div>
-          <button class="follow-btn">Follow</button>
         </div>
       </div>
-    </div>
-  </aside>
+    </main>
+
+    <!-- Right Sidebar: Suggestions -->
+    <aside class="sidebar right-sidebar">
+      <div class="suggestions-container">
+        <h3>Who to follow</h3>
+        <div class="suggestion-list">
+          <div class="suggestion-item">
+            <img>
+            <div class="suggestion-info">
+              <h4>suggestion.name</h4>
+              <p>suggestion.handle</p>
+            </div>
+            <button class="follow-btn">Follow</button>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
 </div>

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, signal, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
@@ -12,40 +12,37 @@ import { NotificationService } from '../../services/notification.service';
   styleUrl: './login.css',
 })
 export class Login {
-  username = '';
-  password = '';
-  loading = false;
-  error: string | null = null;
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
+  private readonly notificationService = inject(NotificationService);
 
-  constructor(
-    private authService: AuthService,
-    private router: Router,
-    private notificationService: NotificationService
-  ) {}
+  readonly username = signal('');
+  readonly password = signal('');
+  readonly loading = signal(false);
+  readonly error = signal<string | null>(null);
 
   onSubmit() {
-    this.loading = true;
-    this.error = null;
+    this.loading.set(true);
+    this.error.set(null);
 
     this.authService.login({
-      username: this.username,
-      password: this.password,
+      username: this.username(),
+      password: this.password(),
     }).subscribe({
       next: () => {
-        this.loading = false;
+        this.loading.set(false);
         this.notificationService.success('Logged in successfully');
         this.router.navigate(['/']);
       },
       error: (err) => {
-        this.loading = false;
-        // Backend returns: { "error": "Invalid username or password" }
-        // Fallback to a generic message if the shape changes.
-        this.error =
+        this.loading.set(false);
+        const errorMsg =
           err?.error?.message ||
           err?.error?.error ||
           'Invalid username or password';
 
-        this.notificationService.error(this.error);
+        this.error.set(errorMsg);
+        this.notificationService.error(errorMsg);
       },
     });
   }
