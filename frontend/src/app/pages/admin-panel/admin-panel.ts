@@ -70,7 +70,6 @@ export class AdminPanelComponent {
         this.adminService.getDashboardStats().subscribe({
             next: stats => this.stats.set(stats),
             error: err => {
-                console.error('Failed to load stats:', err);
                 this.notificationService.error('Failed to load dashboard statistics');
             }
         });
@@ -81,7 +80,6 @@ export class AdminPanelComponent {
                 this.isLoading.set(false);
             },
             error: err => {
-                console.error('Failed to load users:', err);
                 this.notificationService.error('Failed to load users');
                 this.isLoading.set(false);
             }
@@ -108,7 +106,6 @@ export class AdminPanelComponent {
                 this.loadDashboardData();
             },
             error: err => {
-                console.error('Failed to delete user:', err);
                 this.notificationService.error(err.error?.error || 'Failed to delete user');
             }
         });
@@ -125,7 +122,6 @@ export class AdminPanelComponent {
                 this.loadDashboardData();
             },
             error: err => {
-                console.error('Failed to ban user:', err);
                 this.notificationService.error('Failed to ban user');
             }
         });

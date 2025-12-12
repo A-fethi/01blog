@@ -1,6 +1,7 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
+import { NotificationService } from './notification.service';
 
 // Interfaces
 export interface LoginRequest {
@@ -25,16 +26,18 @@ export interface UserDTO {
     username: string;
     email: string;
     role: string;
+    createdAt?: string;
 }
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
     private readonly http = inject(HttpClient);
+    private readonly notificationService = inject(NotificationService);
     private readonly baseUrl = 'http://localhost:8080/api/auth';
 
     // Signals - Angular 21's recommended reactive primitive
     readonly currentUser = signal<UserDTO | null>(null);
-    readonly isLoading = signal<boolean>(false);  // NEW: Track loading state
+    readonly isLoading = signal<boolean>(false);
     readonly isLoggedIn = computed(() => !!this.currentUser());
     readonly isAdmin = computed(() => this.currentUser()?.role === 'ADMIN');
     readonly token = signal<string | null>(this.getStoredToken());
@@ -71,16 +74,16 @@ export class AuthService {
     }
 
     private loadCurrentUser(): void {
-        this.isLoading.set(true);  // Start loading
+        this.isLoading.set(true);
         this.http.get<UserDTO>(`${this.baseUrl}/me`).subscribe({
             next: user => {
                 this.currentUser.set(user);
-                this.isLoading.set(false);  // Done loading
+                this.isLoading.set(false);
             },
             error: err => {
-                console.error('Failed to load user:', err);
+                this.notificationService.error('Session expired. Please log in again.');
                 this.logout();
-                this.isLoading.set(false);  // Done loading (with error)
+                this.isLoading.set(false);
             }
         });
     }
