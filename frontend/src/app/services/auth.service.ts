@@ -26,6 +26,7 @@ export interface UserDTO {
     username: string;
     email: string;
     role: string;
+    avatarUrl?: string;
     createdAt?: string;
 }
 
@@ -59,8 +60,8 @@ export class AuthService {
         );
     }
 
-    register(payload: RegisterRequest): Observable<RegisterRequest> {
-        return this.http.post<RegisterRequest>(`${this.baseUrl}/register`, payload);
+    register(payload: any): Observable<any> {
+        return this.http.post(`${this.baseUrl}/register`, payload);
     }
 
     logout(): void {

@@ -1,4 +1,22 @@
 /* --- Loading Overlay --- */
+.avatar-placeholder {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.avatar-placeholder mat-icon {
+  font-size: 40px;
+  width: 40px;
+  height: 40px;
+  color: #757575;
+}
+
 .loading-overlay {
   position: fixed;
   top: 0;
@@ -28,6 +46,7 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
@@ -39,6 +58,7 @@
   color: #65676b;
   font-weight: 500;
 }
+
 :host {
   display: block;
   min-height: 100vh;
@@ -193,6 +213,7 @@ mat-icon {
   background-color: #f0f2f5;
   border-radius: 8px;
 }
+
 :host {
   display: block;
   min-height: 100vh;

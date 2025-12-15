@@ -45,7 +45,7 @@
 
       <!-- User menu panel (only when logged in) -->
       <div class="user-menu-panel" *ngIf="authService.isLoggedIn() && showUserMenu()">
-        <button class="user-menu-item">Profile</button>
+        <button class="user-menu-item" [routerLink]="['/block']">My Block</button>
         <button class="user-menu-item" (click)="onLogout()">Logout</button>
       </div>
     </div>
@@ -55,7 +55,10 @@
     <!-- Left Sidebar: Navigation & Profile -->
     <aside class="sidebar left-sidebar">
       <div class="profile-card">
-        <img>
+        <img *ngIf="currentUser().avatarUrl" [src]="currentUser().avatarUrl" class="avatar">
+        <div *ngIf="!currentUser().avatarUrl" class="avatar-placeholder">
+          <mat-icon>account_circle</mat-icon>
+        </div>
         <div class="profile-info">
           <h3>{{currentUser().name}}</h3>
           <p>{{currentUser().handle}}</p>
@@ -66,7 +69,7 @@
         <a href="#" class="nav-item active">
           <i class="icon"><mat-icon>home</mat-icon></i> Feed
         </a>
-        <a href="#" class="nav-item">
+        <a href="/block" class="nav-item">
           <i class="icon"><mat-icon>account_circle</mat-icon></i> My Block
         </a>
         <a href="#" class="nav-item">
@@ -86,10 +89,15 @@
       <!-- Create Post Widget -->
       <div class="create-post-card">
         <div class="create-post-top">
-          <img>
+          <img *ngIf="currentUser().avatarUrl" [src]="currentUser().avatarUrl" class="avatar">
+          <div *ngIf="!currentUser().avatarUrl" class="avatar-placeholder">
+            <mat-icon>account_circle</mat-icon>
+          </div>
+          <!-- <img [src]="currentUser().avatarUrl || 'assets/default-avatar.png'" class="user-avatar-small"> -->
           <input type="text"
             [placeholder]="authService.isLoggedIn() ? 'Share your learning journey' : 'You must log in to post'"
-            [(ngModel)]="newPostContent" [disabled]="!authService.isLoggedIn()" />
+            [ngModel]="newPostContent()" (ngModelChange)="newPostContent.set($event)"
+            [disabled]="!authService.isLoggedIn()" />
           <button class="share-post-btn" (click)="onSharePost()">Share</button>
         </div>
         <div class="create-post-actions">
@@ -101,50 +109,61 @@
 
       <!-- Posts Feed -->
       <div class="posts-list">
-        <div class="post-card">
+        <div *ngIf="loading()" class="loading-feed">
+          <mat-icon class="spin">refresh</mat-icon> Loading feed...
+        </div>
+
+        <div class="post-card" *ngFor="let post of posts()">
           <div class="post-header">
-            <img class="user-avatar-small">
+            <img *ngIf="currentUser().avatarUrl" [src]="currentUser().avatarUrl" class="avatar">
+            <div *ngIf="!currentUser().avatarUrl" class="avatar-placeholder">
+              <mat-icon>account_circle</mat-icon>
+            </div>
             <div class="post-meta">
-              <h4>author name</h4>
-              <span class="timestamp">time</span>
+              <h4>{{post.author?.username}}</h4>
+              <span class="timestamp">{{post.createdAt | date:'short'}}</span>
             </div>
             <button class="more-options"><mat-icon>more_horiz</mat-icon></button>
           </div>
 
           <div class="post-content">
-            <p>content</p>
+            <p>{{post.content}}</p>
+            <div *ngIf="post.mediaUrl" class="post-media">
+              <img *ngIf="post.mediaType === 'IMAGE'" [src]="post.mediaUrl">
+              <video *ngIf="post.mediaType === 'VIDEO'" [src]="post.mediaUrl" controls></video>
+            </div>
           </div>
 
           <div class="post-stats">
-            <span>Likes</span>
-            <span>Comments</span>
+            <span>{{post.likeCount || 0}} Likes</span>
+            <span>{{post.commentCount || 0}} Comments</span>
           </div>
 
           <div class="post-actions">
-            <button class="action-btn" (click)="onLike()">
+            <button class="action-btn" (click)="onLike(post)" [class.liked]="post.isLiked">
               <i class="icon">
-                <mat-icon *ngIf="!isLiked()">favorite_border</mat-icon>
-                <mat-icon *ngIf="isLiked()">favorite</mat-icon>
+                <mat-icon>{{post.isLiked ? 'favorite' : 'favorite_border'}}</mat-icon>
               </i>
               Like
             </button>
-            <button class="action-btn" (click)="toggleComments()">
+            <button class="action-btn" (click)="toggleComments(post.id)">
               <i class="icon"><mat-icon>comment</mat-icon></i> Comment
             </button>
           </div>
 
           <!-- Comments section (visible to everyone) -->
-          <div class="comments-section" *ngIf="showComments()">
-            <div class="comment-item" *ngFor="let c of comments()">
-              <div class="comment-author">{{ c.author }}</div>
-              <div class="comment-text">{{ c.text }}</div>
-              <div class="comment-time">{{ c.time }}</div>
+          <div class="comments-section" *ngIf="showComments().has(post.id)">
+            <div class="comment-item" *ngFor="let c of post.comments">
+              <div class="comment-author">{{ c.commentUsername }}</div>
+              <div class="comment-text">{{ c.content }}</div>
+              <div class="comment-time">{{ c.createdAt | date:'short' }}</div>
             </div>
 
             <!-- Comment input only for logged-in users -->
             <div class="add-comment" *ngIf="authService.isLoggedIn(); else loginToComment">
-              <input type="text" placeholder="Write a comment..." [(ngModel)]="newComment" />
-              <button class="comment-submit-btn" (click)="onSubmitComment()">
+              <input type="text" placeholder="Write a comment..." [ngModel]="getCommentInput(post.id)"
+                (ngModelChange)="setCommentInput(post.id, $event)" (keyup.enter)="onSubmitComment(post.id)" />
+              <button class="comment-submit-btn" (click)="onSubmitComment(post.id)">
                 Comment
               </button>
             </div>
@@ -165,13 +184,9 @@
       <div class="suggestions-container">
         <h3>Who to follow</h3>
         <div class="suggestion-list">
+          <!-- TODO: Implement suggestions -->
           <div class="suggestion-item">
-            <img>
-            <div class="suggestion-info">
-              <h4>suggestion.name</h4>
-              <p>suggestion.handle</p>
-            </div>
-            <button class="follow-btn">Follow</button>
+            <p>Suggestions coming soon...</p>
           </div>
         </div>
       </div>
