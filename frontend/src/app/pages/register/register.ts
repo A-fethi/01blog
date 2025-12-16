@@ -16,6 +16,7 @@ export class Register {
     username = '';
     email = '';
     password = '';
+    selectedFile: File | null = null;
     loading = false;
     error: string | null = null;
 
@@ -25,15 +26,23 @@ export class Register {
       private notificationService: NotificationService
     ) {}
 
+    onFileSelected(event: any) {
+      this.selectedFile = event.target.files[0] ?? null;
+    }
+
     onSubmit() {
         this.loading = true;
         this.error = null;
 
-        this.authService.register({
-            username: this.username,
-            email: this.email,
-            password: this.password,
-        }).subscribe({
+        const formData = new FormData();
+        formData.append('username', this.username);
+        formData.append('email', this.email);
+        formData.append('password', this.password);
+        if (this.selectedFile) {
+            formData.append('avatar', this.selectedFile);
+        }
+
+        this.authService.register(formData).subscribe({
             next: () => {
                 this.loading = false;
                 this.notificationService.success('Account created successfully. You can now log in.');

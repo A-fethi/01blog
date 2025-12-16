@@ -22,11 +22,8 @@
       <a href="#" class="nav-tab active" title="Feed">
         <i class="icon"><mat-icon color="red">home</mat-icon></i>
       </a>
-      <a href="#" class="nav-tab" title="Notifications" *ngIf="authService.isLoggedIn()">
+      <a href="/notifications" class="nav-tab" title="Notifications" *ngIf="authService.isLoggedIn()">
         <i class="icon"><mat-icon>notifications</mat-icon></i>
-      </a>
-      <a href="#" class="nav-tab" title="Messages" *ngIf="authService.isLoggedIn()">
-        <i class="icon"><mat-icon>question_answer</mat-icon></i>
       </a>
     </div>
 
@@ -74,9 +71,6 @@
         </a>
         <a href="#" class="nav-item">
           <i class="icon"><mat-icon>diversity_3</mat-icon></i> Subscriptions
-        </a>
-        <a href="#" class="nav-item">
-          <i class="icon"><mat-icon>settings</mat-icon></i> Settings
         </a>
         <a routerLink="/admin" class="nav-item admin-link" *ngIf="authService.isLoggedIn() && authService.isAdmin()">
           <i class="icon"><mat-icon>admin_panel_settings</mat-icon></i> Admin Panel

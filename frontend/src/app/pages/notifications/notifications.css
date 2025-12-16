@@ -1,0 +1,38 @@
+.layout {
+  height: 100vh;
+}
+
+.sidenav {
+  width: 240px;
+  padding: 1rem;
+}
+
+.logo {
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.active {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.spacer {
+  flex: 1;
+}
+
+.notifications {
+  padding: 1rem;
+}
+
+.time {
+  font-size: 0.8rem;
+  color: gray;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  background: #ff9800;
+  border-radius: 50%;
+  margin-left: auto;
+}

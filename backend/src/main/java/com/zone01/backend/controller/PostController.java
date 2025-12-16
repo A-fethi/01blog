@@ -1,7 +1,6 @@
 package com.zone01.backend.controller;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,18 +33,22 @@ public class PostController {
     }
 
     @GetMapping
-    public ResponseEntity<List<PostDTO>> getAllPosts() {
-        List<PostDTO> posts = postService.getAllPosts()
-                .stream()
-                .map(PostDTO::new)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(posts);
+    public ResponseEntity<List<PostDTO>> getAllPosts(@AuthenticationPrincipal AppUserDetails auth) {
+        User currentUser = (auth != null) ? auth.getUser() : null;
+        return ResponseEntity.ok(postService.getAllPostsDTO(currentUser));
+    }
+
+    @GetMapping("/user/{username}")
+    public ResponseEntity<List<PostDTO>> getPostsByUsername(@PathVariable String username,
+            @AuthenticationPrincipal AppUserDetails auth) {
+        User currentUser = (auth != null) ? auth.getUser() : null;
+        return ResponseEntity.ok(postService.getPostsByUsername(username, currentUser));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PostDTO> getPostById(@PathVariable Long id) {
-        Post post = postService.getPostById(id);
-        return ResponseEntity.ok(new PostDTO(post));
+    public ResponseEntity<PostDTO> getPostById(@PathVariable Long id, @AuthenticationPrincipal AppUserDetails auth) {
+        User currentUser = (auth != null) ? auth.getUser() : null;
+        return ResponseEntity.ok(postService.getPostDetails(id, currentUser));
     }
 
     @PostMapping
@@ -63,13 +66,13 @@ public class PostController {
     }
 
     @PutMapping("/{postId}")
-        public ResponseEntity<PostDTO> updatePost(
-                @PathVariable Long postId,
-                @Valid @RequestBody PostDTO postDTO,
-                @AuthenticationPrincipal AppUserDetails auth) {
-            User loggedUser = auth.getUser();
-            return ResponseEntity.ok(new PostDTO(postService.updatePost(postId, loggedUser, postDTO)));
-            }
+    public ResponseEntity<PostDTO> updatePost(
+            @PathVariable Long postId,
+            @Valid @RequestBody PostDTO postDTO,
+            @AuthenticationPrincipal AppUserDetails auth) {
+        User loggedUser = auth.getUser();
+        return ResponseEntity.ok(new PostDTO(postService.updatePost(postId, loggedUser, postDTO)));
+    }
 
     @DeleteMapping("/{postId}")
     public ResponseEntity<PostDTO> deletePost(

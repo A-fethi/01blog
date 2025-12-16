@@ -2,7 +2,8 @@ import { Routes } from '@angular/router';
 import { Register } from './pages/register/register';
 import { Login } from './pages/login/login';
 import { Home } from './pages/home/home';
-import { AdminPanelComponent } from './pages/admin-panel/admin-panel';
+import { AdminPanel } from './pages/admin-panel/admin-panel';
+import { Notifications } from './pages/notifications/notifications';
 
 export const routes: Routes = [
     {
@@ -24,6 +25,10 @@ export const routes: Routes = [
     },
     {
         path: 'admin',
-        component: AdminPanelComponent
+        component: AdminPanel
+    },
+    {
+        path: 'notifications',
+        component: Notifications
     }
 ];

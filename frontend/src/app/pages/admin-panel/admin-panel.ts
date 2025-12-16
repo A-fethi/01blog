@@ -13,7 +13,7 @@ import { NotificationService } from '../../services/notification.service';
     templateUrl: './admin-panel.html',
     styleUrl: './admin-panel.css'
 })
-export class AdminPanelComponent {
+export class AdminPanel {
     private readonly adminService = inject(AdminService);
     readonly authService = inject(AuthService);  // Changed from private to public
     private readonly router = inject(Router);

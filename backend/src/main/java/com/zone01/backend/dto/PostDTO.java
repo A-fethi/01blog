@@ -46,9 +46,16 @@ public class PostDTO {
         this.updateAt = post.getUpdatedAt();
     }
 
+    private boolean isLiked;
+
     public PostDTO withCounts(long likes, long comments) {
         this.likeCount = likes;
         this.commentCount = comments;
+        return this;
+    }
+
+    public PostDTO withIsLiked(boolean isLiked) {
+        this.isLiked = isLiked;
         return this;
     }
 }

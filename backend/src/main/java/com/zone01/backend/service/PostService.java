@@ -114,10 +114,17 @@ public class PostService {
         return postRepository.countByAuthorId(userId);
     }
 
-    public List<PostDTO> getPostsByUsername(String username) {
+    public List<PostDTO> getPostsByUsername(String username, User currentUser) {
         return postRepository.findByAuthorUsernameOrderByCreatedAtDesc(username)
                 .stream()
-                .map(this::toDto)
+                .map(post -> toDto(post, currentUser))
+                .collect(Collectors.toList());
+    }
+
+    public List<PostDTO> getAllPostsDTO(User currentUser) {
+        return postRepository.findAllByOrderByCreatedAtDesc()
+                .stream()
+                .map(post -> toDto(post, currentUser))
                 .collect(Collectors.toList());
     }
 
@@ -128,7 +135,7 @@ public class PostService {
         }
         return postRepository.findByAuthorIdInOrderByCreatedAtDesc(followedIds)
                 .stream()
-                .map(this::toDto)
+                .map(post -> toDto(post, user))
                 .collect(Collectors.toList());
     }
 
@@ -137,18 +144,19 @@ public class PostService {
                 .orElseThrow(() -> new PostNotFoundException(id));
     }
 
-    public PostDTO getPostDetails(Long id) {
-        return toDto(getPostById(id));
+    public PostDTO getPostDetails(Long id, User currentUser) {
+        return toDto(getPostById(id), currentUser);
     }
 
-    private PostDTO toDto(Post post) {
+    private PostDTO toDto(Post post, User currentUser) {
         long likes = likeRepository.countByPostId(post.getId());
         long comments = commentRepository.countByPostId(post.getId());
+        boolean isLiked = currentUser != null && likeRepository.existsByUserAndPost(currentUser, post);
         PostDTO postDTO = new PostDTO(post);
         if (postDTO.getMediaType() == null && postDTO.getMediaUrl() != null) {
             postDTO.setMediaType(guessMediaType(postDTO.getMediaUrl()));
         }
-        return postDTO.withCounts(likes, comments);
+        return postDTO.withCounts(likes, comments).withIsLiked(isLiked);
     }
 
     private MediaType guessMediaType(String mediaUrl) {
