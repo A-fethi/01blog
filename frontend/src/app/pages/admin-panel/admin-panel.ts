@@ -1,7 +1,7 @@
 import { Component, signal, computed, effect, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { AdminService, UserDTO, AdminStats } from '../../services/admin.service';
 import { AuthService } from '../../services/auth.service';
 import { NotificationService } from '../../services/notification.service';
@@ -9,7 +9,7 @@ import { NotificationService } from '../../services/notification.service';
 @Component({
     selector: 'app-admin-panel',
     standalone: true,
-    imports: [CommonModule, MatIconModule],
+    imports: [CommonModule, MatIconModule, RouterModule],
     templateUrl: './admin-panel.html',
     styleUrl: './admin-panel.css'
 })

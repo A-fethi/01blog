@@ -1,10 +1,12 @@
-import { Component } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { RouterModule } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 interface Notification {
   icon: string;
@@ -23,11 +25,14 @@ interface Notification {
     MatButtonModule,
     MatSidenavModule,
     MatToolbarModule,
+    RouterModule
   ],
   templateUrl: './notifications.html',
   styleUrl: './notifications.css',
 })
 export class Notifications {
+  authService = inject(AuthService);
+
   notifications: Notification[] = [
     {
       icon: 'chat',

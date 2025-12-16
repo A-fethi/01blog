@@ -1,189 +1,121 @@
-<!-- Loading Overlay - Shows while auth is loading -->
-<div class="loading-overlay" *ngIf="authService.isLoading()">
-    <div class="loading-spinner">
-        <mat-icon class="spinner-icon">refresh</mat-icon>
-        <p>Loading...</p>
+<div class="admin-dashboard">
+    <div class="content-header" style="margin-bottom: 24px;">
+        <h1 style="font-size: 24px; font-weight: 700; margin: 0;">Admin Dashboard</h1>
     </div>
-</div>
-
-<!-- Main Content - Only shown when not loading -->
-<div class="main-content" *ngIf="!authService.isLoading()">
-    <!-- Admin Dashboard Header -->
-    <header class="admin-header">
-        <div class="header-content">
-            <div class="header-left">
-                <button class="back-btn" (click)="goBack()">
-                    <mat-icon>arrow_back</mat-icon>
-                </button>
-                <h1>Admin Dashboard</h1>
-            </div>
-            <div class="header-right">
-                <mat-icon>admin_panel_settings</mat-icon>
-            </div>
-        </div>
-    </header>
 
     <!-- Stats Cards -->
-    <section class="stats-section">
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-icon users">
-                    <mat-icon>people</mat-icon>
-                </div>
-                <div class="stat-info">
-                    <h3>{{ stats().totalUsers }}</h3>
-                    <p>Total Users</p>
-                </div>
+    <section class="stats-section"
+        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+        <div class="stat-card">
+            <div class="stat-icon users">
+                <mat-icon>people</mat-icon>
             </div>
-
-            <div class="stat-card">
-                <div class="stat-icon posts">
-                    <mat-icon>article</mat-icon>
-                </div>
-                <div class="stat-info">
-                    <h3>{{ stats().totalPosts || 0 }}</h3>
-                    <p>Total Posts</p>
-                </div>
+            <div class="stat-info">
+                <h3>{{ stats().totalUsers }}</h3>
+                <p>Total Users</p>
             </div>
+        </div>
 
-            <div class="stat-card">
-                <div class="stat-icon reports">
-                    <mat-icon>flag</mat-icon>
-                </div>
-                <div class="stat-info">
-                    <h3>{{ stats().totalReports || 0 }}</h3>
-                    <p>Reports</p>
-                </div>
+        <div class="stat-card">
+            <div class="stat-icon posts">
+                <mat-icon>article</mat-icon>
             </div>
+            <div class="stat-info">
+                <h3>{{ stats().totalPosts || 0 }}</h3>
+                <p>Total Posts</p>
+            </div>
+        </div>
 
-            <div class="stat-card">
-                <div class="stat-icon active">
-                    <mat-icon>verified_user</mat-icon>
-                </div>
-                <div class="stat-info">
-                    <h3>{{ stats().regularUsers }}</h3>
-                    <p>Regular Users</p>
-                </div>
+        <div class="stat-card">
+            <div class="stat-icon reports">
+                <mat-icon>flag</mat-icon>
+            </div>
+            <div class="stat-info">
+                <h3>{{ stats().totalReports || 0 }}</h3>
+                <p>Reports</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon active">
+                <mat-icon>verified_user</mat-icon>
+            </div>
+            <div class="stat-info">
+                <h3>{{ stats().regularUsers }}</h3>
+                <p>Regular Users</p>
             </div>
         </div>
     </section>
 
-    <!-- Main Content -->
-    <main class="admin-main">
-        <!-- Tabs Navigation -->
-        <div class="tabs-container">
-            <button class="tab-btn" [class.active]="activeTab() === 'users'" (click)="setActiveTab('users')">
-                <mat-icon>people</mat-icon>
-                Users
-            </button>
-            <button class="tab-btn" [class.active]="activeTab() === 'posts'" (click)="setActiveTab('posts')">
-                <mat-icon>article</mat-icon>
-                Posts
-            </button>
-            <button class="tab-btn" [class.active]="activeTab() === 'reports'" (click)="setActiveTab('reports')">
-                <mat-icon>flag</mat-icon>
-                Reports
-            </button>
-        </div>
+    <!-- Tabs Navigation -->
+    <div class="tabs-container" style="border-bottom: 1px solid #e4e6eb; margin-bottom: 16px;">
+        <button class="tab-btn" [class.active]="activeTab() === 'users'" (click)="setActiveTab('users')">
+            <mat-icon>people</mat-icon> Users
+        </button>
+        <button class="tab-btn" [class.active]="activeTab() === 'posts'" (click)="setActiveTab('posts')">
+            <mat-icon>article</mat-icon> Posts
+        </button>
+        <button class="tab-btn" [class.active]="activeTab() === 'reports'" (click)="setActiveTab('reports')">
+            <mat-icon>flag</mat-icon> Reports
+        </button>
+    </div>
 
-        <!-- Search Bar -->
-        <div class="search-container">
-            <mat-icon>search</mat-icon>
-            <input type="text" placeholder="Search users by name or email..." (input)="onSearch($event)"
-                [value]="searchQuery()" />
-        </div>
-
-        <!-- Users Tab Content -->
-        <div class="tab-content" *ngIf="activeTab() === 'users'">
-            <div class="content-header">
-                <h2>User Management</h2>
-                <p>Manage all registered users</p>
-            </div>
-
-            <div class="loading-spinner" *ngIf="isLoading()">
-                <mat-icon class="spinning">refresh</mat-icon>
-                <p>Loading users...</p>
-            </div>
-
-            <div class="users-table" *ngIf="!isLoading()">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Username</th>
-                            <th>Email</th>
-                            <th>Role</th>
-                            <th>Joined</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr *ngFor="let user of filteredUsers()">
-                            <td>{{ user.id }}</td>
-                            <td>
-                                <div class="user-cell">
-                                    <div class="user-avatar">
-                                        {{ user.username.charAt(0).toUpperCase() }}
-                                    </div>
-                                    <span>{{ user.username }}</span>
+    <!-- Users Tab Content -->
+    <div class="tab-content" *ngIf="activeTab() === 'users'">
+        <div class="users-table-container"
+            style="background: white; border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); overflow: hidden;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead style="background-color: #f0f2f5; border-bottom: 1px solid #e4e6eb;">
+                    <tr>
+                        <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: #65676b;">User</th>
+                        <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: #65676b;">Email</th>
+                        <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: #65676b;">Role</th>
+                        <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: #65676b;">Joined</th>
+                        <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: #65676b;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let user of filteredUsers()" style="border-bottom: 1px solid #e4e6eb;">
+                        <td style="padding: 12px 16px;">
+                            <div style="display: flex; align-items: center;">
+                                <div class="user-avatar"
+                                    style="width: 32px; height: 32px; background: #e4e6eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px; font-weight: bold;">
+                                    {{ user.username.charAt(0).toUpperCase() }}
                                 </div>
-                            </td>
-                            <td>{{ user.email }}</td>
-                            <td>
-                                <span class="role-badge" [class.admin]="user.role === 'ADMIN'">
-                                    {{ user.role }}
-                                </span>
-                            </td>
-                            <td>{{ formatDate(user.createdAt) }}</td>
-                            <td>
-                                <div class="action-buttons">
-                                    <button class="action-btn ban-btn" (click)="banUser(user.id, user.username)"
-                                        [disabled]="user.role === 'ADMIN'" title="Ban User">
-                                        <mat-icon>block</mat-icon>
-                                    </button>
-                                    <button class="action-btn delete-btn" (click)="deleteUser(user.id, user.username)"
-                                        [disabled]="user.role === 'ADMIN'" title="Delete User">
-                                        <mat-icon>delete</mat-icon>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <div class="empty-state" *ngIf="filteredUsers().length === 0">
-                    <mat-icon>search_off</mat-icon>
-                    <p>No users found</p>
-                </div>
-            </div>
+                                <span style="font-weight: 600;">{{ user.username }}</span>
+                            </div>
+                        </td>
+                        <td style="padding: 12px 16px;">{{ user.email }}</td>
+                        <td style="padding: 12px 16px;">
+                            <span class="role-badge" [class.admin]="user.role === 'ADMIN'">
+                                {{ user.role }}
+                            </span>
+                        </td>
+                        <td style="padding: 12px 16px;">{{ formatDate(user.createdAt) }}</td>
+                        <td style="padding: 12px 16px;">
+                            <div class="action-buttons" style="display: flex; gap: 8px;">
+                                <button class="action-btn ban-btn" (click)="banUser(user.id, user.username)"
+                                    [disabled]="user.role === 'ADMIN'">
+                                    <mat-icon>block</mat-icon>
+                                </button>
+                                <button class="action-btn delete-btn" (click)="deleteUser(user.id, user.username)"
+                                    [disabled]="user.role === 'ADMIN'">
+                                    <mat-icon>delete</mat-icon>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
+    </div>
 
-        <!-- Posts Tab Content -->
-        <div class="tab-content" *ngIf="activeTab() === 'posts'">
-            <div class="content-header">
-                <h2>Post Management</h2>
-                <p>Manage all posts and content</p>
-            </div>
-
-            <div class="coming-soon">
-                <mat-icon>construction</mat-icon>
-                <h3>Coming Soon</h3>
-                <p>Post management features will be available soon</p>
-            </div>
+    <!-- Other Tabs -->
+    <div class="tab-content" *ngIf="activeTab() === 'posts' || activeTab() === 'reports'">
+        <div class="coming-soon" style="text-align: center; padding: 48px;">
+            <mat-icon style="font-size: 48px; width: 48px; height: 48px; color: #65676b;">construction</mat-icon>
+            <h3 style="margin-top: 16px; color: #65676b;">Coming Soon</h3>
         </div>
+    </div>
 
-        <!-- Reports Tab Content -->
-        <div class="tab-content" *ngIf="activeTab() === 'reports'">
-            <div class="content-header">
-                <h2>Reports Management</h2>
-                <p>Review and handle user reports</p>
-            </div>
-
-            <div class="coming-soon">
-                <mat-icon>construction</mat-icon>
-                <h3>Coming Soon</h3>
-                <p>Report management features will be available soon</p>
-            </div>
-        </div>
-    </main>
 </div>

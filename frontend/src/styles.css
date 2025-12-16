@@ -1,4 +1,282 @@
 /* You can add global styles to this file, and also import other style files */
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Helvetica, Arial, sans-serif;
+  background-color: #f0f2f5;
+  color: #050505;
+}
+
+/* --- Top Navigation Bar --- */
+.top-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 56px;
+  background-color: white;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 16px;
+  z-index: 100;
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+  min-width: 280px;
+}
+
+.logo {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(to bottom, #1877f2, #1877f2);
+  border-radius: 50%;
+  color: white;
+  font-size: 28px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 16px;
+  cursor: pointer;
+}
+
+.search-bar {
+  background-color: #f0f2f5;
+  border-radius: 20px;
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  width: 240px;
+}
+
+.search-bar input {
+  border: none;
+  background: transparent;
+  outline: none;
+  margin-left: 8px;
+  font-size: 15px;
+  width: 100%;
+}
+
+.nav-center {
+  display: flex;
+  gap: 8px;
+  height: 100%;
+}
+
+.nav-tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 110px;
+  height: 100%;
+  border-bottom: 3px solid transparent;
+  color: #65676b;
+  font-size: 24px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+
+.nav-tab:hover {
+  background-color: #f0f2f5;
+  border-radius: 8px;
+}
+
+.nav-tab.active {
+  color: #1877f2;
+  border-bottom-color: #1877f2;
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 280px;
+  gap: 8px;
+  position: relative;
+}
+
+/* --- Layout Containers --- */
+.main-layout {
+  display: flex;
+  justify-content: space-between;
+  max-width: 1920px;
+  margin: 0 auto;
+  padding-top: 76px;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.sidebar {
+  width: 280px;
+  padding: 0 16px;
+  height: calc(100vh - 76px);
+  overflow-y: auto;
+  position: sticky;
+  top: 76px;
+}
+
+.left-sidebar {
+  min-width: 280px;
+}
+
+.right-sidebar {
+  min-width: 280px;
+}
+
+.feed-container {
+  flex-grow: 1;
+  max-width: 900px;
+  padding: 0 32px;
+  overflow-y: auto;
+  height: calc(100vh - 76px);
+  scrollbar-width: none;
+}
+
+.feed-container::-webkit-scrollbar {
+  display: none;
+}
+
+/* --- Components --- */
+.profile-card {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.profile-card:hover {
+  background-color: #e4e6eb;
+}
+
+.profile-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  margin-right: 12px;
+}
+
+.profile-info h3 {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.profile-info p {
+  font-size: 13px;
+  color: #65676b;
+  margin: 0;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 10px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #050505;
+  font-weight: 600;
+  font-size: 15px;
+  transition: background-color 0.2s;
+  margin-bottom: 4px;
+}
+
+.nav-item:hover {
+  background-color: #e4e6eb;
+}
+
+.nav-item.active {
+  color: #1877f2;
+  background-color: #e7f3ff;
+}
+
+.nav-item.active .icon mat-icon {
+  color: #1877f2;
+}
+
+.nav-item .icon {
+  margin-right: 12px;
+  font-size: 20px;
+  width: 36px;
+  text-align: center;
+}
+
+/* --- Icon Colors --- */
+/* Default Icon Color */
+.icon mat-icon,
+mat-icon {
+  color: #65676b;
+  font-size: 24px;
+  transition: color 0.2s ease;
+}
+
+/* Navigation Icons */
+.nav-item:nth-child(1) .icon mat-icon {
+  color: #1877f2;
+}
+
+/* Feed - Blue */
+.nav-item:nth-child(2) .icon mat-icon {
+  color: #2196f3;
+}
+
+/* My Block - Light Blue */
+.nav-item:nth-child(3) .icon mat-icon {
+  color: #009688;
+}
+
+/* Subscriptions - Teal */
+.nav-item.admin-link .icon mat-icon {
+  color: #673ab7;
+}
+
+/* Admin - Purple */
+
+/* Top Nav Icons */
+.nav-tab.active .icon mat-icon {
+  color: #1877f2;
+}
+
+/* --- Responsive --- */
+@media (max-width: 1100px) {
+  .main-layout {
+    justify-content: center;
+  }
+
+  .right-sidebar {
+    display: none;
+  }
+
+  .nav-center {
+    display: none;
+  }
+
+  .nav-left,
+  .nav-right {
+    min-width: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .left-sidebar {
+    display: none;
+  }
+
+  .feed-container {
+    padding: 0 10px;
+    width: 100%;
+    max-width: 100%;
+  }
+}
