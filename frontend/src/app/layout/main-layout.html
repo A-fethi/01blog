@@ -87,13 +87,55 @@
             <router-outlet></router-outlet>
         </main>
 
-        <!-- Right Sidebar: Suggestions -->
+        <!-- Right Sidebar: Suggestions & Following -->
         <aside class="sidebar right-sidebar">
             <div class="suggestions-container">
-                <h3>Who to follow</h3>
-                <div class="suggestion-list">
-                    <div class="suggestion-item">
-                        <p>Suggestions coming soon...</p>
+                <!-- Suggestions Section -->
+                <div class="sidebar-section">
+                    <h3>Who to follow</h3>
+                    <div class="scrollable-list">
+                        <div class="user-suggestion-card" *ngFor="let user of suggestedUsers()">
+                            <div class="user-info" (click)="viewUserProfile(user.username)">
+                                <img *ngIf="user.avatarUrl" [src]="user.avatarUrl" class="suggestion-avatar">
+                                <div *ngIf="!user.avatarUrl" class="suggestion-avatar-placeholder">
+                                    <mat-icon>account_circle</mat-icon>
+                                </div>
+                                <div class="suggestion-details">
+                                    <h4>{{ user.username }}</h4>
+                                    <p>@{{ user.username }}</p>
+                                </div>
+                            </div>
+                            <button class="suggestion-follow-btn" [class.following]="isUserFollowed(user.id)"
+                                (click)="onFollowSuggestedUser(user)">
+                                {{ isUserFollowed(user.id) ? 'Unfollow' : 'Follow' }}
+                            </button>
+                        </div>
+
+                        <div *ngIf="suggestedUsers().length === 0" class="no-suggestions">
+                            <p>No suggestions available</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Following Section -->
+                <div class="sidebar-section" *ngIf="followingUsers().length > 0">
+                    <h3>Following</h3>
+                    <div class="scrollable-list">
+                        <div class="user-suggestion-card" *ngFor="let user of followingUsers()">
+                            <div class="user-info" (click)="viewUserProfile(user.username)">
+                                <img *ngIf="user.avatarUrl" [src]="user.avatarUrl" class="suggestion-avatar">
+                                <div *ngIf="!user.avatarUrl" class="suggestion-avatar-placeholder">
+                                    <mat-icon>account_circle</mat-icon>
+                                </div>
+                                <div class="suggestion-details">
+                                    <h4>{{ user.username }}</h4>
+                                    <p>@{{ user.username }}</p>
+                                </div>
+                            </div>
+                            <button class="suggestion-follow-btn following" (click)="onFollowSuggestedUser(user)">
+                                Unfollow
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -9,10 +9,13 @@ export interface PostDTO {
   mediaUrl?: string;
   mediaType?: string;
   createdAt: string;
-  author: any;
+  authorId: number;
+  authorUsername: string;
+  authorAvatarUrl?: string;
   likesCount: number;
   commentsCount: number;
   comments?: any[];
+  isLiked?: boolean;
 }
 
 @Injectable({ providedIn: 'root' })

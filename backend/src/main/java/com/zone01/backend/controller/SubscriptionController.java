@@ -75,4 +75,24 @@ public class SubscriptionController {
         long count = subscriptionService.countSubscribers(user);
         return ResponseEntity.ok(Map.of("count", count));
     }
+
+    @GetMapping("/{username}/followers-list")
+    public ResponseEntity<List<SubscriptionDTO>> getFollowers(@PathVariable String username) {
+        User user = userService.requireByUsername(username);
+        List<SubscriptionDTO> followers = subscriptionService.getSubscribers(user)
+                .stream()
+                .map(SubscriptionDTO::new)
+                .toList();
+        return ResponseEntity.ok(followers);
+    }
+
+    @GetMapping("/{username}/following-list")
+    public ResponseEntity<List<SubscriptionDTO>> getFollowing(@PathVariable String username) {
+        User user = userService.requireByUsername(username);
+        List<SubscriptionDTO> following = subscriptionService.getSubscriptions(user)
+                .stream()
+                .map(SubscriptionDTO::new)
+                .toList();
+        return ResponseEntity.ok(following);
+    }
 }

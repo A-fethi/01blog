@@ -1,1 +1,147 @@
-<p>block works!</p>
+<div class="block-container">
+    <!-- Loading State -->
+    <div *ngIf="loading()" class="loading-state">
+        <mat-icon class="spin">refresh</mat-icon>
+        <p>Loading profile...</p>
+    </div>
+
+    <!-- Profile Content -->
+    <div *ngIf="!loading() && profileUser()" class="profile-content">
+        <!-- Profile Header -->
+        <div class="profile-header">
+            <div class="cover-photo"></div>
+            <div class="profile-info-section">
+                <div class="avatar-container">
+                    <img *ngIf="profileUser()?.avatarUrl" [src]="profileUser()!.avatarUrl" class="profile-avatar">
+                    <div *ngIf="!profileUser()?.avatarUrl" class="profile-avatar-placeholder">
+                        <mat-icon>account_circle</mat-icon>
+                    </div>
+                </div>
+
+                <div class="user-details">
+                    <h1 class="username">{{ profileUser()?.username }}</h1>
+                    <p class="user-handle">@{{ profileUser()?.username }}</p>
+                    <p class="user-email" *ngIf="isOwnProfile()">{{ profileUser()?.email }}</p>
+                    <p class="join-date">
+                        <mat-icon>calendar_today</mat-icon>
+                        Joined {{ profileUser()?.createdAt | date:'MMMM yyyy' }}
+                    </p>
+                </div>
+
+                <!-- Follow Button (only for other users' profiles) -->
+                <div class="profile-actions" *ngIf="!isOwnProfile() && authService.isLoggedIn()">
+                    <button class="follow-btn" [class.following]="isFollowing()" (click)="onFollowToggle()">
+                        <mat-icon>{{ isFollowing() ? 'person_remove' : 'person_add' }}</mat-icon>
+                        {{ isFollowing() ? 'Unfollow' : 'Follow' }}
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="profile-stats">
+                <div class="stat-item">
+                    <span class="stat-value">{{ postsCount() }}</span>
+                    <span class="stat-label">Posts</span>
+                </div>
+                <div class="stat-item clickable" (click)="openFollowersModal()">
+                    <span class="stat-value">{{ followersCount() }}</span>
+                    <span class="stat-label">Followers</span>
+                </div>
+                <div class="stat-item clickable" (click)="openFollowingModal()">
+                    <span class="stat-value">{{ followingCount() }}</span>
+                    <span class="stat-label">Following</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Single Column Layout (Posts Only) -->
+        <div class="content-grid single-column">
+            <!-- Posts Section -->
+            <div class="posts-section">
+                <h2 class="section-title">
+                    <mat-icon>article</mat-icon>
+                    Posts
+                </h2>
+
+                <div *ngIf="userPosts().length === 0" class="no-posts">
+                    <mat-icon>post_add</mat-icon>
+                    <p>{{ isOwnProfile() ? 'You haven\'t posted anything yet' : 'No posts yet' }}</p>
+                </div>
+
+                <!-- Posts List -->
+                <div class="post-card" *ngFor="let post of userPosts()">
+                    <div class="post-header">
+                        <img *ngIf="profileUser()?.avatarUrl" [src]="profileUser()!.avatarUrl" class="avatar">
+                        <div *ngIf="!profileUser()?.avatarUrl" class="avatar-placeholder">
+                            <mat-icon>account_circle</mat-icon>
+                        </div>
+                        <div class="post-meta">
+                            <h4>{{ profileUser()?.username }}</h4>
+                            <span class="timestamp">{{ post.createdAt | date:'short' }}</span>
+                        </div>
+                        <button class="more-options">
+                            <mat-icon>more_horiz</mat-icon>
+                        </button>
+                    </div>
+
+                    <div class="post-content">
+                        <p>{{ post.content }}</p>
+                        <div *ngIf="post.mediaUrl" class="post-media">
+                            <img *ngIf="post.mediaType === 'IMAGE'" [src]="post.mediaUrl">
+                            <video *ngIf="post.mediaType === 'VIDEO'" [src]="post.mediaUrl" controls></video>
+                        </div>
+                    </div>
+
+                    <div class="post-stats">
+                        <span>{{ post.likesCount || 0 }} Likes</span>
+                        <span>{{ post.commentsCount || 0 }} Comments</span>
+                    </div>
+
+                    <div class="post-actions">
+                        <button class="action-btn" (click)="onLike(post)" [class.liked]="post.isLiked">
+                            <i class="icon">
+                                <mat-icon>{{ post.isLiked ? 'favorite' : 'favorite_border' }}</mat-icon>
+                            </i>
+                            Like
+                        </button>
+                        <button class="action-btn" (click)="toggleComments(post.id)">
+                            <i class="icon">
+                                <mat-icon>comment</mat-icon>
+                            </i>
+                            Comment
+                        </button>
+                    </div>
+
+                    <!-- Comments Section -->
+                    <div class="comments-section" *ngIf="showComments().has(post.id)">
+                        <div class="comment-item" *ngFor="let c of post.comments">
+                            <div class="comment-author">{{ c.commentUsername }}</div>
+                            <div class="comment-text">{{ c.content }}</div>
+                            <div class="comment-time">{{ c.createdAt | date:'short' }}</div>
+                        </div>
+
+                        <!-- Comment Input -->
+                        <div class="add-comment" *ngIf="authService.isLoggedIn(); else loginToComment">
+                            <input type="text" placeholder="Write a comment..." [ngModel]="getCommentInput(post.id)"
+                                (ngModelChange)="setCommentInput(post.id, $event)"
+                                (keyup.enter)="onSubmitComment(post.id)" />
+                            <button class="comment-submit-btn" (click)="onSubmitComment(post.id)">
+                                Comment
+                            </button>
+                        </div>
+
+                        <ng-template #loginToComment>
+                            <div class="login-to-comment">
+                                Log in to add a comment.
+                            </div>
+                        </ng-template>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User List Modal -->
+    <app-user-list-modal *ngIf="showModal()" [title]="modalTitle()" [users]="modalUsers()" (close)="closeModal()">
+    </app-user-list-modal>
+</div>

@@ -147,6 +147,16 @@
   font-weight: 600;
 }
 
+.clickable-username {
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.clickable-username:hover {
+  color: #1877f2;
+  text-decoration: underline;
+}
+
 .post-meta .timestamp {
   font-size: 13px;
   color: #65676b;
@@ -290,4 +300,14 @@
 
 .spin {
   animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }

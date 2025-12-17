@@ -38,7 +38,8 @@ public class LikeController {
     }
 
     @DeleteMapping("/post/{postId}")
-    public ResponseEntity<Map<String, String>> unlikePost(@PathVariable Long postId, @AuthenticationPrincipal AppUserDetails auth) {
+    public ResponseEntity<Map<String, String>> unlikePost(@PathVariable Long postId,
+            @AuthenticationPrincipal AppUserDetails auth) {
         User currentUser = auth.getUser();
         likeService.unlikePost(postId, currentUser);
 

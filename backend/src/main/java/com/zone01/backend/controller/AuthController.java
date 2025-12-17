@@ -38,12 +38,15 @@ public class AuthController {
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
     private final UserDetailsService userDetailsService;
+    private final com.zone01.backend.service.FileStorageService fileStorageService;
 
-    public AuthController(UserService userService, JwtUtil jwtUtil, AuthenticationManager authenticationManager, UserDetailsService userDetailsService) {
+    public AuthController(UserService userService, JwtUtil jwtUtil, AuthenticationManager authenticationManager,
+            UserDetailsService userDetailsService, com.zone01.backend.service.FileStorageService fileStorageService) {
         this.userService = userService;
         this.jwtUtil = jwtUtil;
         this.authenticationManager = authenticationManager;
         this.userDetailsService = userDetailsService;
+        this.fileStorageService = fileStorageService;
     }
 
     @GetMapping("/register")
@@ -51,8 +54,22 @@ public class AuthController {
         return ResponseEntity.ok("User Registered Successfully");
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<UserDTO> register(@RequestBody RegisterDTO registerDTO) {
+    @PostMapping(value = "/register", consumes = { "multipart/form-data" })
+    public ResponseEntity<UserDTO> register(
+            @RequestParam("username") String username,
+            @RequestParam("email") String email,
+            @RequestParam("password") String password,
+            @RequestParam(value = "avatar", required = false) org.springframework.web.multipart.MultipartFile avatar) {
+
+        String avatarUrl = null;
+        if (avatar != null && !avatar.isEmpty()) {
+            String fileName = fileStorageService.storeFile(avatar);
+            // Assuming the server runs on localhost:8080. In production, use a property or
+            // dynamic builder.
+            avatarUrl = "http://localhost:8080/uploads/" + fileName;
+        }
+
+        RegisterDTO registerDTO = new RegisterDTO(username, email, password, avatarUrl);
         User user = userService.registerUser(registerDTO);
         UserDTO userDTO = new UserDTO(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(userDTO);
@@ -70,14 +87,11 @@ public class AuthController {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             loginDTO.getUsername(),
-                            loginDTO.getPassword()
-                    )
-            );
+                            loginDTO.getPassword()));
 
             // 2. Load user details
             UserDetails userDetails = userDetailsService.loadUserByUsername(
-                    loginDTO.getUsername()
-            );
+                    loginDTO.getUsername());
 
             // 3. Generate JWT token
             String token = jwtUtil.generateToken(userDetails);
@@ -112,10 +126,9 @@ public class AuthController {
 
     @PostMapping("/validate")
     public ResponseEntity<Map<String, Boolean>> validateToken(
-        @RequestHeader("Authorization") String authHeader
-    ) {
+            @RequestHeader("Authorization") String authHeader) {
         Map<String, Boolean> response = new HashMap<>();
-        
+
         try {
             if (authHeader != null && authHeader.startsWith("Bearer ")) {
                 String token = authHeader.substring(7);

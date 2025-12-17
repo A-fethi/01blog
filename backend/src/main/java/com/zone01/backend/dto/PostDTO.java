@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import com.zone01.backend.entity.MediaType;
 import com.zone01.backend.entity.Post;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -28,10 +29,11 @@ public class PostDTO {
     private String mediaUrl;
     private String mediaPreviewUrl;
     private MediaType mediaType;
-    private Long likeCount;
-    private Long commentCount;
+    private Long likesCount;
+    private Long commentsCount;
     private LocalDateTime createdAt;
     private LocalDateTime updateAt;
+    private String authorAvatarUrl;
 
     public PostDTO(Post post) {
         this.id = post.getId();
@@ -44,13 +46,15 @@ public class PostDTO {
         this.mediaType = post.getMediaType();
         this.createdAt = post.getCreatedAt();
         this.updateAt = post.getUpdatedAt();
+        this.authorAvatarUrl = post.getAuthor().getAvatarUrl();
     }
 
+    @JsonProperty("isLiked")
     private boolean isLiked;
 
     public PostDTO withCounts(long likes, long comments) {
-        this.likeCount = likes;
-        this.commentCount = comments;
+        this.likesCount = likes;
+        this.commentsCount = comments;
         return this;
     }
 

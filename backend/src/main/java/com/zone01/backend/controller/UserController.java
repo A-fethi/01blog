@@ -44,6 +44,13 @@ public class UserController {
         return ResponseEntity.ok(userDTO);
     }
 
+    @GetMapping("/username/{username}")
+    public ResponseEntity<UserDTO> getUserByUsername(@PathVariable String username) {
+        User user = userService.requireByUsername(username);
+        UserDTO userDTO = new UserDTO(user);
+        return ResponseEntity.ok(userDTO);
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Map<String, String>> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
