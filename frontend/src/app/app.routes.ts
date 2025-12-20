@@ -5,6 +5,7 @@ import { Home } from './pages/home/home';
 import { AdminPanel } from './pages/admin-panel/admin-panel';
 import { Notifications } from './pages/notifications/notifications';
 import { Block } from './pages/block/block';
+import { Subscriptions } from './pages/subscriptions/subscriptions';
 import { MainLayout } from './layout/main-layout';
 
 export const routes: Routes = [
@@ -36,6 +37,10 @@ export const routes: Routes = [
             {
                 path: 'block/:username',
                 component: Block
+            },
+            {
+                path: 'subscriptions',
+                component: Subscriptions
             }
         ]
     },

@@ -1,0 +1,70 @@
+<div class="posts-list">
+    <div *ngIf="loading()" class="loading-feed">
+        <mat-icon class="spin">refresh</mat-icon> Loading feed...
+    </div>
+
+    <div *ngIf="!loading() && posts().length === 0" class="empty-state">
+        <mat-icon>rss_feed</mat-icon>
+        <h3>No posts from followed users</h3>
+        <p>Follow some users to see their posts here!</p>
+    </div>
+
+    <div class="post-card" *ngFor="let post of posts()">
+        <div class="post-header">
+            <img *ngIf="post.authorAvatarUrl" [src]="post.authorAvatarUrl" class="avatar">
+            <div *ngIf="!post.authorAvatarUrl" class="avatar-placeholder">
+                <mat-icon>account_circle</mat-icon>
+            </div>
+            <div class="post-meta">
+                <h4 class="clickable-username" [routerLink]="['/block', post.authorUsername]">
+                    {{post.authorUsername}}
+                </h4>
+                <span class="timestamp">{{post.createdAt | date:'short'}}</span>
+            </div>
+            <button class="more-options"><mat-icon>more_horiz</mat-icon></button>
+        </div>
+
+        <div class="post-content">
+            <p>{{post.content}}</p>
+            <div *ngIf="post.mediaUrl" class="post-media">
+                <img *ngIf="post.mediaType === 'IMAGE'" [src]="post.mediaUrl">
+                <video *ngIf="post.mediaType === 'VIDEO'" [src]="post.mediaUrl" controls></video>
+            </div>
+        </div>
+
+        <div class="post-stats">
+            <span>{{post.likesCount || 0}} Likes</span>
+            <span>{{post.commentsCount || 0}} Comments</span>
+        </div>
+
+        <div class="post-actions">
+            <button class="action-btn" (click)="onLike(post)" [class.liked]="post.isLiked">
+                <i class="icon">
+                    <mat-icon>{{post.isLiked ? 'favorite' : 'favorite_border'}}</mat-icon>
+                </i>
+                Like
+            </button>
+            <button class="action-btn" (click)="toggleComments(post.id)">
+                <i class="icon"><mat-icon>comment</mat-icon></i> Comment
+            </button>
+        </div>
+
+        <!-- Comments section -->
+        <div class="comments-section" *ngIf="showComments().has(post.id)">
+            <div class="comment-item" *ngFor="let c of post.comments">
+                <div class="comment-author">{{ c.commentUsername }}</div>
+                <div class="comment-text">{{ c.content }}</div>
+                <div class="comment-time">{{ c.createdAt | date:'short' }}</div>
+            </div>
+
+            <div class="add-comment">
+                <input type="text" placeholder="Write a comment..." [ngModel]="getCommentInput(post.id)"
+                    (ngModelChange)="setCommentInput(post.id, $event)" (keyup.enter)="onSubmitComment(post.id)" />
+                <button class="comment-submit-btn" (click)="onSubmitComment(post.id)">
+                    Comment
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
