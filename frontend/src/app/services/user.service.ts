@@ -62,4 +62,8 @@ export class UserService {
     getSuggestedUsers(limit: number = 5): Observable<UserDTO[]> {
         return this.http.get<UserDTO[]>(`${this.baseUrl}?limit=${limit}`);
     }
+
+    updateProfile(formData: FormData): Observable<UserDTO> {
+        return this.http.put<UserDTO>(`${this.baseUrl}/profile`, formData);
+    }
 }

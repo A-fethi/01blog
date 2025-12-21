@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.zone01.backend.dto.PostDTO;
@@ -19,6 +20,7 @@ import com.zone01.backend.entity.Post;
 import com.zone01.backend.entity.User;
 import com.zone01.backend.security.AppUserDetails;
 import com.zone01.backend.service.PostService;
+import com.zone01.backend.service.FileStorageService;
 
 import jakarta.validation.Valid;
 
@@ -27,9 +29,11 @@ import jakarta.validation.Valid;
 public class PostController {
 
     private final PostService postService;
+    private final FileStorageService fileStorageService;
 
-    public PostController(PostService postService) {
+    public PostController(PostService postService, FileStorageService fileStorageService) {
         this.postService = postService;
+        this.fileStorageService = fileStorageService;
     }
 
     @GetMapping
@@ -51,9 +55,11 @@ public class PostController {
         return ResponseEntity.ok(postService.getPostDetails(id, currentUser));
     }
 
-    @PostMapping
+    @PostMapping(consumes = { "multipart/form-data" })
     public ResponseEntity<PostDTO> createPost(
-            @Valid @RequestBody PostDTO postDTO,
+            @RequestParam("title") String title,
+            @RequestParam("content") String content,
+            @RequestParam(value = "file", required = false) org.springframework.web.multipart.MultipartFile file,
             @AuthenticationPrincipal AppUserDetails auth) {
 
         if (auth == null || auth.getUser() == null) {
@@ -61,16 +67,38 @@ public class PostController {
         }
 
         User loggedUser = auth.getUser();
+
+        PostDTO postDTO = new PostDTO();
+        postDTO.setTitle(title);
+        postDTO.setContent(content);
+
+        if (file != null && !file.isEmpty()) {
+            String fileName = fileStorageService.storeFile(file);
+            postDTO.setMediaUrl("http://localhost:8080/uploads/" + fileName);
+        }
+
         Post newPost = postService.createPost(loggedUser.getId(), postDTO);
         return ResponseEntity.ok(new PostDTO(newPost));
     }
 
-    @PutMapping("/{postId}")
+    @PutMapping(value = "/{postId}", consumes = { "multipart/form-data" })
     public ResponseEntity<PostDTO> updatePost(
             @PathVariable Long postId,
-            @Valid @RequestBody PostDTO postDTO,
+            @RequestParam("title") String title,
+            @RequestParam("content") String content,
+            @RequestParam(value = "file", required = false) org.springframework.web.multipart.MultipartFile file,
             @AuthenticationPrincipal AppUserDetails auth) {
+
         User loggedUser = auth.getUser();
+        PostDTO postDTO = new PostDTO();
+        postDTO.setTitle(title);
+        postDTO.setContent(content);
+
+        if (file != null && !file.isEmpty()) {
+            String fileName = fileStorageService.storeFile(file);
+            postDTO.setMediaUrl("http://localhost:8080/uploads/" + fileName);
+        }
+
         return ResponseEntity.ok(new PostDTO(postService.updatePost(postId, loggedUser, postDTO)));
     }
 

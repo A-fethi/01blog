@@ -5,6 +5,7 @@
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
     margin-bottom: 20px;
     padding-bottom: 4px;
+    position: relative;
 }
 
 .post-header {
@@ -39,6 +40,10 @@
     color: #65676b;
 }
 
+.post-actions-menu {
+    position: relative;
+}
+
 .more-options {
     background: none;
     border: none;
@@ -56,10 +61,49 @@
     background-color: #f0f2f5;
 }
 
+.menu-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    z-index: 10;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    min-width: 120px;
+}
+
+.menu-dropdown button {
+    background: none;
+    border: none;
+    padding: 8px 12px;
+    text-align: left;
+    cursor: pointer;
+    font-size: 14px;
+    border-radius: 4px;
+}
+
+.menu-dropdown button:hover {
+    background-color: #f0f2f5;
+}
+
+.menu-dropdown .delete-btn {
+    color: #e41e3f;
+}
+
 .post-content {
     padding: 4px 16px 16px;
     font-size: 15px;
     line-height: 1.4;
+}
+
+.post-title {
+    margin: 0 0 8px 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: #050505;
 }
 
 .post-media {
@@ -73,6 +117,49 @@
 .post-media video {
     width: 100%;
     display: block;
+}
+
+/* --- Edit Forms --- */
+.edit-post-form,
+.edit-comment-form {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.edit-post-form input,
+.edit-post-form textarea,
+.edit-comment-form textarea {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 14px;
+}
+
+.edit-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.edit-actions button {
+    padding: 6px 16px;
+    border-radius: 6px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.save-btn {
+    background-color: #1877f2;
+    color: white;
+}
+
+.cancel-btn {
+    background-color: #e4e6eb;
+    color: #050505;
 }
 
 .post-stats {
@@ -119,16 +206,6 @@
     color: #e41e3f;
 }
 
-/* Post Action Colors */
-.post-actions .action-btn:nth-child(1) .icon mat-icon {
-    color: #e41e3f;
-}
-
-/* Like Heart */
-.post-actions .action-btn:nth-child(2) .icon mat-icon {
-    color: #1877f2;
-}
-
 /* --- Comments Section --- */
 .comments-section {
     padding: 12px 16px 16px;
@@ -145,11 +222,34 @@
     border-bottom: none;
 }
 
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
 .comment-author {
     font-weight: 600;
     font-size: 14px;
     color: #050505;
-    margin-bottom: 4px;
+}
+
+.comment-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.comment-actions button {
+    background: none;
+    border: none;
+    color: #1877f2;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.comment-actions .delete-btn {
+    color: #e41e3f;
 }
 
 .comment-text {
@@ -171,7 +271,7 @@
 
 .add-comment input {
     flex-grow: 1;
-    padding: 8px 122px;
+    padding: 8px 12px;
     border-radius: 20px;
     border: 1px solid #ddd;
     background-color: #f0f2f5;
@@ -253,6 +353,7 @@
     height: 40px;
     border-radius: 50%;
     margin-right: 12px;
+    object-fit: cover;
 }
 
 .avatar-placeholder {

@@ -54,7 +54,13 @@ public class PostService {
         post.setContent(postDTO.getContent());
         post.setMediaUrl(postDTO.getMediaUrl());
         post.setMediaPreviewUrl(postDTO.getMediaPreviewUrl());
-        post.setMediaType(postDTO.getMediaType());
+
+        MediaType type = postDTO.getMediaType();
+        if (type == null && postDTO.getMediaUrl() != null) {
+            type = guessMediaType(postDTO.getMediaUrl());
+        }
+        post.setMediaType(type);
+
         post.setAuthor(author);
         post.setCreatedAt(LocalDateTime.now());
         post.setUpdatedAt(java.time.LocalDateTime.now());
@@ -75,9 +81,14 @@ public class PostService {
 
         post.setTitle(postDTO.getTitle());
         post.setContent(postDTO.getContent());
-        post.setMediaUrl(postDTO.getMediaUrl());
-        post.setMediaPreviewUrl(postDTO.getMediaPreviewUrl());
-        post.setMediaType(postDTO.getMediaType());
+        if (postDTO.getMediaUrl() != null) {
+            post.setMediaUrl(postDTO.getMediaUrl());
+            MediaType type = postDTO.getMediaType();
+            if (type == null) {
+                type = guessMediaType(postDTO.getMediaUrl());
+            }
+            post.setMediaType(type);
+        }
         post.setUpdatedAt(LocalDateTime.now());
 
         return postRepository.save(post);

@@ -43,7 +43,8 @@ public class UserService {
         }
 
         if (!ValidationUtil.isStrongPassword(registerDTO.getPassword())) {
-            throw new WeakPasswordException("Password must be at least 8 characters, include uppercase, lowercase, and a number");
+            throw new WeakPasswordException(
+                    "Password must be at least 8 characters, include uppercase, lowercase, and a number");
         }
 
         if (userRepository.existsByUsername(registerDTO.getUsername())) {
@@ -126,9 +127,27 @@ public class UserService {
     }
 
     @Transactional
-    public User updateProfile(Long userId, String avatarUrl) {
+    public User updateProfile(Long userId, String username, String email, String avatarUrl) {
         User user = requireById(userId);
-        user.setAvatarUrl(avatarUrl);
+
+        if (username != null && !username.equals(user.getUsername())) {
+            if (userRepository.existsByUsername(username)) {
+                throw new UsernameAlreadyExistsException(username);
+            }
+            user.setUsername(username);
+        }
+
+        if (email != null && !email.equals(user.getEmail())) {
+            if (userRepository.existsByEmail(email)) {
+                throw new EmailAlreadyExistsException(email);
+            }
+            user.setEmail(email);
+        }
+
+        if (avatarUrl != null) {
+            user.setAvatarUrl(avatarUrl);
+        }
+
         user.setUpdatedAt(LocalDateTime.now());
         return userRepository.save(user);
     }

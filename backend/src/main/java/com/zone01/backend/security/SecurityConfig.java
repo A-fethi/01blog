@@ -41,7 +41,8 @@ public class SecurityConfig {
                                 "/api/users/**",
                                 "/api/posts/**",
                                 "/api/comments/**",
-                                "/api/likes/**")
+                                "/api/likes/**",
+                                "/uploads/**")
                         .permitAll() // 👈 allow login/register
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated() // all others need authentication

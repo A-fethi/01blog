@@ -119,3 +119,8 @@
     </div>
 
 </div>
+
+<!-- Confirmation Modal -->
+<app-confirm-modal *ngIf="showConfirmModal()" [title]="confirmModalTitle()" [message]="confirmModalMessage()"
+    (confirm)="onConfirmAction()" (cancel)="onCancelConfirm()">
+</app-confirm-modal>

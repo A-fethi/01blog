@@ -8,16 +8,17 @@ import { PostService, PostDTO } from '../../services/post.service';
 import { UserService } from '../../services/user.service';
 import { NotificationService } from '../../services/notification.service';
 import { CommentService } from '../../services/comment.service';
+import { ConfirmModal } from '../../components/confirm-modal/confirm-modal';
 
 @Component({
   selector: 'app-subscriptions',
   standalone: true,
-  imports: [CommonModule, MatIconModule, RouterModule, FormsModule],
+  imports: [CommonModule, MatIconModule, RouterModule, FormsModule, ConfirmModal],
   templateUrl: './subscriptions.html',
   styleUrl: './subscriptions.css',
 })
 export class Subscriptions implements OnInit {
-  private readonly authService = inject(AuthService);
+  readonly authService = inject(AuthService);
   private readonly postService = inject(PostService);
   private readonly userService = inject(UserService);
   private readonly notificationService = inject(NotificationService);
@@ -27,6 +28,20 @@ export class Subscriptions implements OnInit {
   readonly loading = signal(false);
   readonly showComments = signal<Set<number>>(new Set());
   readonly commentInputs = signal<Map<number, string>>(new Map());
+
+  // Editing states
+  readonly editingPostId = signal<number | null>(null);
+  readonly editPostTitle = signal('');
+  readonly editPostContent = signal('');
+
+  readonly editingCommentId = signal<number | null>(null);
+  readonly editCommentContent = signal('');
+
+  // Confirmation Modal State
+  readonly showConfirmModal = signal(false);
+  readonly confirmModalTitle = signal('');
+  readonly confirmModalMessage = signal('');
+  private confirmAction: (() => void) | null = null;
 
   ngOnInit() {
     this.loadFollowedPosts();
@@ -39,12 +54,10 @@ export class Subscriptions implements OnInit {
 
     this.loading.set(true);
 
-    // Fetch subscriptions first
     this.userService.getMySubscriptions().subscribe({
       next: (subs) => {
         const followedIds = new Set(subs.map((s: any) => s.targetUser?.id || s.targetId));
 
-        // Then fetch all posts and filter
         this.postService.getAllPosts().subscribe({
           next: (allPosts) => {
             const filteredPosts = allPosts.filter(post => followedIds.has(post.authorId));
@@ -83,6 +96,48 @@ export class Subscriptions implements OnInit {
         this.posts.update(p => [...p]);
       });
     }
+  }
+
+  onEditPost(post: any) {
+    this.editingPostId.set(post.id);
+    this.editPostTitle.set(post.title || '');
+    this.editPostContent.set(post.content || '');
+  }
+
+  onCancelEditPost() {
+    this.editingPostId.set(null);
+  }
+
+  onUpdatePost() {
+    const postId = this.editingPostId();
+    if (!postId) return;
+    const formData = new FormData();
+    formData.append('title', this.editPostTitle());
+    formData.append('content', this.editPostContent());
+
+    this.postService.updatePost(postId, formData).subscribe({
+      next: (updatedPost) => {
+        this.posts.update(posts => posts.map(p => p.id === postId ? { ...p, ...updatedPost } : p));
+        this.editingPostId.set(null);
+        this.notificationService.success('Post updated!');
+      },
+      error: () => this.notificationService.error('Failed to update post')
+    });
+  }
+
+  onDeletePost(postId: number) {
+    this.confirmAction = () => {
+      this.postService.deletePost(postId).subscribe({
+        next: () => {
+          this.posts.update(posts => posts.filter(p => p.id !== postId));
+          this.notificationService.success('Post deleted!');
+        },
+        error: () => this.notificationService.error('Failed to delete post')
+      });
+    };
+    this.confirmModalTitle.set('Delete Post');
+    this.confirmModalMessage.set('Are you sure you want to delete this post? This action cannot be undone.');
+    this.showConfirmModal.set(true);
   }
 
   toggleComments(postId: number) {
@@ -137,5 +192,64 @@ export class Subscriptions implements OnInit {
         this.notificationService.success('Comment added!');
       }
     });
+  }
+
+  onEditComment(comment: any) {
+    this.editingCommentId.set(comment.id);
+    this.editCommentContent.set(comment.content);
+  }
+
+  onCancelEditComment() {
+    this.editingCommentId.set(null);
+  }
+
+  onUpdateComment(postId: number) {
+    const commentId = this.editingCommentId();
+    if (!commentId) return;
+    this.commentService.updateComment(commentId, this.editCommentContent()).subscribe({
+      next: (updatedComment) => {
+        const post = this.posts().find(p => p.id === postId);
+        if (post && post.comments) {
+          post.comments = post.comments.map((c: any) => c.id === commentId ? updatedComment : c);
+        }
+        this.editingCommentId.set(null);
+        this.posts.update(p => [...p]);
+        this.notificationService.success('Comment updated!');
+      },
+      error: () => this.notificationService.error('Failed to update comment')
+    });
+  }
+
+  onDeleteComment(postId: number, commentId: number) {
+    this.confirmAction = () => {
+      this.commentService.deleteComment(commentId).subscribe({
+        next: () => {
+          const post = this.posts().find(p => p.id === postId);
+          if (post && post.comments) {
+            post.comments = post.comments.filter((c: any) => c.id !== commentId);
+            post.commentsCount = (post.commentsCount || 0) - 1;
+          }
+          this.posts.update(p => [...p]);
+          this.notificationService.success('Comment deleted!');
+        },
+        error: () => this.notificationService.error('Failed to delete comment')
+      });
+    };
+    this.confirmModalTitle.set('Delete Comment');
+    this.confirmModalMessage.set('Are you sure you want to delete this comment?');
+    this.showConfirmModal.set(true);
+  }
+
+  onConfirmAction() {
+    if (this.confirmAction) {
+      this.confirmAction();
+      this.confirmAction = null;
+    }
+    this.showConfirmModal.set(false);
+  }
+
+  onCancelConfirm() {
+    this.confirmAction = null;
+    this.showConfirmModal.set(false);
   }
 }

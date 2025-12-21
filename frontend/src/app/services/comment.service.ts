@@ -21,4 +21,12 @@ export class CommentService {
   addComment(postId: number, content: string): Observable<CommentDTO> {
     return this.http.post<CommentDTO>(`${this.baseUrl}/post/${postId}`, { content });
   }
+
+  updateComment(commentId: number, content: string): Observable<CommentDTO> {
+    return this.http.put<CommentDTO>(`${this.baseUrl}/${commentId}`, { content });
+  }
+
+  deleteComment(commentId: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${commentId}`);
+  }
 }

@@ -16,6 +16,7 @@ export interface PostDTO {
   commentsCount: number;
   comments?: any[];
   isLiked?: boolean;
+  showMenu?: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -29,8 +30,8 @@ export class PostService {
     return this.http.get<PostDTO[]>(this.baseUrl);
   }
 
-  createPost(post: { title: string; content: string }): Observable<PostDTO> {
-    return this.http.post<PostDTO>(this.baseUrl, post);
+  createPost(formData: FormData): Observable<PostDTO> {
+    return this.http.post<PostDTO>(this.baseUrl, formData);
   }
 
   getPostsByUsername(username: string): Observable<PostDTO[]> {
@@ -43,5 +44,13 @@ export class PostService {
 
   unlikePost(postId: number): Observable<any> {
     return this.http.delete(`${this.likesUrl}/post/${postId}`);
+  }
+
+  updatePost(postId: number, formData: FormData): Observable<PostDTO> {
+    return this.http.put<PostDTO>(`${this.baseUrl}/${postId}`, formData);
+  }
+
+  deletePost(postId: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${postId}`);
   }
 }

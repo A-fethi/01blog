@@ -29,7 +29,7 @@ public class CommentService {
         if (commentDTO.getContent() == null || commentDTO.getContent().trim().isEmpty()) {
             throw new IllegalArgumentException("Comment content cannot be empty");
         }
-        
+
         Comment comment = new Comment();
         comment.setContent(commentDTO.getContent());
         comment.setPost(post);
@@ -43,11 +43,31 @@ public class CommentService {
         return commentRepository.findByPostIdOrderByCreatedAtAsc(postId);
     }
 
-    // public Comment getCommentById(Long id) {
-    //     return commentRepository.findById(id)
-    //         .orElseThrow(() -> new CommentNotFoundException(id));
-    // }
-    
+    public Comment getCommentById(Long id) {
+        return commentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Comment not found: " + id));
+    }
+
+    @Transactional
+    public Comment updateComment(Long commentId, User user, CommentDTO commentDTO) {
+        Comment comment = getCommentById(commentId);
+        if (!comment.getAuthor().getId().equals(user.getId())) {
+            throw new RuntimeException("You cannot edit this comment");
+        }
+        comment.setContent(commentDTO.getContent());
+        comment.setUpdatedAt(java.time.LocalDateTime.now());
+        return commentRepository.save(comment);
+    }
+
+    @Transactional
+    public void deleteComment(Long commentId, User user) {
+        Comment comment = getCommentById(commentId);
+        if (!comment.getAuthor().getId().equals(user.getId())) {
+            throw new RuntimeException("You cannot delete this comment");
+        }
+        commentRepository.delete(comment);
+    }
+
     public List<Comment> getCommentsByAuthor(User author) {
         return commentRepository.findByAuthor(author);
     }

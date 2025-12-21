@@ -5,11 +5,12 @@ import { Router, RouterModule } from '@angular/router';
 import { AdminService, UserDTO, AdminStats } from '../../services/admin.service';
 import { AuthService } from '../../services/auth.service';
 import { NotificationService } from '../../services/notification.service';
+import { ConfirmModal } from '../../components/confirm-modal/confirm-modal';
 
 @Component({
     selector: 'app-admin-panel',
     standalone: true,
-    imports: [CommonModule, MatIconModule, RouterModule],
+    imports: [CommonModule, MatIconModule, RouterModule, ConfirmModal],
     templateUrl: './admin-panel.html',
     styleUrl: './admin-panel.css'
 })
@@ -30,6 +31,12 @@ export class AdminPanel {
     readonly activeTab = signal<'users' | 'posts' | 'reports'>('users');
     readonly searchQuery = signal('');
     readonly isLoading = signal(false);
+
+    // Confirmation Modal State
+    readonly showConfirmModal = signal(false);
+    readonly confirmModalTitle = signal('');
+    readonly confirmModalMessage = signal('');
+    private confirmAction: (() => void) | null = null;
 
     // Computed: Automatically filters users based on search query
     readonly filteredUsers = computed(() => {
@@ -96,35 +103,50 @@ export class AdminPanel {
     }
 
     deleteUser(userId: number, username: string) {
-        if (!confirm(`Are you sure you want to delete user "${username}"? This action cannot be undone.`)) {
-            return;
-        }
-
-        this.adminService.deleteUser(userId).subscribe({
-            next: () => {
-                this.notificationService.success(`User "${username}" deleted successfully`);
-                this.loadDashboardData();
-            },
-            error: err => {
-                this.notificationService.error(err.error?.error || 'Failed to delete user');
-            }
-        });
+        this.confirmAction = () => {
+            this.adminService.deleteUser(userId).subscribe({
+                next: () => {
+                    this.notificationService.success(`User "${username}" deleted successfully`);
+                    this.loadDashboardData();
+                },
+                error: err => {
+                    this.notificationService.error(err.error?.error || 'Failed to delete user');
+                }
+            });
+        };
+        this.confirmModalTitle.set('Delete User');
+        this.confirmModalMessage.set(`Are you sure you want to delete user "${username}"? This action cannot be undone.`);
+        this.showConfirmModal.set(true);
     }
 
     banUser(userId: number, username: string) {
-        if (!confirm(`Are you sure you want to ban user "${username}"?`)) {
-            return;
-        }
+        this.confirmAction = () => {
+            this.adminService.banUser(userId).subscribe({
+                next: () => {
+                    this.notificationService.success(`User "${username}" banned successfully`);
+                    this.loadDashboardData();
+                },
+                error: err => {
+                    this.notificationService.error('Failed to ban user');
+                }
+            });
+        };
+        this.confirmModalTitle.set('Ban User');
+        this.confirmModalMessage.set(`Are you sure you want to ban user "${username}"?`);
+        this.showConfirmModal.set(true);
+    }
 
-        this.adminService.banUser(userId).subscribe({
-            next: () => {
-                this.notificationService.success(`User "${username}" banned successfully`);
-                this.loadDashboardData();
-            },
-            error: err => {
-                this.notificationService.error('Failed to ban user');
-            }
-        });
+    onConfirmAction() {
+        if (this.confirmAction) {
+            this.confirmAction();
+            this.confirmAction = null;
+        }
+        this.showConfirmModal.set(false);
+    }
+
+    onCancelConfirm() {
+        this.confirmAction = null;
+        this.showConfirmModal.set(false);
     }
 
     goBack() {

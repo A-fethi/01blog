@@ -6,24 +6,32 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.zone01.backend.dto.UserDTO;
 import com.zone01.backend.entity.User;
+import com.zone01.backend.security.AppUserDetails;
 import com.zone01.backend.service.UserService;
+import com.zone01.backend.service.FileStorageService;
 
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
 
-    public UserService userService;
+    public final UserService userService;
+    private final FileStorageService fileStorageService;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, FileStorageService fileStorageService) {
         this.userService = userService;
+        this.fileStorageService = fileStorageService;
     }
 
     @GetMapping
@@ -59,5 +67,24 @@ public class UserController {
         response.put("message", "User deleted successfully");
 
         return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/profile")
+    public ResponseEntity<UserDTO> updateProfile(
+            @RequestParam(value = "username", required = false) String username,
+            @RequestParam(value = "email", required = false) String email,
+            @RequestParam(value = "avatar", required = false) MultipartFile avatar,
+            @AuthenticationPrincipal AppUserDetails auth) {
+
+        User currentUser = auth.getUser();
+        String avatarUrl = null;
+
+        if (avatar != null && !avatar.isEmpty()) {
+            String fileName = fileStorageService.storeFile(avatar);
+            avatarUrl = "http://localhost:8080/uploads/" + fileName;
+        }
+
+        User updated = userService.updateProfile(currentUser.getId(), username, email, avatarUrl);
+        return ResponseEntity.ok(new UserDTO(updated));
     }
 }

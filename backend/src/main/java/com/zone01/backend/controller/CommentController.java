@@ -4,9 +4,11 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -43,5 +45,24 @@ public class CommentController {
         List<CommentDTO> commentDTOs = comments.stream().map(CommentDTO::new).toList();
 
         return ResponseEntity.ok(commentDTOs);
+    }
+
+    @PutMapping("/{commentId}")
+    public ResponseEntity<CommentDTO> updateComment(
+            @PathVariable Long commentId,
+            @RequestBody CommentDTO commentDTO,
+            @AuthenticationPrincipal AppUserDetails auth) {
+        User currentUser = auth.getUser();
+        Comment updated = commentService.updateComment(commentId, currentUser, commentDTO);
+        return ResponseEntity.ok(new CommentDTO(updated));
+    }
+
+    @DeleteMapping("/{commentId}")
+    public ResponseEntity<Void> deleteComment(
+            @PathVariable Long commentId,
+            @AuthenticationPrincipal AppUserDetails auth) {
+        User currentUser = auth.getUser();
+        commentService.deleteComment(commentId, currentUser);
+        return ResponseEntity.noContent().build();
     }
 }

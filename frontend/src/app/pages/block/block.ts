@@ -10,10 +10,11 @@ import { CommentService } from '../../services/comment.service';
 import { FormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 import { UserListModal } from '../../components/user-list-modal/user-list-modal';
+import { ConfirmModal } from '../../components/confirm-modal/confirm-modal';
 
 @Component({
     selector: 'app-block',
-    imports: [CommonModule, MatIconModule, RouterModule, FormsModule, UserListModal],
+    imports: [CommonModule, MatIconModule, RouterModule, FormsModule, UserListModal, ConfirmModal],
     templateUrl: './block.html',
     styleUrl: './block.css',
 })
@@ -37,10 +38,29 @@ export class Block implements OnInit {
     readonly showComments = signal<Set<number>>(new Set());
     readonly commentInputs = signal<Map<number, string>>(new Map());
 
+    // Editing states
+    readonly editingProfile = signal(false);
+    readonly editUsername = signal('');
+    readonly editEmail = signal('');
+    readonly editAvatarFile = signal<File | null>(null);
+
+    readonly editingPostId = signal<number | null>(null);
+    readonly editPostTitle = signal('');
+    readonly editPostContent = signal('');
+
+    readonly editingCommentId = signal<number | null>(null);
+    readonly editCommentContent = signal('');
+
     // Modal Signals
     readonly showModal = signal(false);
     readonly modalTitle = signal('');
     readonly modalUsers = signal<any[]>([]);
+
+    // Confirmation Modal State
+    readonly showConfirmModal = signal(false);
+    readonly confirmModalTitle = signal('');
+    readonly confirmModalMessage = signal('');
+    private confirmAction: (() => void) | null = null;
 
     // Computed
     readonly isOwnProfile = computed(() => {
@@ -52,14 +72,11 @@ export class Block implements OnInit {
     readonly postsCount = computed(() => this.userPosts().length);
 
     ngOnInit() {
-        // Check if viewing own profile or another user's profile
         this.route.paramMap.subscribe(params => {
             const username = params.get('username');
             if (username) {
-                // Viewing another user's profile
                 this.loadUserProfile(username);
             } else {
-                // Viewing own profile
                 this.loadOwnProfile();
             }
         });
@@ -71,7 +88,6 @@ export class Block implements OnInit {
             this.router.navigate(['/login']);
             return;
         }
-
         this.profileUser.set(currentUser);
         this.loadUserData(currentUser.username);
     }
@@ -94,7 +110,6 @@ export class Block implements OnInit {
 
     loadUserData(username: string) {
         this.loading.set(true);
-
         forkJoin({
             posts: this.postService.getPostsByUsername(username),
             followerCount: this.userService.getFollowerCount(username)
@@ -109,11 +124,6 @@ export class Block implements OnInit {
             }
         });
 
-        // Load following count (subscriptions)
-        // For now, we don't have a direct endpoint for "following count of user X" in the snippet I saw,
-        // but we can fetch the list or assume the user object has it if we updated UserDTO.
-        // The snippet showed `getMySubscriptions` but not `getUserSubscriptions`.
-        // However, I added `getFollowing` endpoint.
         this.userService.getFollowing(username).subscribe({
             next: (following) => {
                 this.followingCount.set(following.length);
@@ -123,7 +133,6 @@ export class Block implements OnInit {
 
     checkIfFollowing(userId: number) {
         if (!this.authService.isLoggedIn()) return;
-
         this.userService.getMySubscriptions().subscribe({
             next: (subscriptions) => {
                 const isFollowing = subscriptions.some((s: any) => s.targetUser?.id === userId);
@@ -137,7 +146,6 @@ export class Block implements OnInit {
             this.router.navigate(['/login']);
             return;
         }
-
         const user = this.profileUser();
         if (!user) return;
 
@@ -160,18 +168,56 @@ export class Block implements OnInit {
         }
     }
 
+    // Profile Editing
+    onEditProfile() {
+        const user = this.profileUser();
+        if (!user) return;
+        this.editUsername.set(user.username);
+        this.editEmail.set(user.email || '');
+        this.editAvatarFile.set(null);
+        this.editingProfile.set(true);
+    }
+
+    onCancelEditProfile() {
+        this.editingProfile.set(false);
+    }
+
+    onAvatarSelected(event: any) {
+        this.editAvatarFile.set(event.target.files[0] ?? null);
+    }
+
+    onUpdateProfile() {
+        const formData = new FormData();
+        formData.append('username', this.editUsername());
+        formData.append('email', this.editEmail());
+        if (this.editAvatarFile()) {
+            formData.append('avatar', this.editAvatarFile()!);
+        }
+
+        this.userService.updateProfile(formData).subscribe({
+            next: (updatedUser) => {
+                this.profileUser.set(updatedUser);
+                this.authService.currentUser.set(updatedUser);
+                this.editingProfile.set(false);
+                this.notificationService.success('Profile updated!');
+                // If username changed, we might need to navigate to new URL
+                if (updatedUser.username !== this.editUsername()) {
+                    this.router.navigate(['/block', updatedUser.username]);
+                }
+            },
+            error: (err) => this.notificationService.error(err?.error?.message || 'Failed to update profile')
+        });
+    }
+
     // Modal Methods
     openFollowersModal() {
         const user = this.profileUser();
         if (!user) return;
-
         this.userService.getFollowers(user.username).subscribe(users => {
             this.modalTitle.set('Followers');
-            // Map to show the SUBSCRIBER (the person following the profile user)
             const mappedUsers = users.map((u: any) => ({
                 username: u.subscriberUsername,
                 avatarUrl: u.subscriberAvatarUrl,
-                // Keep original ID if needed for navigation, though username is used
                 id: u.subscriberId
             }));
             this.modalUsers.set(mappedUsers);
@@ -182,10 +228,8 @@ export class Block implements OnInit {
     openFollowingModal() {
         const user = this.profileUser();
         if (!user) return;
-
         this.userService.getFollowing(user.username).subscribe(users => {
             this.modalTitle.set('Following');
-            // Map to show the TARGET (the person the profile user is following)
             const mappedUsers = users.map((u: any) => ({
                 username: u.targetUsername,
                 avatarUrl: u.targetAvatarUrl,
@@ -206,7 +250,6 @@ export class Block implements OnInit {
             this.notificationService.info('Please log in to like posts');
             return;
         }
-
         if (post.isLiked) {
             this.postService.unlikePost(post.id).subscribe(() => {
                 post.isLiked = false;
@@ -220,6 +263,48 @@ export class Block implements OnInit {
                 this.userPosts.update(p => [...p]);
             });
         }
+    }
+
+    onEditPost(post: any) {
+        this.editingPostId.set(post.id);
+        this.editPostTitle.set(post.title || '');
+        this.editPostContent.set(post.content || '');
+    }
+
+    onCancelEditPost() {
+        this.editingPostId.set(null);
+    }
+
+    onUpdatePost() {
+        const postId = this.editingPostId();
+        if (!postId) return;
+        const formData = new FormData();
+        formData.append('title', this.editPostTitle());
+        formData.append('content', this.editPostContent());
+
+        this.postService.updatePost(postId, formData).subscribe({
+            next: (updatedPost) => {
+                this.userPosts.update(posts => posts.map(p => p.id === postId ? { ...p, ...updatedPost } : p));
+                this.editingPostId.set(null);
+                this.notificationService.success('Post updated!');
+            },
+            error: () => this.notificationService.error('Failed to update post')
+        });
+    }
+
+    onDeletePost(postId: number) {
+        this.confirmAction = () => {
+            this.postService.deletePost(postId).subscribe({
+                next: () => {
+                    this.userPosts.update(posts => posts.filter(p => p.id !== postId));
+                    this.notificationService.success('Post deleted!');
+                },
+                error: () => this.notificationService.error('Failed to delete post')
+            });
+        };
+        this.confirmModalTitle.set('Delete Post');
+        this.confirmModalMessage.set('Are you sure you want to delete this post? This action cannot be undone.');
+        this.showConfirmModal.set(true);
     }
 
     toggleComments(postId: number) {
@@ -262,10 +347,8 @@ export class Block implements OnInit {
             this.router.navigate(['/login']);
             return;
         }
-
         const content = this.getCommentInput(postId);
         if (!content.trim()) return;
-
         this.commentService.addComment(postId, content).subscribe(comment => {
             const post = this.userPosts().find(p => p.id === postId);
             if (post) {
@@ -277,5 +360,64 @@ export class Block implements OnInit {
                 this.notificationService.success('Comment added!');
             }
         });
+    }
+
+    onEditComment(comment: any) {
+        this.editingCommentId.set(comment.id);
+        this.editCommentContent.set(comment.content);
+    }
+
+    onCancelEditComment() {
+        this.editingCommentId.set(null);
+    }
+
+    onUpdateComment(postId: number) {
+        const commentId = this.editingCommentId();
+        if (!commentId) return;
+        this.commentService.updateComment(commentId, this.editCommentContent()).subscribe({
+            next: (updatedComment) => {
+                const post = this.userPosts().find(p => p.id === postId);
+                if (post && post.comments) {
+                    post.comments = post.comments.map((c: any) => c.id === commentId ? updatedComment : c);
+                }
+                this.editingCommentId.set(null);
+                this.userPosts.update(p => [...p]);
+                this.notificationService.success('Comment updated!');
+            },
+            error: () => this.notificationService.error('Failed to update comment')
+        });
+    }
+
+    onDeleteComment(postId: number, commentId: number) {
+        this.confirmAction = () => {
+            this.commentService.deleteComment(commentId).subscribe({
+                next: () => {
+                    const post = this.userPosts().find(p => p.id === postId);
+                    if (post && post.comments) {
+                        post.comments = post.comments.filter((c: any) => c.id !== commentId);
+                        post.commentsCount = (post.commentsCount || 0) - 1;
+                    }
+                    this.userPosts.update(p => [...p]);
+                    this.notificationService.success('Comment deleted!');
+                },
+                error: () => this.notificationService.error('Failed to delete comment')
+            });
+        };
+        this.confirmModalTitle.set('Delete Comment');
+        this.confirmModalMessage.set('Are you sure you want to delete this comment?');
+        this.showConfirmModal.set(true);
+    }
+
+    onConfirmAction() {
+        if (this.confirmAction) {
+            this.confirmAction();
+            this.confirmAction = null;
+        }
+        this.showConfirmModal.set(false);
+    }
+
+    onCancelConfirm() {
+        this.confirmAction = null;
+        this.showConfirmModal.set(false);
     }
 }

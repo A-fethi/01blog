@@ -21,14 +21,37 @@
                 </h4>
                 <span class="timestamp">{{post.createdAt | date:'short'}}</span>
             </div>
-            <button class="more-options"><mat-icon>more_horiz</mat-icon></button>
+
+            <div class="post-actions-menu"
+                *ngIf="authService.isLoggedIn() && post.authorId === authService.currentUser()?.id">
+                <button class="more-options" (click)="post.showMenu = !post.showMenu">
+                    <mat-icon>more_horiz</mat-icon>
+                </button>
+                <div class="menu-dropdown" *ngIf="post.showMenu">
+                    <button (click)="onEditPost(post); post.showMenu = false">Edit</button>
+                    <button (click)="onDeletePost(post.id); post.showMenu = false" class="delete-btn">Delete</button>
+                </div>
+            </div>
         </div>
 
-        <div class="post-content">
+        <div class="post-content" *ngIf="editingPostId() !== post.id">
+            <h3 *ngIf="post.title && post.title !== 'Untitled Post'" class="post-title">{{post.title}}</h3>
             <p>{{post.content}}</p>
             <div *ngIf="post.mediaUrl" class="post-media">
                 <img *ngIf="post.mediaType === 'IMAGE'" [src]="post.mediaUrl">
                 <video *ngIf="post.mediaType === 'VIDEO'" [src]="post.mediaUrl" controls></video>
+            </div>
+        </div>
+
+        <!-- Edit Post Form -->
+        <div class="edit-post-form" *ngIf="editingPostId() === post.id">
+            <input type="text" [ngModel]="editPostTitle()" (ngModelChange)="editPostTitle.set($event)"
+                placeholder="Title">
+            <textarea [ngModel]="editPostContent()" (ngModelChange)="editPostContent.set($event)"
+                placeholder="Content"></textarea>
+            <div class="edit-actions">
+                <button class="save-btn" (click)="onUpdatePost()">Save</button>
+                <button class="cancel-btn" (click)="onCancelEditPost()">Cancel</button>
             </div>
         </div>
 
@@ -52,12 +75,32 @@
         <!-- Comments section -->
         <div class="comments-section" *ngIf="showComments().has(post.id)">
             <div class="comment-item" *ngFor="let c of post.comments">
-                <div class="comment-author">{{ c.commentUsername }}</div>
-                <div class="comment-text">{{ c.content }}</div>
-                <div class="comment-time">{{ c.createdAt | date:'short' }}</div>
+                <div class="comment-header">
+                    <div class="comment-author">{{ c.commentUsername }}</div>
+                    <div class="comment-actions"
+                        *ngIf="authService.isLoggedIn() && c.commentUsername === authService.currentUser()?.username">
+                        <button (click)="onEditComment(c)">Edit</button>
+                        <button (click)="onDeleteComment(post.id, c.id)" class="delete-btn">Delete</button>
+                    </div>
+                </div>
+
+                <div class="comment-body" *ngIf="editingCommentId() !== c.id">
+                    <div class="comment-text">{{ c.content }}</div>
+                    <div class="comment-time">{{ c.createdAt | date:'short' }}</div>
+                </div>
+
+                <!-- Edit Comment Form -->
+                <div class="edit-comment-form" *ngIf="editingCommentId() === c.id">
+                    <textarea [ngModel]="editCommentContent()"
+                        (ngModelChange)="editCommentContent.set($event)"></textarea>
+                    <div class="edit-actions">
+                        <button class="save-btn" (click)="onUpdateComment(post.id)">Save</button>
+                        <button class="cancel-btn" (click)="onCancelEditComment()">Cancel</button>
+                    </div>
+                </div>
             </div>
 
-            <div class="add-comment">
+            <div class="add-comment" *ngIf="authService.isLoggedIn()">
                 <input type="text" placeholder="Write a comment..." [ngModel]="getCommentInput(post.id)"
                     (ngModelChange)="setCommentInput(post.id, $event)" (keyup.enter)="onSubmitComment(post.id)" />
                 <button class="comment-submit-btn" (click)="onSubmitComment(post.id)">
@@ -68,3 +111,7 @@
     </div>
 </div>
 
+<!-- Confirmation Modal -->
+<app-confirm-modal *ngIf="showConfirmModal()" [title]="confirmModalTitle()" [message]="confirmModalMessage()"
+    (confirm)="onConfirmAction()" (cancel)="onCancelConfirm()">
+</app-confirm-modal>
