@@ -7,6 +7,7 @@ import { Notifications } from './pages/notifications/notifications';
 import { Block } from './pages/block/block';
 import { Subscriptions } from './pages/subscriptions/subscriptions';
 import { MainLayout } from './layout/main-layout';
+import { ErrorPage } from './pages/error-page/error-page';
 
 export const routes: Routes = [
     {
@@ -51,5 +52,33 @@ export const routes: Routes = [
     {
         path: 'register',
         component: Register
+    },
+    {
+        path: '404',
+        component: ErrorPage,
+        data: { type: '404' }
+    },
+    {
+        path: '500',
+        component: ErrorPage,
+        data: { type: '500' }
+    },
+    {
+        path: '403',
+        component: ErrorPage,
+        data: { type: '403' }
+    },
+    {
+        path: '400',
+        component: ErrorPage,
+        data: { type: '400' }
+    },
+    {
+        path: 'error',
+        component: ErrorPage
+    },
+    {
+        path: '**',
+        redirectTo: '404'
     }
 ];
