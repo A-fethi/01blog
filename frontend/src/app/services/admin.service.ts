@@ -45,4 +45,20 @@ export class AdminService {
     unbanUser(userId: number): Observable<any> {
         return this.http.post(`${this.baseUrl}/users/${userId}/unban`, {});
     }
+
+    getAllPosts(): Observable<any[]> {
+        return this.http.get<any[]>(`${this.baseUrl}/posts`);
+    }
+
+    deletePost(postId: number): Observable<any> {
+        return this.http.delete(`${this.baseUrl}/posts/${postId}`);
+    }
+
+    getReports(): Observable<any[]> {
+        return this.http.get<any[]>(`${this.baseUrl}/reports`);
+    }
+
+    updateReportStatus(reportId: number, status: string): Observable<any> {
+        return this.http.post(`${this.baseUrl}/reports/${reportId}/status/${status}`, {});
+    }
 }

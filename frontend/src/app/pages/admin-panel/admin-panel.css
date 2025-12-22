@@ -106,24 +106,19 @@
   width: 20px;
   height: 20px;
   color: #65676b;
-  /* Default gray */
 }
 
 .tab-btn:nth-child(1) mat-icon {
   color: #1877f2;
 }
 
-/* Users Blue */
 .tab-btn:nth-child(2) mat-icon {
   color: #f02849;
 }
 
-/* Posts Red */
 .tab-btn:nth-child(3) mat-icon {
   color: #f7b928;
 }
-
-/* Reports Orange */
 
 .tab-btn.active mat-icon {
   color: #1877f2;
@@ -219,7 +214,6 @@ td {
   color: #1877f2;
 }
 
-/* Add style for USER role */
 .role-badge:not(.admin) {
   background-color: #e8f5e9;
   color: #2e7d32;
@@ -258,7 +252,6 @@ td {
 }
 
 .ban-btn:hover:not(:disabled) {
-  color: #f7b928 !important;
   background-color: #fff8e1;
 }
 
@@ -271,7 +264,53 @@ td {
 }
 
 .delete-btn:hover:not(:disabled) {
+  background-color: #ffebee;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status-badge.pending {
+  background-color: #fff8e1;
+  color: #f7b928;
+}
+
+.status-badge.resolved {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.status-badge.rejected {
+  background-color: #ffebee;
+  color: #f02849;
+}
+
+.resolve-btn {
+  color: #42b72a !important;
+}
+
+.resolve-btn mat-icon {
+  color: #42b72a !important;
+}
+
+.resolve-btn:hover:not(:disabled) {
+  background-color: #e8f5e9;
+}
+
+.reject-btn {
   color: #f02849 !important;
+}
+
+.reject-btn mat-icon {
+  color: #f02849 !important;
+}
+
+.reject-btn:hover:not(:disabled) {
   background-color: #ffebee;
 }
 
@@ -288,21 +327,6 @@ td {
 }
 
 .empty-state mat-icon {
-  font-size: 48px;
-  width: 48px;
-  height: 48px;
-  margin-bottom: 16px;
-  color: #bcc0c4;
-}
-
-/* Coming Soon */
-.coming-soon {
-  text-align: center;
-  padding: 48px;
-  color: #65676b;
-}
-
-.coming-soon mat-icon {
   font-size: 48px;
   width: 48px;
   height: 48px;

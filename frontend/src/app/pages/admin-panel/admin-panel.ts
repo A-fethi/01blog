@@ -28,6 +28,8 @@ export class AdminPanel {
     });
 
     readonly users = signal<UserDTO[]>([]);
+    readonly posts = signal<any[]>([]);
+    readonly reports = signal<any[]>([]);
     readonly activeTab = signal<'users' | 'posts' | 'reports'>('users');
     readonly searchQuery = signal('');
     readonly isLoading = signal(false);
@@ -46,6 +48,28 @@ export class AdminPanel {
         return this.users().filter(user =>
             user.username.toLowerCase().includes(query) ||
             user.email.toLowerCase().includes(query)
+        );
+    });
+
+    readonly filteredPosts = computed(() => {
+        const query = this.searchQuery().toLowerCase();
+        if (!query) return this.posts();
+
+        return this.posts().filter(post =>
+            (post.title && post.title.toLowerCase().includes(query)) ||
+            (post.content && post.content.toLowerCase().includes(query)) ||
+            (post.authorUsername && post.authorUsername.toLowerCase().includes(query))
+        );
+    });
+
+    readonly filteredReports = computed(() => {
+        const query = this.searchQuery().toLowerCase();
+        if (!query) return this.reports();
+
+        return this.reports().filter(report =>
+            (report.reason && report.reason.toLowerCase().includes(query)) ||
+            (report.reportedUsername && report.reportedUsername.toLowerCase().includes(query)) ||
+            (report.status && report.status.toLowerCase().includes(query))
         );
     });
 
@@ -91,6 +115,16 @@ export class AdminPanel {
                 this.isLoading.set(false);
             }
         });
+
+        this.adminService.getAllPosts().subscribe({
+            next: posts => this.posts.set(posts),
+            error: () => this.notificationService.error('Failed to load posts')
+        });
+
+        this.adminService.getReports().subscribe({
+            next: reports => this.reports.set(reports),
+            error: () => this.notificationService.error('Failed to load reports')
+        });
     }
 
     setActiveTab(tab: 'users' | 'posts' | 'reports') {
@@ -134,6 +168,41 @@ export class AdminPanel {
         this.confirmModalTitle.set('Ban User');
         this.confirmModalMessage.set(`Are you sure you want to ban user "${username}"?`);
         this.showConfirmModal.set(true);
+    }
+
+    deletePost(postId: number) {
+        this.confirmAction = () => {
+            this.adminService.deletePost(postId).subscribe({
+                next: () => {
+                    this.notificationService.success('Post removed successfully');
+                    this.loadDashboardData();
+                },
+                error: () => this.notificationService.error('Failed to remove post')
+            });
+        };
+        this.confirmModalTitle.set('Remove Post');
+        this.confirmModalMessage.set('Are you sure you want to remove this post?');
+        this.showConfirmModal.set(true);
+    }
+
+    resolveReport(reportId: number) {
+        this.adminService.updateReportStatus(reportId, 'RESOLVED').subscribe({
+            next: () => {
+                this.notificationService.success('Report marked as resolved');
+                this.loadDashboardData();
+            },
+            error: () => this.notificationService.error('Failed to update report status')
+        });
+    }
+
+    rejectReport(reportId: number) {
+        this.adminService.updateReportStatus(reportId, 'REJECTED').subscribe({
+            next: () => {
+                this.notificationService.success('Report rejected');
+                this.loadDashboardData();
+            },
+            error: () => this.notificationService.error('Failed to update report status')
+        });
     }
 
     onConfirmAction() {

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.zone01.backend.dto.PostDTO;
 import com.zone01.backend.dto.ReportDTO;
 import com.zone01.backend.dto.UserDTO;
 import com.zone01.backend.entity.Post;
@@ -64,9 +65,12 @@ public class AdminController {
         }
         Map<String, Object> stats = new HashMap<>();
 
-        long totalUsers = userService.getAllUsers().size();
+        long totalUsers = userService.getAllUsers().size(); // userService doesn't have count() yet, size() is fine for
+                                                            // now
         stats.put("totalUsers", totalUsers);
         stats.put("regularUsers", Math.max(totalUsers - 1L, 0L));
+        stats.put("totalPosts", postService.countAllPosts());
+        stats.put("totalReports", reportService.countAllReports());
 
         return ResponseEntity.ok(stats);
     }
@@ -110,8 +114,8 @@ public class AdminController {
     }
 
     @GetMapping("/posts")
-    public ResponseEntity<List<Post>> getAllPosts() {
-        return ResponseEntity.ok(postService.getAllPosts());
+    public ResponseEntity<List<PostDTO>> getAllPosts() {
+        return ResponseEntity.ok(postService.getAllPostsDTO(null));
     }
 
     @DeleteMapping("/posts/{postId}")
@@ -127,5 +131,15 @@ public class AdminController {
                 .map(ReportDTO::new)
                 .toList();
         return ResponseEntity.ok(reports);
+    }
+
+    @PostMapping("/reports/{reportId}/status/{status}")
+    public ResponseEntity<ReportDTO> updateReportStatus(
+            @PathVariable Long reportId,
+            @PathVariable String status) {
+        com.zone01.backend.entity.ReportStatus reportStatus = com.zone01.backend.entity.ReportStatus
+                .valueOf(status.toUpperCase());
+        com.zone01.backend.entity.Report report = reportService.updateStatus(reportId, reportStatus);
+        return ResponseEntity.ok(new ReportDTO(report));
     }
 }
