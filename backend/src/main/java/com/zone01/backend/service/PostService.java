@@ -125,6 +125,10 @@ public class PostService {
         return postRepository.countByAuthorId(userId);
     }
 
+    public long countAllPosts() {
+        return postRepository.count();
+    }
+
     public List<PostDTO> getPostsByUsername(String username, User currentUser) {
         return postRepository.findByAuthorUsernameOrderByCreatedAtDesc(username)
                 .stream()

@@ -49,6 +49,10 @@ public class ReportService {
         return reportRepository.findByStatusOrderByCreatedAtAsc(status);
     }
 
+    public long countAllReports() {
+        return reportRepository.count();
+    }
+
     @Transactional
     public Report updateStatus(Long reportId, ReportStatus status) {
         Report report = reportRepository.findById(reportId)
