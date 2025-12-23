@@ -11,6 +11,9 @@ import { FormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 import { UserListModal } from '../../components/user-list-modal/user-list-modal';
 import { ConfirmModal } from '../../components/confirm-modal/confirm-modal';
+import { ReportService } from '../../services/report.service';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { ReportDialog } from '../../components/report-dialog/report-dialog';
 
 @Component({
     selector: 'app-block',
@@ -26,6 +29,8 @@ export class Block implements OnInit {
     private readonly postService = inject(PostService);
     private readonly notificationService = inject(NotificationService);
     private readonly commentService = inject(CommentService);
+    private readonly reportService = inject(ReportService);
+    private readonly dialog = inject(MatDialog);
 
     // Signals
     readonly loading = signal(false);
@@ -166,6 +171,50 @@ export class Block implements OnInit {
                 }
             });
         }
+    }
+
+    onReportUser() {
+        const user = this.profileUser();
+        if (!user || !this.authService.isLoggedIn()) {
+            if (!this.authService.isLoggedIn()) this.router.navigate(['/login']);
+            return;
+        }
+
+        const dialogRef = this.dialog.open(ReportDialog, {
+            data: { type: 'user', targetName: user.username }
+        });
+
+        dialogRef.afterClosed().subscribe(reason => {
+            if (reason) {
+                this.reportService.reportUser(user.id, reason).subscribe({
+                    next: () => this.notificationService.success('Report submitted successfully'),
+                    error: () => this.notificationService.error('Failed to submit report')
+                });
+            }
+        });
+    }
+
+    onReportPost(post: any) {
+        if (!this.authService.isLoggedIn()) {
+            this.router.navigate(['/login']);
+            return;
+        }
+
+        const dialogRef = this.dialog.open(ReportDialog, {
+            data: { type: 'post', targetName: post.title || 'this post' }
+        });
+
+        dialogRef.afterClosed().subscribe(reason => {
+            if (reason) {
+                this.reportService.reportPost(post.id, reason).subscribe({
+                    next: () => {
+                        this.notificationService.success('Report submitted successfully');
+                        post.showMenu = false;
+                    },
+                    error: () => this.notificationService.error('Failed to submit report')
+                });
+            }
+        });
     }
 
     // Profile Editing

@@ -1,6 +1,5 @@
 package com.zone01.backend.controller;
 
-import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -38,6 +37,19 @@ public class ReportController {
         }
 
         Report report = reportService.createReport(auth.getUser(), userId, reportDTO.getReason());
+        return ResponseEntity.status(HttpStatus.CREATED).body(new ReportDTO(report));
+    }
+
+    @PostMapping("/posts/{postId}")
+    public ResponseEntity<ReportDTO> reportPost(
+            @PathVariable Long postId,
+            @Valid @RequestBody ReportDTO reportDTO,
+            @AuthenticationPrincipal AppUserDetails auth) {
+        if (auth == null || auth.getUser() == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Report report = reportService.createPostReport(auth.getUser(), postId, reportDTO.getReason());
         return ResponseEntity.status(HttpStatus.CREATED).body(new ReportDTO(report));
     }
 }

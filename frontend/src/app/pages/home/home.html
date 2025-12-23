@@ -46,14 +46,19 @@
                 <span class="timestamp">{{post.createdAt | date:'short'}}</span>
             </div>
 
-            <div class="post-actions-menu"
-                *ngIf="authService.isLoggedIn() && post.authorId === authService.currentUser()?.id">
+            <div class="post-actions-menu" *ngIf="authService.isLoggedIn()">
                 <button class="more-options" (click)="post.showMenu = !post.showMenu">
                     <mat-icon>more_horiz</mat-icon>
                 </button>
                 <div class="menu-dropdown" *ngIf="post.showMenu">
-                    <button (click)="onEditPost(post); post.showMenu = false">Edit</button>
-                    <button (click)="onDeletePost(post.id); post.showMenu = false" class="delete-btn">Delete</button>
+                    <ng-container *ngIf="post.authorId === authService.currentUser()?.id; else reportOption">
+                        <button (click)="onEditPost(post); post.showMenu = false">Edit</button>
+                        <button (click)="onDeletePost(post.id); post.showMenu = false"
+                            class="delete-btn">Delete</button>
+                    </ng-container>
+                    <ng-template #reportOption>
+                        <button (click)="onReportPost(post); post.showMenu = false">Report</button>
+                    </ng-template>
                 </div>
             </div>
         </div>

@@ -13,8 +13,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ReportDTO {
     private Long id;
-    private Long reportedId;
+    private Long reportedId; // This is the reporter's ID
     private Long reportedUserId;
+    private Long reportedPostId;
     private String reportedUsername;
     private ReportStatus status;
     private LocalDateTime createdAt;
@@ -28,6 +29,9 @@ public class ReportDTO {
         this.reportedId = report.getReporter().getId();
         this.reportedUserId = report.getReportedUser().getId();
         this.reportedUsername = report.getReportedUser().getUsername();
+        if (report.getReportedPost() != null) {
+            this.reportedPostId = report.getReportedPost().getId();
+        }
         this.reason = report.getReason();
         this.status = report.getStatus();
         this.createdAt = report.getCreatedAt();

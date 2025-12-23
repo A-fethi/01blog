@@ -7,7 +7,10 @@ import { AuthService } from '../../services/auth.service';
 import { NotificationService } from '../../services/notification.service';
 import { PostService } from '../../services/post.service';
 import { CommentService } from '../../services/comment.service';
+import { ReportService } from '../../services/report.service';
 import { ConfirmModal } from '../../components/confirm-modal/confirm-modal';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { ReportDialog } from '../../components/report-dialog/report-dialog';
 
 @Component({
     selector: 'app-home',
@@ -21,6 +24,8 @@ export class Home implements OnInit {
     private readonly notificationService = inject(NotificationService);
     private readonly postService = inject(PostService);
     private readonly commentService = inject(CommentService);
+    private readonly reportService = inject(ReportService);
+    private readonly dialog = inject(MatDialog);
 
     readonly newPostTitle = signal('');
     readonly newPostContent = signal('');
@@ -189,6 +194,26 @@ export class Home implements OnInit {
         this.confirmModalTitle.set('Delete Post');
         this.confirmModalMessage.set('Are you sure you want to delete this post? This action cannot be undone.');
         this.showConfirmModal.set(true);
+    }
+
+    onReportPost(post: any) {
+        if (!this.requireLogin()) return;
+
+        const dialogRef = this.dialog.open(ReportDialog, {
+            data: { type: 'post', targetName: post.title || 'this post' }
+        });
+
+        dialogRef.afterClosed().subscribe(reason => {
+            if (reason) {
+                this.reportService.reportPost(post.id, reason).subscribe({
+                    next: () => {
+                        this.notificationService.success('Report submitted successfully');
+                        post.showMenu = false;
+                    },
+                    error: () => this.notificationService.error('Failed to submit report')
+                });
+            }
+        });
     }
 
     toggleComments(postId: number) {

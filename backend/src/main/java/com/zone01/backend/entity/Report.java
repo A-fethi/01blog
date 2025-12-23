@@ -32,8 +32,12 @@ public class Report {
     private User reporter;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "reported_user_id", nullable = false)
+    @JoinColumn(name = "reported_user_id")
     private User reportedUser;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "reported_post_id")
+    private Post reportedPost;
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String reason;
@@ -51,6 +55,13 @@ public class Report {
     public Report(User reporter, User reportedUser, String reason) {
         this.reporter = reporter;
         this.reportedUser = reportedUser;
+        this.reason = reason;
+    }
+
+    public Report(User reporter, Post reportedPost, String reason) {
+        this.reporter = reporter;
+        this.reportedPost = reportedPost;
+        this.reportedUser = reportedPost.getAuthor();
         this.reason = reason;
     }
 
