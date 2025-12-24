@@ -82,7 +82,8 @@
                                     style="width: 32px; height: 32px; background: #e4e6eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px; font-weight: bold;">
                                     {{ user.username.charAt(0).toUpperCase() }}
                                 </div>
-                                <span style="font-weight: 600;">{{ user.username }}</span>
+                                <span style="font-weight: 600; cursor: pointer; color: #1877f2;"
+                                    [routerLink]="['/block', user.username]">{{ user.username }}</span>
                             </div>
                         </td>
                         <td style="padding: 12px 16px;">{{ user.email }}</td>
@@ -127,7 +128,12 @@
                 </thead>
                 <tbody>
                     <tr *ngFor="let post of filteredPosts()" style="border-bottom: 1px solid #e4e6eb;">
-                        <td style="padding: 12px 16px;">{{ post.authorUsername }}</td>
+                        <td style="padding: 12px 16px;">
+                            <span style="cursor: pointer; color: #1877f2; font-weight: 600;"
+                                [routerLink]="['/block', post.authorUsername]">
+                                {{ post.authorUsername }}
+                            </span>
+                        </td>
                         <td style="padding: 12px 16px;">{{ post.title || 'Untitled' }}</td>
                         <td style="padding: 12px 16px;">{{ post.content | slice:0:50 }}{{ post.content.length > 50 ?
                             '...' : '' }}</td>
@@ -161,9 +167,12 @@
                 <tbody>
                     <tr *ngFor="let report of filteredReports()" style="border-bottom: 1px solid #e4e6eb;">
                         <td style="padding: 12px 16px;">
-                            {{ report.reportedUsername }}
-                            <span *ngIf="report.reportedPostId" style="color: #65676b; font-size: 12px;">(Post #{{
-                                report.reportedPostId }})</span>
+                            <div (click)="navigateToReported(report)"
+                                style="cursor: pointer; color: #1877f2; font-weight: 600;">
+                                {{ report.reportedUsername }}
+                                <span *ngIf="report.reportedPostId" style="color: #65676b; font-size: 12px;">(Post #{{
+                                    report.reportedPostId }})</span>
+                            </div>
                         </td>
                         <td style="padding: 12px 16px;">{{ report.reason }}</td>
                         <td style="padding: 12px 16px;">
@@ -192,6 +201,43 @@
         </div>
     </div>
 
+</div>
+
+<!-- Post View Modal -->
+<div class="modal-backdrop" *ngIf="showPostModal()" (click)="closePostModal()">
+    <div class="modal-content post-view-modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h2>Reported Post</h2>
+            <button class="close-btn" (click)="closePostModal()">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+        <div class="modal-body" *ngIf="selectedPost() as post">
+            <div class="post-preview-header">
+                <div class="author-info">
+                    <span class="author-name">{{ post.authorUsername }}</span>
+                    <span class="post-date">{{ formatDate(post.createdAt) }}</span>
+                </div>
+            </div>
+            <div class="post-preview-content">
+                <h3 *ngIf="post.title">{{ post.title }}</h3>
+                <p>{{ post.content }}</p>
+                <div *ngIf="post.mediaUrl" class="post-media">
+                    <img *ngIf="post.mediaType === 'IMAGE'" [src]="post.mediaUrl"
+                        style="max-width: 100%; border-radius: 8px;">
+                    <video *ngIf="post.mediaType === 'VIDEO'" [src]="post.mediaUrl" controls
+                        style="max-width: 100%; border-radius: 8px;"></video>
+                </div>
+            </div>
+            <div class="modal-footer" style="margin-top: 20px; display: flex; gap: 12px; justify-content: flex-end;">
+                <button class="action-btn delete-btn" (click)="deletePost(post.id); closePostModal()"
+                    style="padding: 8px 16px; display: flex; align-items: center; gap: 8px;">
+                    <mat-icon>delete</mat-icon> Delete Post
+                </button>
+                <button class="action-btn" (click)="closePostModal()" style="padding: 8px 16px;">Close</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- Confirmation Modal -->

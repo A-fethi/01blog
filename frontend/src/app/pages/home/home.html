@@ -51,14 +51,20 @@
                     <mat-icon>more_horiz</mat-icon>
                 </button>
                 <div class="menu-dropdown" *ngIf="post.showMenu">
-                    <ng-container *ngIf="post.authorId === authService.currentUser()?.id; else reportOption">
+                    <ng-container *ngIf="post.authorId === authService.currentUser()?.id">
                         <button (click)="onEditPost(post); post.showMenu = false">Edit</button>
                         <button (click)="onDeletePost(post.id); post.showMenu = false"
                             class="delete-btn">Delete</button>
                     </ng-container>
-                    <ng-template #reportOption>
-                        <button (click)="onReportPost(post); post.showMenu = false">Report</button>
-                    </ng-template>
+
+                    <!-- Admin Options (if not owner) -->
+                    <button *ngIf="authService.isAdmin() && post.authorId !== authService.currentUser()?.id"
+                        (click)="onDeletePost(post.id); post.showMenu = false" class="delete-btn">Delete</button>
+
+                    <!-- Report Option (if not owner and not admin) -->
+                    <button *ngIf="!authService.isAdmin() && post.authorId !== authService.currentUser()?.id"
+                        (click)="onReportPost(post); post.showMenu = false">Report</button>
+
                 </div>
             </div>
         </div>

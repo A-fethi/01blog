@@ -33,6 +33,8 @@ export class AdminPanel {
     readonly activeTab = signal<'users' | 'posts' | 'reports'>('users');
     readonly searchQuery = signal('');
     readonly isLoading = signal(false);
+    readonly selectedPost = signal<any | null>(null);
+    readonly showPostModal = signal(false);
 
     // Confirmation Modal State
     readonly showConfirmModal = signal(false);
@@ -203,6 +205,34 @@ export class AdminPanel {
             },
             error: () => this.notificationService.error('Failed to update report status')
         });
+    }
+
+    navigateToReported(report: any) {
+        if (report.reportedPostId) {
+            this.viewPost(report.reportedPostId);
+        } else if (report.reportedUsername) {
+            this.router.navigate(['/block', report.reportedUsername]);
+        }
+    }
+
+    viewPost(postId: number) {
+        const post = this.posts().find(p => p.id === postId);
+        if (post) {
+            this.selectedPost.set(post);
+            this.showPostModal.set(true);
+        } else {
+            // If post not in current list, we might need to fetch it
+            // For now, let's try to find it in the reports if it's there
+            this.notificationService.info('Loading post details...');
+            // In a real app, you'd call adminService.getPostById(postId)
+            // Since we don't have it, we'll just show what we have or an error
+            this.notificationService.error('Post details not found in current list');
+        }
+    }
+
+    closePostModal() {
+        this.showPostModal.set(false);
+        this.selectedPost.set(null);
     }
 
     onConfirmAction() {
