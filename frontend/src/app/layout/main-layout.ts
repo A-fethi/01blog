@@ -5,6 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { AuthService, UserDTO } from '../services/auth.service';
 import { UserService } from '../services/user.service';
 import { NotificationService } from '../services/notification.service';
+import { InAppNotificationService } from '../services/in-app-notification.service';
 
 @Component({
     selector: 'app-main-layout',
@@ -17,11 +18,12 @@ export class MainLayout implements OnInit {
     readonly authService = inject(AuthService);
     private readonly userService = inject(UserService);
     private readonly notificationService = inject(NotificationService);
+    readonly inAppNotificationService = inject(InAppNotificationService);
     private readonly router = inject(Router);
 
     readonly showUserMenu = signal(false);
     readonly suggestedUsers = signal<UserDTO[]>([]);
-    readonly followingUsers = signal<any[]>([]); // Using any[] because SubscriptionDTO structure might vary
+    readonly followingUsers = signal<any[]>([]);
     readonly followedUserIds = signal<Set<number>>(new Set());
 
     readonly currentUser = computed(() => {
@@ -55,6 +57,8 @@ export class MainLayout implements OnInit {
 
     loadData() {
         if (!this.authService.isLoggedIn()) return;
+
+        this.inAppNotificationService.refreshUnreadCount();
 
         // Load Subscriptions (Following)
         this.userService.getMySubscriptions().subscribe(subs => {

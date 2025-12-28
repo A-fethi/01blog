@@ -17,10 +17,13 @@ public class SubscriptionService {
 
     private final SubscriptionRepository subscriptionRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
-    public SubscriptionService(SubscriptionRepository subscriptionRepository, UserRepository userRepository) {
+    public SubscriptionService(SubscriptionRepository subscriptionRepository, UserRepository userRepository,
+            NotificationService notificationService) {
         this.subscriptionRepository = subscriptionRepository;
         this.userRepository = userRepository;
+        this.notificationService = notificationService;
     }
 
     @Transactional
@@ -36,7 +39,9 @@ public class SubscriptionService {
             throw new IllegalStateException("Already subscribed to this user");
         }
 
-        return subscriptionRepository.save(new Subscription(subscriber, target));
+        Subscription subscription = subscriptionRepository.save(new Subscription(subscriber, target));
+        notificationService.createFollowNotification(subscriber, target);
+        return subscription;
     }
 
     @Transactional

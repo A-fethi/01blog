@@ -37,6 +37,13 @@ public class Notification {
     @JoinColumn(name = "post_id")
     private Post post;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "actor_id")
+    private User actor;
+
+    @Column(name = "target_id")
+    private Long targetId;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 40)
     private NotificationType type = NotificationType.NEW_POST;
@@ -50,9 +57,19 @@ public class Notification {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    public Notification(User recipient, Post post, String message) {
+    public Notification(User recipient, User actor, Post post, NotificationType type, String message) {
         this.recipient = recipient;
+        this.actor = actor;
         this.post = post;
+        this.type = type;
+        this.message = message;
+    }
+
+    public Notification(User recipient, User actor, Long targetId, NotificationType type, String message) {
+        this.recipient = recipient;
+        this.actor = actor;
+        this.targetId = targetId;
+        this.type = type;
         this.message = message;
     }
 

@@ -24,7 +24,11 @@
             </a>
             <a routerLink="/notifications" class="nav-tab" routerLinkActive="active" title="Notifications"
                 *ngIf="authService.isLoggedIn()">
-                <i class="icon"><mat-icon>notifications</mat-icon></i>
+                <div class="icon-with-badge">
+                    <i class="icon"><mat-icon>notifications</mat-icon></i>
+                    <span class="badge"
+                        *ngIf="inAppNotificationService.unreadCount() > 0">{{inAppNotificationService.unreadCount()}}</span>
+                </div>
             </a>
         </div>
 

@@ -29,16 +29,80 @@ public class NotificationService {
 
         List<Notification> notifications = subscribers.stream()
                 .filter(subscriber -> !subscriber.getId().equals(post.getAuthor().getId()))
-                .map(subscriber -> {
-                    Notification notification = new Notification(
+                .map(subscriber -> new Notification(
                         subscriber,
+                        post.getAuthor(),
                         post,
-                        post.getAuthor().getUsername() + " published a new post");
-                    notification.setType(NotificationType.NEW_POST);
-                    return notification;
-                })
+                        NotificationType.NEW_POST,
+                        post.getAuthor().getUsername() + " published a new post: " + post.getTitle()))
                 .toList();
 
+        notificationRepository.saveAll(notifications);
+    }
+
+    @Transactional
+    public void createLikeNotification(User actor, Post post) {
+        if (actor.getId().equals(post.getAuthor().getId())) {
+            return;
+        }
+        Notification notification = new Notification(
+                post.getAuthor(),
+                actor,
+                post,
+                NotificationType.LIKE,
+                actor.getUsername() + " liked your post: " + post.getTitle());
+        notificationRepository.save(notification);
+    }
+
+    @Transactional
+    public void createCommentNotification(User actor, Post post) {
+        if (actor.getId().equals(post.getAuthor().getId())) {
+            return;
+        }
+        Notification notification = new Notification(
+                post.getAuthor(),
+                actor,
+                post,
+                NotificationType.COMMENT,
+                actor.getUsername() + " commented on your post: " + post.getTitle());
+        notificationRepository.save(notification);
+    }
+
+    @Transactional
+    public void createShareNotification(User actor, Post post) {
+        if (actor.getId().equals(post.getAuthor().getId())) {
+            return;
+        }
+        Notification notification = new Notification(
+                post.getAuthor(),
+                actor,
+                post,
+                NotificationType.SHARE,
+                actor.getUsername() + " shared your post: " + post.getTitle());
+        notificationRepository.save(notification);
+    }
+
+    @Transactional
+    public void createFollowNotification(User actor, User recipient) {
+        Notification notification = new Notification(
+                recipient,
+                actor,
+                actor.getId(),
+                NotificationType.FOLLOW,
+                actor.getUsername() + " started following you");
+        notificationRepository.save(notification);
+    }
+
+    @Transactional
+    public void createReportNotification(User actor, Long targetId, String type, List<User> admins) {
+        List<Notification> notifications = admins.stream()
+                .map(admin -> new Notification(
+                        admin,
+                        actor,
+                        targetId,
+                        NotificationType.REPORT,
+                        actor.getUsername() + " reported a " + type))
+                .toList();
         notificationRepository.saveAll(notifications);
     }
 

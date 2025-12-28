@@ -14,10 +14,13 @@ public class LikeService {
 
     private final LikeRepository likeRepository;
     private final PostService postService;
+    private final NotificationService notificationService;
 
-    public LikeService(LikeRepository likeRepository, PostService postService) {
+    public LikeService(LikeRepository likeRepository, PostService postService,
+            NotificationService notificationService) {
         this.likeRepository = likeRepository;
         this.postService = postService;
+        this.notificationService = notificationService;
     }
 
     @Transactional
@@ -29,7 +32,9 @@ public class LikeService {
         }
 
         Like like = new Like(user, post);
-        return likeRepository.save(like);
+        Like savedLike = likeRepository.save(like);
+        notificationService.createLikeNotification(user, post);
+        return savedLike;
     }
 
     @Transactional

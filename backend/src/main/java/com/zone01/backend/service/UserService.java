@@ -167,4 +167,8 @@ public class UserService {
         user.setUpdatedAt(LocalDateTime.now());
         return userRepository.save(user);
     }
+
+    public List<User> getAllAdmins() {
+        return userRepository.findByRole(Role.ADMIN);
+    }
 }

@@ -1,19 +1,13 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
-
-interface Notification {
-  icon: string;
-  message: string;
-  time: string;
-  unread: boolean;
-}
+import { InAppNotificationService, NotificationDTO } from '../../services/in-app-notification.service';
 
 @Component({
   selector: 'app-notifications',
@@ -30,37 +24,57 @@ interface Notification {
   templateUrl: './notifications.html',
   styleUrl: './notifications.css',
 })
-export class Notifications {
+export class Notifications implements OnInit {
   authService = inject(AuthService);
+  notificationService = inject(InAppNotificationService);
+  router = inject(Router);
 
-  notifications: Notification[] = [
-    {
-      icon: 'chat',
-      message: `Alice commented on your post 'My First Angular Project'`,
-      time: '5m ago',
-      unread: true,
-    },
-    {
-      icon: 'school',
-      message: `Your submission for 'Data Structures' has been graded.`,
-      time: '2h ago',
-      unread: true,
-    },
-    {
-      icon: 'alternate_email',
-      message: `Bob mentioned you in a comment on 'Final Year Thesis Ideas'.`,
-      time: 'Yesterday',
-      unread: false,
-    },
-    {
-      icon: 'group_add',
-      message: `You have been invited to join the 'Advanced Algorithms' study group.`,
-      time: '2 days ago',
-      unread: false,
-    },
-  ];
+  notifications = signal<NotificationDTO[]>([]);
+
+  ngOnInit(): void {
+    this.loadNotifications();
+  }
+
+  loadNotifications(): void {
+    this.notificationService.getNotifications().subscribe(notifications => {
+      this.notifications.set(notifications);
+      this.notificationService.refreshUnreadCount();
+    });
+  }
 
   markAllAsRead(): void {
-    this.notifications.forEach(n => (n.unread = false));
+    this.notificationService.markAllAsRead().subscribe(() => {
+      this.loadNotifications();
+    });
+  }
+
+  onNotificationClick(notification: NotificationDTO): void {
+    if (!notification.read) {
+      this.notificationService.markAsRead(notification.id).subscribe(() => {
+        notification.read = true;
+        this.notificationService.refreshUnreadCount();
+      });
+    }
+
+    // Navigation logic based on type
+    if (notification.type === 'FOLLOW') {
+      this.router.navigate(['/block', notification.actorUsername]);
+    } else if (notification.postId) {
+      this.router.navigate(['/home']);
+    } else if (notification.type === 'REPORT' && this.authService.isAdmin()) {
+      this.router.navigate(['/admin-panel']);
+    }
+  }
+
+  getIcon(type: string): string {
+    switch (type) {
+      case 'LIKE': return 'favorite';
+      case 'COMMENT': return 'comment';
+      case 'FOLLOW': return 'person_add';
+      case 'NEW_POST': return 'article';
+      case 'SHARE': return 'share';
+      case 'REPORT': return 'report';
+      default: return 'notifications';
+    }
   }
 }

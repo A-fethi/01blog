@@ -21,12 +21,16 @@ public class ReportService {
     private final ReportRepository reportRepository;
     private final UserRepository UserRepository;
     private final PostRepository postRepository;
+    private final NotificationService notificationService;
+    private final UserService userService;
 
     public ReportService(ReportRepository reportRepository, UserRepository userRepository,
-            PostRepository postRepository) {
+            PostRepository postRepository, NotificationService notificationService, UserService userService) {
         this.reportRepository = reportRepository;
         this.UserRepository = userRepository;
         this.postRepository = postRepository;
+        this.notificationService = notificationService;
+        this.userService = userService;
     }
 
     @Transactional
@@ -43,7 +47,9 @@ public class ReportService {
         }
 
         Report report = new Report(reporter, reported, reason.strip());
-        return reportRepository.save(report);
+        Report savedReport = reportRepository.save(report);
+        notificationService.createReportNotification(reporter, reportedUserId, "profile", userService.getAllAdmins());
+        return savedReport;
     }
 
     @Transactional
@@ -60,7 +66,9 @@ public class ReportService {
         }
 
         Report report = new Report(reporter, post, reason.strip());
-        return reportRepository.save(report);
+        Report savedReport = reportRepository.save(report);
+        notificationService.createReportNotification(reporter, postId, "post", userService.getAllAdmins());
+        return savedReport;
     }
 
     public List<Report> getAllReports() {

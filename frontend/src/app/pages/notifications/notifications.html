@@ -1,20 +1,26 @@
 <div class="notifications-header"
   style="padding: 16px 0; display: flex; justify-content: space-between; align-items: center;">
   <h2 style="margin: 0; font-size: 24px; font-weight: 700;">Notifications</h2>
-  <button mat-button color="primary" (click)="markAllAsRead()">Mark all as read</button>
+  <button mat-button color="primary" (click)="markAllAsRead()" *ngIf="notifications().length > 0">Mark all as read</button>
 </div>
 
 <div class="notifications-list">
-  <div class="notification-card" *ngFor="let n of notifications" [class.unread]="n.unread">
+  <div class="notification-card" *ngFor="let n of notifications()" [class.unread]="!n.read" (click)="onNotificationClick(n)">
     <div class="notification-icon">
-      <mat-icon>{{ n.icon }}</mat-icon>
+      <img *ngIf="n.actorAvatarUrl" [src]="n.actorAvatarUrl" class="avatar-img">
+      <mat-icon *ngIf="!n.actorAvatarUrl">{{ getIcon(n.type) }}</mat-icon>
     </div>
     <div class="notification-content">
       <p class="notification-message">{{ n.message }}</p>
-      <span class="notification-time">{{ n.time }}</span>
+      <span class="notification-time">{{ n.createdAt | date:'short' }}</span>
     </div>
-    <div class="notification-status" *ngIf="n.unread">
+    <div class="notification-status" *ngIf="!n.read">
       <span class="dot"></span>
     </div>
+  </div>
+
+  <div *ngIf="notifications().length === 0" class="empty-notifications">
+    <mat-icon>notifications_none</mat-icon>
+    <p>No notifications yet</p>
   </div>
 </div>

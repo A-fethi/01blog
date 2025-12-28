@@ -16,10 +16,13 @@ import jakarta.transaction.Transactional;
 public class CommentService {
     private final CommentRepository commentRepository;
     private final PostService postService;
+    private final NotificationService notificationService;
 
-    public CommentService(CommentRepository commentRepository, PostService postService) {
+    public CommentService(CommentRepository commentRepository, PostService postService,
+            NotificationService notificationService) {
         this.commentRepository = commentRepository;
         this.postService = postService;
+        this.notificationService = notificationService;
     }
 
     @Transactional
@@ -36,7 +39,9 @@ public class CommentService {
         comment.setAuthor(user);
         comment.setCreatedAt(java.time.LocalDateTime.now());
         comment.setUpdatedAt(java.time.LocalDateTime.now());
-        return commentRepository.save(comment);
+        Comment savedComment = commentRepository.save(comment);
+        notificationService.createCommentNotification(user, post);
+        return savedComment;
     }
 
     public List<Comment> getCommentsByPost(Long postId) {
