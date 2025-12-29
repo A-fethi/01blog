@@ -2,7 +2,7 @@ import { Component, signal, computed, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule, ActivatedRoute, Params } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { NotificationService } from '../../services/notification.service';
 import { PostService } from '../../services/post.service';
@@ -26,10 +26,12 @@ export class Home implements OnInit {
     private readonly commentService = inject(CommentService);
     private readonly reportService = inject(ReportService);
     private readonly dialog = inject(MatDialog);
+    private readonly route = inject(ActivatedRoute);
 
     readonly newPostTitle = signal('');
     readonly newPostContent = signal('');
     readonly selectedFile = signal<File | null>(null);
+    readonly selectedFilePreview = signal<string | null>(null);
     readonly showComments = signal<Set<number>>(new Set());
     readonly commentInputs = signal<Map<number, string>>(new Map());
     readonly showUserMenu = signal(false);
@@ -75,6 +77,21 @@ export class Home implements OnInit {
             next: (posts) => {
                 this.posts.set(posts);
                 this.loading.set(false);
+
+                // Check for postId in query params to scroll to it
+                this.route.queryParams.subscribe((params: Params) => {
+                    const postId = params['postId'];
+                    if (postId) {
+                        setTimeout(() => {
+                            const element = document.getElementById('post-' + postId);
+                            if (element) {
+                                element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                element.classList.add('highlight-post');
+                                setTimeout(() => element.classList.remove('highlight-post'), 2000);
+                            }
+                        }, 100);
+                    }
+                });
             },
             error: () => this.loading.set(false)
         });
@@ -92,6 +109,12 @@ export class Home implements OnInit {
         const file = event.target.files[0];
         if (file) {
             this.selectedFile.set(file);
+            // Create a preview URL
+            const reader = new FileReader();
+            reader.onload = () => {
+                this.selectedFilePreview.set(reader.result as string);
+            };
+            reader.readAsDataURL(file);
         }
     }
 
@@ -120,6 +143,7 @@ export class Home implements OnInit {
                 this.newPostTitle.set('');
                 this.newPostContent.set('');
                 this.selectedFile.set(null);
+                this.selectedFilePreview.set(null);
                 this.notificationService.success('Post shared!');
             },
             error: (err) => {

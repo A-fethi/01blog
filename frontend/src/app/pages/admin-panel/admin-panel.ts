@@ -1,7 +1,7 @@
-import { Component, signal, computed, effect, inject } from '@angular/core';
+import { Component, signal, computed, effect, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule, ActivatedRoute, Params } from '@angular/router';
 import { AdminService, UserDTO, AdminStats } from '../../services/admin.service';
 import { AuthService } from '../../services/auth.service';
 import { NotificationService } from '../../services/notification.service';
@@ -14,10 +14,11 @@ import { ConfirmModal } from '../../components/confirm-modal/confirm-modal';
     templateUrl: './admin-panel.html',
     styleUrl: './admin-panel.css'
 })
-export class AdminPanel {
+export class AdminPanel implements OnInit {
     private readonly adminService = inject(AdminService);
     readonly authService = inject(AuthService);  // Changed from private to public
     private readonly router = inject(Router);
+    private readonly route = inject(ActivatedRoute);
     private readonly notificationService = inject(NotificationService);
 
     readonly stats = signal<AdminStats>({
@@ -93,6 +94,15 @@ export class AdminPanel {
                 if (this.users().length === 0 && !this.isLoading()) {
                     this.loadDashboardData();
                 }
+            }
+        });
+    }
+
+    ngOnInit() {
+        this.route.queryParams.subscribe((params: Params) => {
+            const tab = params['tab'];
+            if (tab === 'reports' || tab === 'users' || tab === 'posts') {
+                this.activeTab.set(tab);
             }
         });
     }

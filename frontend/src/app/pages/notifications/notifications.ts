@@ -59,10 +59,10 @@ export class Notifications implements OnInit {
     // Navigation logic based on type
     if (notification.type === 'FOLLOW') {
       this.router.navigate(['/block', notification.actorUsername]);
-    } else if (notification.postId) {
-      this.router.navigate(['/home']);
     } else if (notification.type === 'REPORT' && this.authService.isAdmin()) {
-      this.router.navigate(['/admin-panel']);
+      this.router.navigate(['/admin'], { queryParams: { tab: 'reports' } });
+    } else if (notification.postId) {
+      this.router.navigate(['/home'], { queryParams: { postId: notification.postId } });
     }
   }
 

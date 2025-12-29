@@ -76,6 +76,54 @@
   background-color: #e4e6eb;
 }
 
+/* --- Selected Media Preview --- */
+.selected-media-preview {
+  margin-top: 12px;
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e4e6eb;
+  max-height: 300px;
+  background-color: #f0f2f5;
+  display: flex;
+  justify-content: center;
+}
+
+.selected-media-preview img,
+.selected-media-preview video {
+  max-width: 100%;
+  max-height: 300px;
+  display: block;
+}
+
+.remove-media {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+  transition: background-color 0.2s;
+}
+
+.remove-media:hover {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+.remove-media mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
 .share-post-btn {
   background-color: #1877f2;
   color: white;
@@ -429,4 +477,24 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+@keyframes highlight {
+  0% {
+    background-color: white;
+  }
+
+  50% {
+    background-color: #e7f3ff;
+    box-shadow: 0 0 15px rgba(24, 119, 242, 0.3);
+  }
+
+  100% {
+    background-color: white;
+  }
+}
+
+.highlight-post {
+  animation: highlight 2s ease-in-out;
+  border: 2px solid #1877f2;
 }

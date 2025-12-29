@@ -12,6 +12,16 @@
                 [placeholder]="authService.isLoggedIn() ? 'Share your learning journey' : 'You must log in to post'"
                 [ngModel]="newPostContent()" (ngModelChange)="newPostContent.set($event)"
                 [disabled]="!authService.isLoggedIn()"></textarea>
+
+            <!-- Media Preview -->
+            <div class="selected-media-preview" *ngIf="selectedFilePreview()">
+                <button class="remove-media" (click)="selectedFile.set(null); selectedFilePreview.set(null)">
+                    <mat-icon>close</mat-icon>
+                </button>
+                <img *ngIf="selectedFile()?.type?.startsWith('image/')" [src]="selectedFilePreview()" alt="Preview">
+                <video *ngIf="selectedFile()?.type?.startsWith('video/')" [src]="selectedFilePreview()"
+                    controls></video>
+            </div>
         </div>
     </div>
     <div class="create-post-actions">
@@ -33,7 +43,7 @@
         <mat-icon class="spin">refresh</mat-icon> Loading feed...
     </div>
 
-    <div class="post-card" *ngFor="let post of posts()">
+    <div class="post-card" *ngFor="let post of posts()" [id]="'post-' + post.id">
         <div class="post-header">
             <img *ngIf="post.authorAvatarUrl" [src]="post.authorAvatarUrl" class="avatar">
             <div *ngIf="!post.authorAvatarUrl" class="avatar-placeholder">
