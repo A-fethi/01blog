@@ -62,12 +62,12 @@ export class MainLayout implements OnInit {
 
         // Load Subscriptions (Following)
         this.userService.getMySubscriptions().subscribe(subs => {
-            const followedIds = new Set(subs.map((s: any) => s.targetUser?.id || s.targetId));
+            const followedIds = new Set(subs.map((s: any) => s.targetId));
             this.followedUserIds.set(followedIds);
 
             // Map subscriptions to user-like objects for display
             const following = subs.map((s: any) => ({
-                id: s.targetUser?.id || s.targetId,
+                id: s.targetId,
                 username: s.targetUsername,
                 avatarUrl: s.targetAvatarUrl
             }));

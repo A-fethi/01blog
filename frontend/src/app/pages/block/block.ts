@@ -140,7 +140,7 @@ export class Block implements OnInit {
         if (!this.authService.isLoggedIn()) return;
         this.userService.getMySubscriptions().subscribe({
             next: (subscriptions) => {
-                const isFollowing = subscriptions.some((s: any) => s.targetUser?.id === userId);
+                const isFollowing = subscriptions.some((s: any) => s.targetId === userId);
                 this.isFollowing.set(isFollowing);
             }
         });

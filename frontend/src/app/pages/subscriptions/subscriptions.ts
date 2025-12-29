@@ -56,7 +56,7 @@ export class Subscriptions implements OnInit {
 
     this.userService.getMySubscriptions().subscribe({
       next: (subs) => {
-        const followedIds = new Set(subs.map((s: any) => s.targetUser?.id || s.targetId));
+        const followedIds = new Set(subs.map((s: any) => s.targetId));
 
         this.postService.getAllPosts().subscribe({
           next: (allPosts) => {
