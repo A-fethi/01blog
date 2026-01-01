@@ -64,8 +64,6 @@ public class AuthController {
         String avatarUrl = null;
         if (avatar != null && !avatar.isEmpty()) {
             String fileName = fileStorageService.storeFile(avatar);
-            // Assuming the server runs on localhost:8080. In production, use a property or
-            // dynamic builder.
             avatarUrl = "http://localhost:8080/uploads/" + fileName;
         }
 

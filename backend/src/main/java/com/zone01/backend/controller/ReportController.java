@@ -13,7 +13,6 @@ import com.zone01.backend.dto.ReportDTO;
 import com.zone01.backend.entity.Report;
 import com.zone01.backend.security.AppUserDetails;
 import com.zone01.backend.service.ReportService;
-import com.zone01.backend.service.UserService;
 
 import jakarta.validation.Valid;
 

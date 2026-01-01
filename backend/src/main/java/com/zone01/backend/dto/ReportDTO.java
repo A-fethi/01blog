@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ReportDTO {
     private Long id;
-    private Long reportedId; // This is the reporter's ID
+    private Long reportedId;
     private Long reportedUserId;
     private Long reportedPostId;
     private String reportedUsername;

@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.zone01.backend.dto.PostDTO;
 import com.zone01.backend.dto.ReportDTO;
 import com.zone01.backend.dto.UserDTO;
-import com.zone01.backend.entity.Post;
 import com.zone01.backend.entity.Role;
 import com.zone01.backend.entity.User;
 import com.zone01.backend.security.AppUserDetails;
@@ -65,8 +64,7 @@ public class AdminController {
         }
         Map<String, Object> stats = new HashMap<>();
 
-        long totalUsers = userService.getAllUsers().size(); // userService doesn't have count() yet, size() is fine for
-                                                            // now
+        long totalUsers = userService.getAllUsers().size();
         stats.put("totalUsers", totalUsers);
         stats.put("regularUsers", Math.max(totalUsers - 1L, 0L));
         stats.put("totalPosts", postService.countAllPosts());
