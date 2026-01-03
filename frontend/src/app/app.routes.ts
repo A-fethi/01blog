@@ -74,6 +74,11 @@ export const routes: Routes = [
         data: { type: '400' }
     },
     {
+        path: '429',
+        component: ErrorPage,
+        data: { type: '429' }
+    },
+    {
         path: 'error',
         component: ErrorPage
     },

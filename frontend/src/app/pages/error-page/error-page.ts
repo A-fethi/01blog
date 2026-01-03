@@ -41,6 +41,11 @@ export class ErrorPage implements OnInit {
                 this.errorMessage = 'Bad Request';
                 this.errorDescription = "The server could not understand the request.";
                 this.errorIcon = 'error_outline';
+            } else if (data['type'] === '429') {
+                this.errorCode = '429';
+                this.errorMessage = 'Too Many Requests';
+                this.errorDescription = "Slow down! You're sending too many requests. Please wait a moment before trying again.";
+                this.errorIcon = 'speed';
             }
         });
 
