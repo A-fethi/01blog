@@ -27,22 +27,19 @@ public class LikeService {
     public Like likePost(Long postId, User user) {
         Post post = postService.getPostById(postId);
 
-        if (likeRepository.existsByUserAndPost(user, post)) {
-            throw new IllegalStateException("You already liked this post");
-        }
-
-        Like like = new Like(user, post);
-        Like savedLike = likeRepository.save(like);
-        notificationService.createLikeNotification(user, post);
-        return savedLike;
+        return likeRepository.findByUserAndPost(user, post)
+                .orElseGet(() -> {
+                    Like like = new Like(user, post);
+                    Like savedLike = likeRepository.save(like);
+                    notificationService.createLikeNotification(user, post);
+                    return savedLike;
+                });
     }
 
     @Transactional
     public void unlikePost(Long postId, User user) {
         Post post = postService.getPostById(postId);
-        Like like = likeRepository.findByUserAndPost(user, post)
-                .orElseThrow(() -> new IllegalStateException("You haven't liked this post yet"));
-
-        likeRepository.delete(like);
+        likeRepository.findByUserAndPost(user, post)
+                .ifPresent(likeRepository::delete);
     }
 }

@@ -35,13 +35,12 @@ public class SubscriptionService {
         User target = userRepository.findById(targetUserId)
                 .orElseThrow(() -> new UserNotFoundException(targetUserId));
 
-        if (subscriptionRepository.existsBySubscriberAndTarget(subscriber, target)) {
-            throw new IllegalStateException("Already subscribed to this user");
-        }
-
-        Subscription subscription = subscriptionRepository.save(new Subscription(subscriber, target));
-        notificationService.createFollowNotification(subscriber, target);
-        return subscription;
+        return subscriptionRepository.findBySubscriberAndTarget(subscriber, target)
+                .orElseGet(() -> {
+                    Subscription subscription = subscriptionRepository.save(new Subscription(subscriber, target));
+                    notificationService.createFollowNotification(subscriber, target);
+                    return subscription;
+                });
     }
 
     @Transactional
@@ -49,10 +48,8 @@ public class SubscriptionService {
         User target = userRepository.findById(targetUserId)
                 .orElseThrow(() -> new UserNotFoundException(targetUserId));
 
-        Subscription subscription = subscriptionRepository.findBySubscriberAndTarget(subscriber, target)
-                .orElseThrow(() -> new IllegalStateException("Subscription not found"));
-
-        subscriptionRepository.delete(subscription);
+        subscriptionRepository.findBySubscriberAndTarget(subscriber, target)
+                .ifPresent(subscriptionRepository::delete);
     }
 
     public long countSubscribers(User user) {

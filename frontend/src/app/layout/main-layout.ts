@@ -25,6 +25,7 @@ export class MainLayout implements OnInit {
     readonly suggestedUsers = signal<UserDTO[]>([]);
     readonly followingUsers = signal<any[]>([]);
     readonly followedUserIds = signal<Set<number>>(new Set());
+    private followingUserIdsInProgress = new Set<number>();
 
     readonly currentUser = computed(() => {
         const user = this.authService.currentUser();
@@ -91,6 +92,9 @@ export class MainLayout implements OnInit {
             return;
         }
 
+        if (this.followingUserIdsInProgress.has(user.id)) return;
+        this.followingUserIdsInProgress.add(user.id);
+
         const isFollowing = this.followedUserIds().has(user.id);
 
         if (isFollowing) {
@@ -106,7 +110,9 @@ export class MainLayout implements OnInit {
                     // Add back to suggestions if needed, or just reload
                     this.loadData();
                     this.notificationService.success(`Unfollowed ${user.username}`);
-                }
+                    this.followingUserIdsInProgress.delete(user.id);
+                },
+                error: () => this.followingUserIdsInProgress.delete(user.id)
             });
         } else {
             this.userService.followUser(user.id).subscribe({
@@ -125,7 +131,9 @@ export class MainLayout implements OnInit {
                     // Remove from suggestions
                     this.suggestedUsers.update(users => users.filter(u => u.id !== user.id));
                     this.notificationService.success(`Following ${user.username}`);
-                }
+                    this.followingUserIdsInProgress.delete(user.id);
+                },
+                error: () => this.followingUserIdsInProgress.delete(user.id)
             });
         }
     }

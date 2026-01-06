@@ -54,6 +54,8 @@ export class Home implements OnInit {
     readonly confirmModalMessage = signal('');
     private confirmAction: (() => void) | null = null;
 
+    private likingPosts = new Set<number>();
+
     readonly currentUser = computed(() => {
         const user = this.authService.currentUser();
         return user ? {
@@ -158,17 +160,28 @@ export class Home implements OnInit {
             return;
         }
 
+        if (this.likingPosts.has(post.id)) return;
+        this.likingPosts.add(post.id);
+
         if (post.isLiked) {
-            this.postService.unlikePost(post.id).subscribe(() => {
-                post.isLiked = false;
-                post.likesCount = (post.likesCount || 0) - 1;
-                this.posts.update(p => [...p]);
+            this.postService.unlikePost(post.id).subscribe({
+                next: () => {
+                    post.isLiked = false;
+                    post.likesCount = (post.likesCount || 0) - 1;
+                    this.posts.update(p => [...p]);
+                    this.likingPosts.delete(post.id);
+                },
+                error: () => this.likingPosts.delete(post.id)
             });
         } else {
-            this.postService.likePost(post.id).subscribe(() => {
-                post.isLiked = true;
-                post.likesCount = (post.likesCount || 0) + 1;
-                this.posts.update(p => [...p]);
+            this.postService.likePost(post.id).subscribe({
+                next: () => {
+                    post.isLiked = true;
+                    post.likesCount = (post.likesCount || 0) + 1;
+                    this.posts.update(p => [...p]);
+                    this.likingPosts.delete(post.id);
+                },
+                error: () => this.likingPosts.delete(post.id)
             });
         }
     }

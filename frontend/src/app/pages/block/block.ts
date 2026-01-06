@@ -67,6 +67,9 @@ export class Block implements OnInit {
     readonly confirmModalMessage = signal('');
     private confirmAction: (() => void) | null = null;
 
+    private likingPosts = new Set<number>();
+    private togglingFollow = false;
+
     // Computed
     readonly isOwnProfile = computed(() => {
         const current = this.authService.currentUser();
@@ -152,15 +155,18 @@ export class Block implements OnInit {
             return;
         }
         const user = this.profileUser();
-        if (!user) return;
+        if (!user || this.togglingFollow) return;
 
+        this.togglingFollow = true;
         if (this.isFollowing()) {
             this.userService.unfollowUser(user.id).subscribe({
                 next: () => {
                     this.isFollowing.set(false);
                     this.followersCount.update(c => c - 1);
                     this.notificationService.success(`Unfollowed ${user.username}`);
-                }
+                    this.togglingFollow = false;
+                },
+                error: () => this.togglingFollow = false
             });
         } else {
             this.userService.followUser(user.id).subscribe({
@@ -168,7 +174,9 @@ export class Block implements OnInit {
                     this.isFollowing.set(true);
                     this.followersCount.update(c => c + 1);
                     this.notificationService.success(`Following ${user.username}`);
-                }
+                    this.togglingFollow = false;
+                },
+                error: () => this.togglingFollow = false
             });
         }
     }
@@ -315,17 +323,28 @@ export class Block implements OnInit {
             this.notificationService.info('Please log in to like posts');
             return;
         }
+        if (this.likingPosts.has(post.id)) return;
+        this.likingPosts.add(post.id);
+
         if (post.isLiked) {
-            this.postService.unlikePost(post.id).subscribe(() => {
-                post.isLiked = false;
-                post.likesCount = (post.likesCount || 0) - 1;
-                this.userPosts.update(p => [...p]);
+            this.postService.unlikePost(post.id).subscribe({
+                next: () => {
+                    post.isLiked = false;
+                    post.likesCount = (post.likesCount || 0) - 1;
+                    this.userPosts.update(p => [...p]);
+                    this.likingPosts.delete(post.id);
+                },
+                error: () => this.likingPosts.delete(post.id)
             });
         } else {
-            this.postService.likePost(post.id).subscribe(() => {
-                post.isLiked = true;
-                post.likesCount = (post.likesCount || 0) + 1;
-                this.userPosts.update(p => [...p]);
+            this.postService.likePost(post.id).subscribe({
+                next: () => {
+                    post.isLiked = true;
+                    post.likesCount = (post.likesCount || 0) + 1;
+                    this.userPosts.update(p => [...p]);
+                    this.likingPosts.delete(post.id);
+                },
+                error: () => this.likingPosts.delete(post.id)
             });
         }
     }
