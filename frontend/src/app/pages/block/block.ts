@@ -258,6 +258,22 @@ export class Block implements OnInit {
         });
     }
 
+    onDeleteProfile() {
+        this.confirmAction = () => {
+            this.userService.deleteProfile().subscribe({
+                next: () => {
+                    this.notificationService.success('Your profile has been deleted.');
+                    this.authService.logout();
+                    this.router.navigate(['/home']);
+                },
+                error: () => this.notificationService.error('Failed to delete profile')
+            });
+        };
+        this.confirmModalTitle.set('Delete Profile');
+        this.confirmModalMessage.set('Are you sure you want to delete your profile? This action is permanent and will delete all your posts, comments, and likes.');
+        this.showConfirmModal.set(true);
+    }
+
     // Modal Methods
     openFollowersModal() {
         const user = this.profileUser();

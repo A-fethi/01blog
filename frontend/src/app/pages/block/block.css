@@ -522,3 +522,17 @@
     font-weight: 600;
     cursor: pointer;
 }
+
+.delete-profile-btn {
+    background-color: #e41e3f;
+    color: white;
+    padding: 6px 16px;
+    border-radius: 6px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.delete-profile-btn:hover {
+    background-color: #c01935;
+}

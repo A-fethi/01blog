@@ -66,4 +66,7 @@ export class UserService {
     updateProfile(formData: FormData): Observable<UserDTO> {
         return this.http.put<UserDTO>(`${this.baseUrl}/profile`, formData);
     }
+    deleteProfile(): Observable<any> {
+        return this.http.delete(`${this.baseUrl}/me`);
+    }
 }
