@@ -17,6 +17,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     List<Post> findByTitleContainingIgnoreCase(String keyword);
 
+    @org.springframework.data.jpa.repository.Query("SELECT p FROM Post p JOIN FETCH p.author ORDER BY p.createdAt DESC")
     List<Post> findAllByOrderByCreatedAtDesc();
 
     List<Post> findByAuthorOrderByCreatedAtDesc(User author);
@@ -25,7 +26,11 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     long countByAuthorId(Long authorId);
 
-    List<Post> findByAuthorUsernameOrderByCreatedAtDesc(String username);
+    @org.springframework.data.jpa.repository.Query("SELECT p FROM Post p JOIN FETCH p.author WHERE p.author.username = :username ORDER BY p.createdAt DESC")
+    List<Post> findByAuthorUsernameOrderByCreatedAtDesc(
+            @org.springframework.data.repository.query.Param("username") String username);
 
-    List<Post> findByAuthorIdInOrderByCreatedAtDesc(List<Long> authorIds);
+    @org.springframework.data.jpa.repository.Query("SELECT p FROM Post p JOIN FETCH p.author WHERE p.author.id IN :authorIds ORDER BY p.createdAt DESC")
+    List<Post> findByAuthorIdInOrderByCreatedAtDesc(
+            @org.springframework.data.repository.query.Param("authorIds") List<Long> authorIds);
 }

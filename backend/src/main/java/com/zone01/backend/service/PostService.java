@@ -130,16 +130,22 @@ public class PostService {
     }
 
     public List<PostDTO> getPostsByUsername(String username, User currentUser) {
-        return postRepository.findByAuthorUsernameOrderByCreatedAtDesc(username)
-                .stream()
-                .map(post -> toDto(post, currentUser))
+        List<Post> posts = postRepository.findByAuthorUsernameOrderByCreatedAtDesc(username);
+        java.util.Set<Long> likedPostIds = currentUser != null ? likeRepository.findPostIdsLikedByUser(currentUser)
+                : java.util.Collections.emptySet();
+
+        return posts.stream()
+                .map(post -> toDto(post, likedPostIds))
                 .collect(Collectors.toList());
     }
 
     public List<PostDTO> getAllPostsDTO(User currentUser) {
-        return postRepository.findAllByOrderByCreatedAtDesc()
-                .stream()
-                .map(post -> toDto(post, currentUser))
+        List<Post> posts = postRepository.findAllByOrderByCreatedAtDesc();
+        java.util.Set<Long> likedPostIds = currentUser != null ? likeRepository.findPostIdsLikedByUser(currentUser)
+                : java.util.Collections.emptySet();
+
+        return posts.stream()
+                .map(post -> toDto(post, likedPostIds))
                 .collect(Collectors.toList());
     }
 
@@ -148,9 +154,12 @@ public class PostService {
         if (followedIds.isEmpty()) {
             return List.of();
         }
-        return postRepository.findByAuthorIdInOrderByCreatedAtDesc(followedIds)
-                .stream()
-                .map(post -> toDto(post, user))
+        List<Post> posts = postRepository.findByAuthorIdInOrderByCreatedAtDesc(followedIds);
+        java.util.Set<Long> likedPostIds = user != null ? likeRepository.findPostIdsLikedByUser(user)
+                : java.util.Collections.emptySet();
+
+        return posts.stream()
+                .map(post -> toDto(post, likedPostIds))
                 .collect(Collectors.toList());
     }
 
@@ -160,18 +169,17 @@ public class PostService {
     }
 
     public PostDTO getPostDetails(Long id, User currentUser) {
-        return toDto(getPostById(id), currentUser);
+        Post post = getPostById(id);
+        boolean isLiked = currentUser != null && likeRepository.existsByUserAndPost(currentUser, post);
+        return new PostDTO(post).withIsLiked(isLiked);
     }
 
-    private PostDTO toDto(Post post, User currentUser) {
-        long likes = likeRepository.countByPostId(post.getId());
-        long comments = commentRepository.countByPostId(post.getId());
-        boolean isLiked = currentUser != null && likeRepository.existsByUserAndPost(currentUser, post);
+    private PostDTO toDto(Post post, java.util.Set<Long> likedPostIds) {
         PostDTO postDTO = new PostDTO(post);
         if (postDTO.getMediaType() == null && postDTO.getMediaUrl() != null) {
             postDTO.setMediaType(guessMediaType(postDTO.getMediaUrl()));
         }
-        return postDTO.withCounts(likes, comments).withIsLiked(isLiked);
+        return postDTO.withIsLiked(likedPostIds.contains(post.getId()));
     }
 
     private MediaType guessMediaType(String mediaUrl) {

@@ -47,6 +47,8 @@ public class PostDTO {
         this.createdAt = post.getCreatedAt();
         this.updateAt = post.getUpdatedAt();
         this.authorAvatarUrl = post.getAuthor().getAvatarUrl();
+        this.likesCount = post.getLikeCount();
+        this.commentsCount = post.getCommentCount();
     }
 
     @JsonProperty("isLiked")

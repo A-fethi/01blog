@@ -19,6 +19,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import org.hibernate.annotations.Formula;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -49,6 +50,12 @@ public class Post {
     @Enumerated(EnumType.STRING)
     @Column(name = "media_type", length = 10)
     private MediaType mediaType;
+
+    @Formula("(SELECT COUNT(*) FROM likes l WHERE l.post_id = id)")
+    private long likeCount;
+
+    @Formula("(SELECT COUNT(*) FROM comments c WHERE c.post_id = id)")
+    private long commentCount;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
