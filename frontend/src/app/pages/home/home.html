@@ -83,8 +83,10 @@
             <h3 *ngIf="post.title && post.title !== 'Untitled Post'" class="post-title">{{post.title}}</h3>
             <p>{{post.content}}</p>
             <div *ngIf="post.mediaUrl" class="post-media">
-                <img *ngIf="post.mediaType === 'IMAGE'" [src]="post.mediaUrl">
-                <video *ngIf="post.mediaType === 'VIDEO'" [src]="post.mediaUrl" controls></video>
+                <img *ngIf="post.mediaType === 'IMAGE'" [src]="post.mediaUrl" class="clickable-media"
+                    (click)="openLightbox(post.mediaUrl, 'IMAGE')">
+                <video *ngIf="post.mediaType === 'VIDEO'" [src]="post.mediaUrl" controls class="clickable-media"
+                    (click)="openLightbox(post.mediaUrl, 'VIDEO')"></video>
             </div>
         </div>
 

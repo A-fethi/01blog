@@ -1,0 +1,68 @@
+<div class="discover-container">
+    <div class="discover-section">
+        <h2>Who to follow</h2>
+        <div class="user-list">
+            <div class="user-card" *ngFor="let user of suggestedUsers()">
+                <div class="user-info" (click)="viewUserProfile(user.username)">
+                    <img *ngIf="user.avatarUrl" [src]="user.avatarUrl" class="avatar">
+                    <div *ngIf="!user.avatarUrl" class="avatar-placeholder">
+                        <mat-icon>account_circle</mat-icon>
+                    </div>
+                    <div class="details">
+                        <h4>{{ user.username }}</h4>
+                        <p>@{{ user.username }}</p>
+                    </div>
+                </div>
+                <button class="follow-btn" (click)="onFollowUser(user)">
+                    Follow
+                </button>
+            </div>
+            <div *ngIf="suggestedUsers().length === 0" class="empty-state">
+                <p>No new suggestions at the moment.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="discover-section" *ngIf="followersUsers().length > 0">
+        <h2>Followers</h2>
+        <div class="user-list">
+            <div class="user-card" *ngFor="let user of followersUsers()">
+                <div class="user-info" (click)="viewUserProfile(user.username)">
+                    <img *ngIf="user.avatarUrl" [src]="user.avatarUrl" class="avatar">
+                    <div *ngIf="!user.avatarUrl" class="avatar-placeholder">
+                        <mat-icon>account_circle</mat-icon>
+                    </div>
+                    <div class="details">
+                        <h4>{{ user.username }}</h4>
+                        <p>@{{ user.username }}</p>
+                    </div>
+                </div>
+                <button class="follow-btn" [class.following]="followedUserIds().has(user.id)"
+                    (click)="onFollowUser(user)">
+                    {{ followedUserIds().has(user.id) ? 'Unfollow' : 'Follow Back' }}
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="discover-section" *ngIf="followingUsers().length > 0">
+        <h2>Following</h2>
+        <div class="user-list">
+            <div class="user-card" *ngFor="let user of followingUsers()">
+                <div class="user-info" (click)="viewUserProfile(user.username)">
+                    <img *ngIf="user.avatarUrl" [src]="user.avatarUrl" class="avatar">
+                    <div *ngIf="!user.avatarUrl" class="avatar-placeholder">
+                        <mat-icon>account_circle</mat-icon>
+                    </div>
+                    <div class="details">
+                        <h4>{{ user.username }}</h4>
+                        <p>@{{ user.username }}</p>
+                    </div>
+                </div>
+                <button class="follow-btn following" (click)="onFollowUser(user)">
+                    Unfollow
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -11,6 +11,7 @@ import { ReportService } from '../../services/report.service';
 import { ConfirmModal } from '../../components/confirm-modal/confirm-modal';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ReportDialog } from '../../components/report-dialog/report-dialog';
+import { LightboxService } from '../../services/lightbox.service';
 
 @Component({
     selector: 'app-home',
@@ -27,6 +28,11 @@ export class Home implements OnInit {
     private readonly reportService = inject(ReportService);
     private readonly dialog = inject(MatDialog);
     private readonly route = inject(ActivatedRoute);
+    private readonly lightboxService = inject(LightboxService);
+
+    openLightbox(url: string, type: 'IMAGE' | 'VIDEO') {
+        this.lightboxService.open(url, type);
+    }
 
     readonly newPostTitle = signal('');
     readonly newPostContent = signal('');

@@ -6,6 +6,7 @@ import { AdminPanel } from './pages/admin-panel/admin-panel';
 import { Notifications } from './pages/notifications/notifications';
 import { Block } from './pages/block/block';
 import { Subscriptions } from './pages/subscriptions/subscriptions';
+import { Discover } from './pages/discover/discover';
 import { MainLayout } from './layout/main-layout';
 import { ErrorPage } from './pages/error-page/error-page';
 
@@ -42,6 +43,10 @@ export const routes: Routes = [
             {
                 path: 'subscriptions',
                 component: Subscriptions
+            },
+            {
+                path: 'discover',
+                component: Discover
             }
         ]
     },

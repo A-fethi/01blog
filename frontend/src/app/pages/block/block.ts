@@ -14,6 +14,7 @@ import { ConfirmModal } from '../../components/confirm-modal/confirm-modal';
 import { ReportService } from '../../services/report.service';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ReportDialog } from '../../components/report-dialog/report-dialog';
+import { LightboxService } from '../../services/lightbox.service';
 
 @Component({
     selector: 'app-block',
@@ -31,6 +32,11 @@ export class Block implements OnInit {
     private readonly commentService = inject(CommentService);
     private readonly reportService = inject(ReportService);
     private readonly dialog = inject(MatDialog);
+    private readonly lightboxService = inject(LightboxService);
+
+    openLightbox(url: string, type: 'IMAGE' | 'VIDEO') {
+        this.lightboxService.open(url, type);
+    }
 
     // Signals
     readonly loading = signal(false);

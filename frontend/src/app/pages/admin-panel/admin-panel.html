@@ -1,11 +1,10 @@
 <div class="admin-dashboard">
-    <div class="content-header" style="margin-bottom: 24px;">
-        <h1 style="font-size: 24px; font-weight: 700; margin: 0;">Admin Dashboard</h1>
+    <div class="content-header">
+        <h1>Admin Dashboard</h1>
     </div>
 
     <!-- Stats Cards -->
-    <section class="stats-section"
-        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+    <section class="stats-section">
         <div class="stat-card">
             <div class="stat-icon users">
                 <mat-icon>people</mat-icon>
@@ -48,60 +47,58 @@
     </section>
 
     <!-- Tabs Navigation -->
-    <div class="tabs-container" style="border-bottom: 1px solid #e4e6eb; margin-bottom: 16px;">
+    <div class="tabs-container">
         <button class="tab-btn" [class.active]="activeTab() === 'users'" (click)="setActiveTab('users')">
-            <mat-icon>people</mat-icon> Users
+            <mat-icon>people</mat-icon> <span>Users</span>
         </button>
         <button class="tab-btn" [class.active]="activeTab() === 'posts'" (click)="setActiveTab('posts')">
-            <mat-icon>article</mat-icon> Posts
+            <mat-icon>article</mat-icon> <span>Posts</span>
         </button>
         <button class="tab-btn" [class.active]="activeTab() === 'reports'" (click)="setActiveTab('reports')">
-            <mat-icon>flag</mat-icon> Reports
+            <mat-icon>flag</mat-icon> <span>Reports</span>
         </button>
     </div>
 
     <!-- Users Tab Content -->
     <div class="tab-content" *ngIf="activeTab() === 'users'">
-        <div class="users-table-container"
-            style="background: white; border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); overflow: hidden;">
-            <table style="width: 100%; border-collapse: collapse;">
-                <thead style="background-color: #f0f2f5; border-bottom: 1px solid #e4e6eb;">
+        <div class="users-table-container">
+            <table>
+                <thead>
                     <tr>
-                        <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: #65676b;">User</th>
-                        <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: #65676b;">Email</th>
-                        <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: #65676b;">Role</th>
-                        <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: #65676b;">Joined</th>
-                        <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: #65676b;">Actions</th>
+                        <th>User</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Joined</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let user of filteredUsers()" style="border-bottom: 1px solid #e4e6eb;">
-                        <td style="padding: 12px 16px;">
-                            <div style="display: flex; align-items: center;">
-                                <div class="user-avatar"
-                                    style="width: 32px; height: 32px; background: #e4e6eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px; font-weight: bold;">
+                    <tr *ngFor="let user of filteredUsers()">
+                        <td>
+                            <div class="user-cell">
+                                <div class="user-avatar-circle">
                                     {{ user.username.charAt(0).toUpperCase() }}
                                 </div>
-                                <span style="font-weight: 600; cursor: pointer; color: #1877f2;"
-                                    [routerLink]="['/block', user.username]">{{ user.username }}</span>
+                                <span class="username-link" [routerLink]="['/block', user.username]">{{ user.username
+                                    }}</span>
                             </div>
                         </td>
-                        <td style="padding: 12px 16px;">{{ user.email }}</td>
-                        <td style="padding: 12px 16px;">
+                        <td>{{ user.email }}</td>
+                        <td>
                             <span class="role-badge" [class.admin]="user.role === 'ADMIN'">
                                 {{ user.role }}
                             </span>
                         </td>
-                        <td style="padding: 12px 16px;">{{ formatDate(user.createdAt) }}</td>
-                        <td style="padding: 12px 16px;">
-                            <div class="action-buttons" style="display: flex; gap: 8px;">
+                        <td>{{ formatDate(user.createdAt) }}</td>
+                        <td>
+                            <div class="action-buttons">
                                 <button *ngIf="!user.banned" class="action-btn ban-btn"
                                     (click)="banUser(user.id, user.username)" [disabled]="user.role === 'ADMIN'">
                                     <mat-icon>block</mat-icon>
                                 </button>
                                 <button *ngIf="user.banned" class="action-btn unban-btn"
                                     (click)="unbanUser(user.id, user.username)" [disabled]="user.role === 'ADMIN'"
-                                    title="Unban User" style="color: #28a745;">
+                                    title="Unban User">
                                     <mat-icon>check_circle</mat-icon>
                                 </button>
                                 <button class="action-btn delete-btn" (click)="deleteUser(user.id, user.username)"
@@ -118,32 +115,28 @@
 
     <!-- Posts Tab Content -->
     <div class="tab-content" *ngIf="activeTab() === 'posts'">
-        <div class="users-table-container"
-            style="background: white; border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); overflow: hidden;">
-            <table style="width: 100%; border-collapse: collapse;">
-                <thead style="background-color: #f0f2f5; border-bottom: 1px solid #e4e6eb;">
+        <div class="users-table-container">
+            <table>
+                <thead>
                     <tr>
-                        <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: #65676b;">Author</th>
-                        <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: #65676b;">Title</th>
-                        <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: #65676b;">Content
-                            Snippet</th>
-                        <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: #65676b;">Date</th>
-                        <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: #65676b;">Actions</th>
+                        <th>Author</th>
+                        <th>Title</th>
+                        <th>Snippet</th>
+                        <th>Date</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let post of filteredPosts()" style="border-bottom: 1px solid #e4e6eb;">
-                        <td style="padding: 12px 16px;">
-                            <span style="cursor: pointer; color: #1877f2; font-weight: 600;"
-                                [routerLink]="['/block', post.authorUsername]">
+                    <tr *ngFor="let post of filteredPosts()">
+                        <td>
+                            <span class="username-link" [routerLink]="['/block', post.authorUsername]">
                                 {{ post.authorUsername }}
                             </span>
                         </td>
-                        <td style="padding: 12px 16px;">{{ post.title || 'Untitled' }}</td>
-                        <td style="padding: 12px 16px;">{{ post.content | slice:0:50 }}{{ post.content.length > 50 ?
-                            '...' : '' }}</td>
-                        <td style="padding: 12px 16px;">{{ formatDate(post.createdAt) }}</td>
-                        <td style="padding: 12px 16px;">
+                        <td>{{ post.title || 'Untitled' }}</td>
+                        <td>{{ post.content | slice:0:50 }}{{ post.content.length > 50 ? '...' : '' }}</td>
+                        <td>{{ formatDate(post.createdAt) }}</td>
+                        <td>
                             <button class="action-btn delete-btn" (click)="deletePost(post.id)">
                                 <mat-icon>delete</mat-icon>
                             </button>
@@ -156,41 +149,37 @@
 
     <!-- Reports Tab Content -->
     <div class="tab-content" *ngIf="activeTab() === 'reports'">
-        <div class="users-table-container"
-            style="background: white; border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); overflow: hidden;">
-            <table style="width: 100%; border-collapse: collapse;">
-                <thead style="background-color: #f0f2f5; border-bottom: 1px solid #e4e6eb;">
+        <div class="users-table-container">
+            <table>
+                <thead>
                     <tr>
-                        <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: #65676b;">Reported
-                        </th>
-                        <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: #65676b;">Reason</th>
-                        <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: #65676b;">Status</th>
-                        <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: #65676b;">Date</th>
-                        <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: #65676b;">Actions</th>
+                        <th>Reported</th>
+                        <th>Reason</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let report of filteredReports()" style="border-bottom: 1px solid #e4e6eb;">
-                        <td style="padding: 12px 16px;">
-                            <div (click)="navigateToReported(report)"
-                                style="cursor: pointer; color: #1877f2; font-weight: 600;">
+                    <tr *ngFor="let report of filteredReports()">
+                        <td>
+                            <div (click)="navigateToReported(report)" class="username-link">
                                 {{ report.reportedUsername }}
-                                <span *ngIf="report.reportedPostId" style="color: #65676b; font-size: 12px;">(Post #{{
-                                    report.reportedPostId }})</span>
+                                <span *ngIf="report.reportedPostId" class="post-id-hint">(Post #{{ report.reportedPostId
+                                    }})</span>
                             </div>
                         </td>
-                        <td style="padding: 12px 16px;">{{ report.reason }}</td>
-                        <td style="padding: 12px 16px;">
+                        <td>{{ report.reason }}</td>
+                        <td>
                             <span class="status-badge" [class.pending]="report.status === 'PENDING'"
                                 [class.resolved]="report.status === 'RESOLVED'"
                                 [class.rejected]="report.status === 'REJECTED'">
                                 {{ report.status }}
                             </span>
                         </td>
-                        <td style="padding: 12px 16px;">{{ formatDate(report.createdAt) }}</td>
-                        <td style="padding: 12px 16px;">
-                            <div class="action-buttons" style="display: flex; gap: 8px;"
-                                *ngIf="report.status === 'PENDING'">
+                        <td>{{ formatDate(report.createdAt) }}</td>
+                        <td>
+                            <div class="action-buttons" *ngIf="report.status === 'PENDING'">
                                 <button class="action-btn resolve-btn" (click)="resolveReport(report.id)"
                                     title="Resolve">
                                     <mat-icon>check_circle</mat-icon>
@@ -228,18 +217,15 @@
                 <h3 *ngIf="post.title">{{ post.title }}</h3>
                 <p>{{ post.content }}</p>
                 <div *ngIf="post.mediaUrl" class="post-media">
-                    <img *ngIf="post.mediaType === 'IMAGE'" [src]="post.mediaUrl"
-                        style="max-width: 100%; border-radius: 8px;">
-                    <video *ngIf="post.mediaType === 'VIDEO'" [src]="post.mediaUrl" controls
-                        style="max-width: 100%; border-radius: 8px;"></video>
+                    <img *ngIf="post.mediaType === 'IMAGE'" [src]="post.mediaUrl">
+                    <video *ngIf="post.mediaType === 'VIDEO'" [src]="post.mediaUrl" controls></video>
                 </div>
             </div>
-            <div class="modal-footer" style="margin-top: 20px; display: flex; gap: 12px; justify-content: flex-end;">
-                <button class="action-btn delete-btn" (click)="deletePost(post.id); closePostModal()"
-                    style="padding: 8px 16px; display: flex; align-items: center; gap: 8px;">
+            <div class="modal-footer">
+                <button class="action-btn delete-btn-large" (click)="deletePost(post.id); closePostModal()">
                     <mat-icon>delete</mat-icon> Delete Post
                 </button>
-                <button class="action-btn" (click)="closePostModal()" style="padding: 8px 16px;">Close</button>
+                <button class="action-btn close-modal-btn" (click)="closePostModal()">Close</button>
             </div>
         </div>
     </div>

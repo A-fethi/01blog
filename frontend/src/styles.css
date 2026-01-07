@@ -1,3 +1,16 @@
+* {
+  box-sizing: border-box;
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+}
+
+*::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari and Opera */
+}
+
 html,
 body {
   height: 100%;
@@ -94,39 +107,31 @@ body {
   justify-content: space-between;
   max-width: 1920px;
   margin: 0 auto;
-  padding-top: 76px;
+  padding-top: 56px;
   height: 100vh;
   overflow: hidden;
 }
 
 .sidebar {
   width: 280px;
-  padding: 0 16px;
-  height: calc(100vh - 76px);
+  padding: 16px;
+  height: calc(100vh - 56px);
   overflow-y: auto;
   position: sticky;
-  top: 76px;
+  top: 56px;
+  flex-shrink: 0;
 }
 
-.left-sidebar {
-  min-width: 280px;
-}
+.left-sidebar {}
 
-.right-sidebar {
-  min-width: 280px;
-}
+.right-sidebar {}
 
 .feed-container {
   flex-grow: 1;
   max-width: 900px;
   padding: 0 32px;
   overflow-y: auto;
-  height: calc(100vh - 76px);
-  scrollbar-width: none;
-}
-
-.feed-container::-webkit-scrollbar {
-  display: none;
+  height: calc(100vh - 56px);
 }
 
 /* --- Components --- */
@@ -196,7 +201,6 @@ body {
 }
 
 /* --- Icon Colors --- */
-/* Default Icon Color */
 .icon mat-icon,
 mat-icon {
   color: #65676b;
@@ -204,63 +208,119 @@ mat-icon {
   transition: color 0.2s ease;
 }
 
-/* Navigation Icons */
 .nav-item:nth-child(1) .icon mat-icon {
   color: #1877f2;
 }
 
-/* Feed - Blue */
 .nav-item:nth-child(2) .icon mat-icon {
   color: #2196f3;
 }
 
-/* My Block - Light Blue */
 .nav-item:nth-child(3) .icon mat-icon {
   color: #009688;
 }
 
-/* Subscriptions - Teal */
 .nav-item.admin-link .icon mat-icon {
   color: #673ab7;
 }
 
-/* Admin - Purple */
-
-/* Top Nav Icons */
 .nav-tab.active .icon mat-icon {
   color: #1877f2;
 }
 
-/* --- Responsive --- */
-@media (max-width: 1100px) {
-  .main-layout {
-    justify-content: center;
-  }
-
-  .right-sidebar {
-    display: none;
-  }
-
-  .nav-center {
-    display: none;
-  }
-
-  .nav-left,
-  .nav-right {
-    min-width: auto;
-  }
+/* --- Bottom Navigation (Mobile) --- */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background-color: white;
+  border-top: 1px solid #e4e6eb;
+  display: none;
+  justify-content: space-around;
+  align-items: center;
+  z-index: 1000;
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
-@media (max-width: 768px) {
-  .left-sidebar {
-    display: none;
-  }
+.bottom-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  color: #65676b;
+  font-size: 10px;
+  gap: 2px;
+}
 
-  .feed-container {
-    padding: 0 10px;
-    width: 100%;
-    max-width: 100%;
-  }
+.bottom-nav-item mat-icon {
+  font-size: 24px;
+}
+
+.bottom-nav-item.active {
+  color: #1877f2;
+}
+
+.bottom-nav-item.active mat-icon {
+  color: #1877f2;
+}
+
+/* --- Lightbox Overlay --- */
+.lightbox-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  cursor: zoom-out;
+}
+
+.lightbox-content {
+  max-width: 90%;
+  max-height: 90%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: default;
+}
+
+.lightbox-content img,
+.lightbox-content video {
+  max-width: 100%;
+  max-height: 90vh;
+  border-radius: 4px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.close-lightbox {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.close-lightbox:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.close-lightbox mat-icon {
+  color: white;
 }
 
 /* Suggestions Section */
@@ -289,19 +349,6 @@ mat-icon {
 .scrollable-list {
   overflow-y: auto;
   padding-right: 4px;
-}
-
-/* Hide scrollbar globally */
-* {
-  scrollbar-width: none;
-  /* Firefox */
-  -ms-overflow-style: none;
-  /* IE and Edge */
-}
-
-*::-webkit-scrollbar {
-  display: none;
-  /* Chrome, Safari and Opera */
 }
 
 .user-suggestion-card {
@@ -400,4 +447,79 @@ mat-icon {
   padding: 20px;
   color: #65676b;
   font-size: 13px;
+}
+
+/* --- Responsive Media Queries --- */
+
+@media (max-width: 1400px) {
+  .sidebar {
+    width: 240px;
+  }
+
+  .feed-container {
+    padding: 0 16px;
+  }
+}
+
+@media (max-width: 1100px) {
+  .main-layout {
+    justify-content: flex-start;
+    overflow-x: auto;
+  }
+
+  .sidebar {
+    width: 200px;
+  }
+
+  .nav-center {
+    display: none;
+  }
+
+  .nav-left,
+  .nav-right {
+    min-width: auto;
+  }
+
+  .right-sidebar {
+    display: block !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .sidebar {
+    width: 180px;
+  }
+
+  .feed-container {
+    padding: 0 8px;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-layout {
+    overflow-x: hidden;
+  }
+
+  .left-sidebar {
+    display: none;
+  }
+
+  .right-sidebar {
+    display: none !important;
+  }
+
+  .feed-container {
+    padding: 0 10px;
+    width: 100%;
+    max-width: 100%;
+    height: calc(100vh - 116px);
+  }
+
+  .bottom-nav {
+    display: flex;
+  }
+
+  .top-nav .nav-center {
+    display: none;
+  }
 }

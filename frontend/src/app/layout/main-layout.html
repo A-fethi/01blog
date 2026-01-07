@@ -12,10 +12,6 @@
     <header class="top-nav">
         <div class="nav-left">
             <div class="logo"><img src="logo.png" alt="logo"></div>
-            <!-- <div class="search-bar">
-                <i class="icon"><mat-icon>search</mat-icon></i>
-                <input type="text" placeholder="Search 01Blog">
-            </div> -->
         </div>
 
         <div class="nav-center">
@@ -145,5 +141,48 @@
                 </div>
             </div>
         </aside>
+    </div>
+
+    <!-- Bottom Navigation Bar (Mobile only) -->
+    <nav class="bottom-nav">
+        <a routerLink="/home" class="bottom-nav-item" routerLinkActive="active">
+            <mat-icon>home</mat-icon>
+            <span>Home</span>
+        </a>
+        <a routerLink="/notifications" class="bottom-nav-item" routerLinkActive="active"
+            *ngIf="authService.isLoggedIn()">
+            <div class="icon-with-badge">
+                <mat-icon>notifications</mat-icon>
+                <span class="badge"
+                    *ngIf="inAppNotificationService.unreadCount() > 0">{{inAppNotificationService.unreadCount()}}</span>
+            </div>
+            <span>Alerts</span>
+        </a>
+        <a routerLink="/block" class="bottom-nav-item" routerLinkActive="active" *ngIf="authService.isLoggedIn()">
+            <mat-icon>account_circle</mat-icon>
+            <span>Profile</span>
+        </a>
+        <a routerLink="/subscriptions" class="bottom-nav-item" routerLinkActive="active"
+            *ngIf="authService.isLoggedIn()">
+            <mat-icon>diversity_3</mat-icon>
+            <span>Follows</span>
+        </a>
+        <a routerLink="/discover" class="bottom-nav-item" routerLinkActive="active" *ngIf="authService.isLoggedIn()">
+            <mat-icon>explore</mat-icon>
+            <span>Discover</span>
+        </a>
+    </nav>
+
+    <!-- Media Lightbox Overlay -->
+    <div class="lightbox-overlay" *ngIf="lightboxService.isOpen()" (click)="closeLightbox()">
+        <button class="close-lightbox" (click)="closeLightbox()">
+            <mat-icon>close</mat-icon>
+        </button>
+        <div class="lightbox-content" (click)="$event.stopPropagation()">
+            <img *ngIf="lightboxService.data()?.type === 'IMAGE'" [src]="lightboxService.data()?.url"
+                alt="Enlarged media">
+            <video *ngIf="lightboxService.data()?.type === 'VIDEO'" [src]="lightboxService.data()?.url" controls
+                autoplay></video>
+        </div>
     </div>
 </div>
