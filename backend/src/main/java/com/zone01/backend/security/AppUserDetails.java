@@ -23,8 +23,7 @@ public class AppUserDetails implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.singletonList(
-            () -> "ROLE_" + user.getRole().name()
-        );
+                () -> "ROLE_" + user.getRole().name());
     }
 
     @Override
@@ -44,7 +43,7 @@ public class AppUserDetails implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return !user.isBanned();
     }
 
     @Override

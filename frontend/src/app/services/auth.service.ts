@@ -27,6 +27,7 @@ export interface UserDTO {
     email: string;
     role: string;
     avatarUrl?: string;
+    banned?: boolean;
     createdAt?: string;
 }
 

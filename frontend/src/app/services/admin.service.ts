@@ -7,6 +7,7 @@ export interface UserDTO {
     username: string;
     email: string;
     role: string;
+    banned: boolean;
     createdAt: string;
     updatedAt: string;
 }

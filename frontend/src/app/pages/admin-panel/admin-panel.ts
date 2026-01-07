@@ -182,6 +182,23 @@ export class AdminPanel implements OnInit {
         this.showConfirmModal.set(true);
     }
 
+    unbanUser(userId: number, username: string) {
+        this.confirmAction = () => {
+            this.adminService.unbanUser(userId).subscribe({
+                next: () => {
+                    this.notificationService.success(`User "${username}" unbanned successfully`);
+                    this.loadDashboardData();
+                },
+                error: err => {
+                    this.notificationService.error('Failed to unban user');
+                }
+            });
+        };
+        this.confirmModalTitle.set('Unban User');
+        this.confirmModalMessage.set(`Are you sure you want to unban user "${username}"?`);
+        this.showConfirmModal.set(true);
+    }
+
     deletePost(postId: number) {
         this.confirmAction = () => {
             this.adminService.deletePost(postId).subscribe({

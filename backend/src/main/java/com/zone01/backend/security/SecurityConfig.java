@@ -36,17 +36,15 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 // Define which requests are allowed without authentication
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/",
-                                "/api/auth/**",
-                                "/api/users/**",
+                        .requestMatchers(org.springframework.http.HttpMethod.GET,
                                 "/api/posts/**",
                                 "/api/comments/**",
-                                "/api/likes/**",
+                                "/api/users/**",
                                 "/uploads/**")
-                        .permitAll() // 👈 allow login/register
+                        .permitAll()
+                        .requestMatchers("/", "/api/auth/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .anyRequest().authenticated() // all others need authentication
-                )
+                        .anyRequest().authenticated())
                 // Disable default login form
                 .formLogin(form -> form.disable())
                 // Disable HTTP Basic auth

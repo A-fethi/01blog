@@ -105,6 +105,10 @@ public class AuthController {
 
             return ResponseEntity.ok(response);
 
+        } catch (org.springframework.security.authentication.LockedException e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Your account has been banned");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
         } catch (BadCredentialsException e) {
             Map<String, String> error = new HashMap<>();
             error.put("error", "Invalid username or password");

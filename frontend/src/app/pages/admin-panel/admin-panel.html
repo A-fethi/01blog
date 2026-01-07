@@ -95,9 +95,14 @@
                         <td style="padding: 12px 16px;">{{ formatDate(user.createdAt) }}</td>
                         <td style="padding: 12px 16px;">
                             <div class="action-buttons" style="display: flex; gap: 8px;">
-                                <button class="action-btn ban-btn" (click)="banUser(user.id, user.username)"
-                                    [disabled]="user.role === 'ADMIN'">
+                                <button *ngIf="!user.banned" class="action-btn ban-btn"
+                                    (click)="banUser(user.id, user.username)" [disabled]="user.role === 'ADMIN'">
                                     <mat-icon>block</mat-icon>
+                                </button>
+                                <button *ngIf="user.banned" class="action-btn unban-btn"
+                                    (click)="unbanUser(user.id, user.username)" [disabled]="user.role === 'ADMIN'"
+                                    title="Unban User" style="color: #28a745;">
+                                    <mat-icon>check_circle</mat-icon>
                                 </button>
                                 <button class="action-btn delete-btn" (click)="deleteUser(user.id, user.username)"
                                     [disabled]="user.role === 'ADMIN'">
