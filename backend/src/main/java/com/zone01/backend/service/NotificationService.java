@@ -119,6 +119,14 @@ public class NotificationService {
     }
 
     @Transactional
+    public Notification markAsUnread(Long notificationId, User user) {
+        Notification notification = notificationRepository.findByIdAndRecipient(notificationId, user)
+                .orElseThrow(() -> new IllegalArgumentException("Notification not found"));
+        notification.setRead(false);
+        return notificationRepository.save(notification);
+    }
+
+    @Transactional
     public void markAllAsRead(User user) {
         List<Notification> notifications = notificationRepository.findByRecipientOrderByCreatedAtDesc(user)
                 .stream()

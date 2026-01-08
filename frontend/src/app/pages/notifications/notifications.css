@@ -93,3 +93,25 @@
   margin-bottom: 16px;
   opacity: 0.5;
 }
+
+.notification-actions {
+  opacity: 0;
+  transition: opacity 0.2s;
+  margin-left: 8px;
+}
+
+.notification-card:hover .notification-actions {
+  opacity: 1;
+}
+
+.notification-actions button {
+  color: #65676b;
+}
+
+.notification-actions button:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.read-icon {
+  color: #1877f2 !important;
+}

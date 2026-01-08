@@ -53,6 +53,18 @@ public class NotificationController {
         return ResponseEntity.ok(new NotificationDTO(notification));
     }
 
+    @PatchMapping("/{notificationId}/unread")
+    public ResponseEntity<NotificationDTO> markAsUnread(
+            @PathVariable Long notificationId,
+            @AuthenticationPrincipal AppUserDetails auth) {
+        if (auth == null || auth.getUser() == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Notification notification = notificationService.markAsUnread(notificationId, auth.getUser());
+        return ResponseEntity.ok(new NotificationDTO(notification));
+    }
+
     @PostMapping("/read-all")
     public ResponseEntity<Map<String, String>> markAllAsRead(@AuthenticationPrincipal AppUserDetails auth) {
         if (auth == null || auth.getUser() == null) {

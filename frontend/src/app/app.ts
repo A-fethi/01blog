@@ -10,5 +10,5 @@ import { NotificationComponent } from './components/notification/notification';
   styleUrl: './app.css'
 })
 export class App {
-  protected readonly title = signal('frontend');
+  protected readonly title = signal('01Blog');
 }

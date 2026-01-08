@@ -66,13 +66,27 @@ export class Notifications implements OnInit {
     }
   }
 
+  toggleReadStatus(event: Event, notification: NotificationDTO): void {
+    event.stopPropagation();
+    if (notification.read) {
+      this.notificationService.markAsUnread(notification.id).subscribe(() => {
+        notification.read = false;
+        this.notificationService.refreshUnreadCount();
+      });
+    } else {
+      this.notificationService.markAsRead(notification.id).subscribe(() => {
+        notification.read = true;
+        this.notificationService.refreshUnreadCount();
+      });
+    }
+  }
+
   getIcon(type: string): string {
     switch (type) {
       case 'LIKE': return 'favorite';
       case 'COMMENT': return 'comment';
       case 'FOLLOW': return 'person_add';
       case 'NEW_POST': return 'article';
-      case 'SHARE': return 'share';
       case 'REPORT': return 'report';
       default: return 'notifications';
     }

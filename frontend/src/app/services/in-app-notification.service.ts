@@ -30,6 +30,10 @@ export class InAppNotificationService {
     return this.http.patch<NotificationDTO>(`${this.baseUrl}/${notificationId}/read`, {});
   }
 
+  markAsUnread(notificationId: number): Observable<NotificationDTO> {
+    return this.http.patch<NotificationDTO>(`${this.baseUrl}/${notificationId}/unread`, {});
+  }
+
   markAllAsRead(): Observable<any> {
     return this.http.post(`${this.baseUrl}/read-all`, {});
   }
