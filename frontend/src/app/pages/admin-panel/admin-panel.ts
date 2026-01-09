@@ -214,6 +214,36 @@ export class AdminPanel implements OnInit {
         this.showConfirmModal.set(true);
     }
 
+    hidePost(postId: number) {
+        this.confirmAction = () => {
+            this.adminService.hidePost(postId).subscribe({
+                next: () => {
+                    this.notificationService.success('Post hidden successfully');
+                    this.loadDashboardData();
+                },
+                error: () => this.notificationService.error('Failed to hide post')
+            });
+        };
+        this.confirmModalTitle.set('Hide Post');
+        this.confirmModalMessage.set('Are you sure you want to hide this post? It will no longer be visible to regular users.');
+        this.showConfirmModal.set(true);
+    }
+
+    unhidePost(postId: number) {
+        this.confirmAction = () => {
+            this.adminService.unhidePost(postId).subscribe({
+                next: () => {
+                    this.notificationService.success('Post is now visible');
+                    this.loadDashboardData();
+                },
+                error: () => this.notificationService.error('Failed to unhide post')
+            });
+        };
+        this.confirmModalTitle.set('Unhide Post');
+        this.confirmModalMessage.set('Are you sure you want to make this post visible again?');
+        this.showConfirmModal.set(true);
+    }
+
     resolveReport(reportId: number) {
         this.adminService.updateReportStatus(reportId, 'RESOLVED').subscribe({
             next: () => {

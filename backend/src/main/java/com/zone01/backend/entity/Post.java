@@ -79,6 +79,9 @@ public class Post {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Column(nullable = false)
+    private boolean hidden = false;
+
     @PrePersist
     public void onCreate() {
         LocalDateTime now = LocalDateTime.now();

@@ -137,9 +137,19 @@
                         <td>{{ post.content | slice:0:50 }}{{ post.content.length > 50 ? '...' : '' }}</td>
                         <td>{{ formatDate(post.createdAt) }}</td>
                         <td>
-                            <button class="action-btn delete-btn" (click)="deletePost(post.id)">
-                                <mat-icon>delete</mat-icon>
-                            </button>
+                            <div class="action-buttons">
+                                <button *ngIf="!post.hidden" class="action-btn ban-btn" (click)="hidePost(post.id)"
+                                    title="Hide Post">
+                                    <mat-icon>visibility_off</mat-icon>
+                                </button>
+                                <button *ngIf="post.hidden" class="action-btn unban-btn" (click)="unhidePost(post.id)"
+                                    title="Unhide Post">
+                                    <mat-icon>visibility</mat-icon>
+                                </button>
+                                <button class="action-btn delete-btn" (click)="deletePost(post.id)" title="Delete Post">
+                                    <mat-icon>delete</mat-icon>
+                                </button>
+                            </div>
                         </td>
                     </tr>
                 </tbody>
@@ -222,6 +232,13 @@
                 </div>
             </div>
             <div class="modal-footer">
+                <button *ngIf="!post.hidden" class="action-btn ban-btn" (click)="hidePost(post.id); closePostModal()">
+                    <mat-icon>visibility_off</mat-icon> Hide Post
+                </button>
+                <button *ngIf="post.hidden" class="action-btn unban-btn"
+                    (click)="unhidePost(post.id); closePostModal()">
+                    <mat-icon>visibility</mat-icon> Unhide Post
+                </button>
                 <button class="action-btn delete-btn-large" (click)="deletePost(post.id); closePostModal()">
                     <mat-icon>delete</mat-icon> Delete Post
                 </button>

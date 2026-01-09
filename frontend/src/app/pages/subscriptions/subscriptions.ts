@@ -9,6 +9,7 @@ import { UserService } from '../../services/user.service';
 import { NotificationService } from '../../services/notification.service';
 import { CommentService } from '../../services/comment.service';
 import { ConfirmModal } from '../../components/confirm-modal/confirm-modal';
+import { AdminService } from '../../services/admin.service';
 
 @Component({
   selector: 'app-subscriptions',
@@ -23,6 +24,37 @@ export class Subscriptions implements OnInit {
   private readonly userService = inject(UserService);
   private readonly notificationService = inject(NotificationService);
   private readonly commentService = inject(CommentService);
+  private readonly adminService = inject(AdminService);
+
+  onHidePost(postId: number) {
+    this.confirmAction = () => {
+      this.adminService.hidePost(postId).subscribe({
+        next: () => {
+          this.notificationService.success('Post hidden');
+          this.posts.update(posts => posts.filter(p => p.id !== postId));
+        },
+        error: () => this.notificationService.error('Failed to hide post')
+      });
+    };
+    this.confirmModalTitle.set('Hide Post');
+    this.confirmModalMessage.set('Are you sure you want to hide this post? It will no longer be visible to regular users.');
+    this.showConfirmModal.set(true);
+  }
+
+  onUnhidePost(postId: number) {
+    this.confirmAction = () => {
+      this.adminService.unhidePost(postId).subscribe({
+        next: () => {
+          this.notificationService.success('Post is now visible');
+          this.loadFollowedPosts();
+        },
+        error: () => this.notificationService.error('Failed to unhide post')
+      });
+    };
+    this.confirmModalTitle.set('Unhide Post');
+    this.confirmModalMessage.set('Are you sure you want to make this post visible again?');
+    this.showConfirmModal.set(true);
+  }
 
   readonly posts = signal<PostDTO[]>([]);
   readonly loading = signal(false);

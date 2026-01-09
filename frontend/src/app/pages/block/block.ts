@@ -15,6 +15,7 @@ import { ReportService } from '../../services/report.service';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ReportDialog } from '../../components/report-dialog/report-dialog';
 import { LightboxService } from '../../services/lightbox.service';
+import { AdminService } from '../../services/admin.service';
 
 @Component({
     selector: 'app-block',
@@ -33,6 +34,38 @@ export class Block implements OnInit {
     private readonly reportService = inject(ReportService);
     private readonly dialog = inject(MatDialog);
     private readonly lightboxService = inject(LightboxService);
+    private readonly adminService = inject(AdminService);
+
+    onHidePost(postId: number) {
+        this.confirmAction = () => {
+            this.adminService.hidePost(postId).subscribe({
+                next: () => {
+                    this.notificationService.success('Post hidden');
+                    this.userPosts.update(posts => posts.filter(p => p.id !== postId));
+                },
+                error: () => this.notificationService.error('Failed to hide post')
+            });
+        };
+        this.confirmModalTitle.set('Hide Post');
+        this.confirmModalMessage.set('Are you sure you want to hide this post? It will no longer be visible to regular users.');
+        this.showConfirmModal.set(true);
+    }
+
+    onUnhidePost(postId: number) {
+        this.confirmAction = () => {
+            this.adminService.unhidePost(postId).subscribe({
+                next: () => {
+                    this.notificationService.success('Post is now visible');
+                    const username = this.profileUser()?.username;
+                    if (username) this.loadUserData(username);
+                },
+                error: () => this.notificationService.error('Failed to unhide post')
+            });
+        };
+        this.confirmModalTitle.set('Unhide Post');
+        this.confirmModalMessage.set('Are you sure you want to make this post visible again?');
+        this.showConfirmModal.set(true);
+    }
 
     openLightbox(url: string, type: 'IMAGE' | 'VIDEO') {
         this.lightboxService.open(url, type);

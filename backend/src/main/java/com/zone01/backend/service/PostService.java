@@ -113,6 +113,22 @@ public class PostService {
         postRepository.delete(post);
     }
 
+    @Transactional
+    public void hidePost(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new PostNotFoundException(postId));
+        post.setHidden(true);
+        postRepository.save(post);
+    }
+
+    @Transactional
+    public void unhidePost(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new PostNotFoundException(postId));
+        post.setHidden(false);
+        postRepository.save(post);
+    }
+
     public List<Post> getAllPosts() {
         return postRepository.findAllByOrderByCreatedAtDesc();
     }
@@ -130,7 +146,7 @@ public class PostService {
     }
 
     public List<PostDTO> getPostsByUsername(String username, User currentUser) {
-        List<Post> posts = postRepository.findByAuthorUsernameOrderByCreatedAtDesc(username);
+        List<Post> posts = postRepository.findVisibleByAuthorUsernameOrderByCreatedAtDesc(username);
         java.util.Set<Long> likedPostIds = currentUser != null ? likeRepository.findPostIdsLikedByUser(currentUser)
                 : java.util.Collections.emptySet();
 
@@ -140,7 +156,7 @@ public class PostService {
     }
 
     public List<PostDTO> getAllPostsDTO(User currentUser) {
-        List<Post> posts = postRepository.findAllByOrderByCreatedAtDesc();
+        List<Post> posts = postRepository.findAllVisibleByOrderByCreatedAtDesc();
         java.util.Set<Long> likedPostIds = currentUser != null ? likeRepository.findPostIdsLikedByUser(currentUser)
                 : java.util.Collections.emptySet();
 
@@ -149,12 +165,19 @@ public class PostService {
                 .collect(Collectors.toList());
     }
 
+    public List<PostDTO> getAllPostsForAdmin() {
+        List<Post> posts = postRepository.findAllByOrderByCreatedAtDesc();
+        return posts.stream()
+                .map(post -> toDto(post, java.util.Collections.emptySet()))
+                .collect(Collectors.toList());
+    }
+
     public List<PostDTO> getFeedPosts(User user) {
         var followedIds = subscriptionService.getFollowedAuthorIds(user);
         if (followedIds.isEmpty()) {
             return List.of();
         }
-        List<Post> posts = postRepository.findByAuthorIdInOrderByCreatedAtDesc(followedIds);
+        List<Post> posts = postRepository.findVisibleByAuthorIdInOrderByCreatedAtDesc(followedIds);
         java.util.Set<Long> likedPostIds = user != null ? likeRepository.findPostIdsLikedByUser(user)
                 : java.util.Collections.emptySet();
 

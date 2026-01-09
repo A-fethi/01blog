@@ -17,6 +17,7 @@ export interface PostDTO {
   comments?: any[];
   isLiked?: boolean;
   showMenu?: boolean;
+  hidden?: boolean;
 }
 
 @Injectable({ providedIn: 'root' })

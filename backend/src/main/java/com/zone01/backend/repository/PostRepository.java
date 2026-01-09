@@ -11,26 +11,29 @@ import com.zone01.backend.entity.User;
 @Repository
 public interface PostRepository extends JpaRepository<Post, Long> {
 
-    List<Post> findByAuthor(User author);
+        List<Post> findByAuthor(User author);
 
-    List<Post> findByAuthorId(Long authorId);
+        List<Post> findByAuthorId(Long authorId);
 
-    List<Post> findByTitleContainingIgnoreCase(String keyword);
+        List<Post> findByTitleContainingIgnoreCase(String keyword);
 
-    @org.springframework.data.jpa.repository.Query("SELECT p FROM Post p JOIN FETCH p.author ORDER BY p.createdAt DESC")
-    List<Post> findAllByOrderByCreatedAtDesc();
+        @org.springframework.data.jpa.repository.Query("SELECT p FROM Post p JOIN FETCH p.author WHERE p.hidden = false ORDER BY p.createdAt DESC")
+        List<Post> findAllVisibleByOrderByCreatedAtDesc();
 
-    List<Post> findByAuthorOrderByCreatedAtDesc(User author);
+        @org.springframework.data.jpa.repository.Query("SELECT p FROM Post p JOIN FETCH p.author ORDER BY p.createdAt DESC")
+        List<Post> findAllByOrderByCreatedAtDesc();
 
-    long countByAuthor(User author);
+        List<Post> findByAuthorOrderByCreatedAtDesc(User author);
 
-    long countByAuthorId(Long authorId);
+        long countByAuthor(User author);
 
-    @org.springframework.data.jpa.repository.Query("SELECT p FROM Post p JOIN FETCH p.author WHERE p.author.username = :username ORDER BY p.createdAt DESC")
-    List<Post> findByAuthorUsernameOrderByCreatedAtDesc(
-            @org.springframework.data.repository.query.Param("username") String username);
+        long countByAuthorId(Long authorId);
 
-    @org.springframework.data.jpa.repository.Query("SELECT p FROM Post p JOIN FETCH p.author WHERE p.author.id IN :authorIds ORDER BY p.createdAt DESC")
-    List<Post> findByAuthorIdInOrderByCreatedAtDesc(
-            @org.springframework.data.repository.query.Param("authorIds") List<Long> authorIds);
+        @org.springframework.data.jpa.repository.Query("SELECT p FROM Post p JOIN FETCH p.author WHERE p.author.username = :username AND p.hidden = false ORDER BY p.createdAt DESC")
+        List<Post> findVisibleByAuthorUsernameOrderByCreatedAtDesc(
+                        @org.springframework.data.repository.query.Param("username") String username);
+
+        @org.springframework.data.jpa.repository.Query("SELECT p FROM Post p JOIN FETCH p.author WHERE p.author.id IN :authorIds AND p.hidden = false ORDER BY p.createdAt DESC")
+        List<Post> findVisibleByAuthorIdInOrderByCreatedAtDesc(
+                        @org.springframework.data.repository.query.Param("authorIds") List<Long> authorIds);
 }

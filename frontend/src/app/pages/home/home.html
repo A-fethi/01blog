@@ -68,8 +68,11 @@
                     </ng-container>
 
                     <!-- Admin Options (if not owner) -->
-                    <button *ngIf="authService.isAdmin() && post.authorId !== authService.currentUser()?.id"
-                        (click)="onDeletePost(post.id); post.showMenu = false" class="delete-btn">Delete</button>
+                    <ng-container *ngIf="authService.isAdmin() && post.authorId !== authService.currentUser()?.id">
+                        <button (click)="onHidePost(post.id); post.showMenu = false">Hide</button>
+                        <button (click)="onDeletePost(post.id); post.showMenu = false"
+                            class="delete-btn">Delete</button>
+                    </ng-container>
 
                     <!-- Report Option (if not owner and not admin) -->
                     <button *ngIf="!authService.isAdmin() && post.authorId !== authService.currentUser()?.id"

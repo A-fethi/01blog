@@ -113,13 +113,25 @@ public class AdminController {
 
     @GetMapping("/posts")
     public ResponseEntity<List<PostDTO>> getAllPosts() {
-        return ResponseEntity.ok(postService.getAllPostsDTO(null));
+        return ResponseEntity.ok(postService.getAllPostsForAdmin());
     }
 
     @DeleteMapping("/posts/{postId}")
     public ResponseEntity<Map<String, String>> deletePost(@PathVariable Long postId) {
         postService.deletePostAsAdmin(postId);
         return ResponseEntity.ok(Map.of("success", "Post removed"));
+    }
+
+    @PostMapping("/posts/{postId}/hide")
+    public ResponseEntity<Map<String, String>> hidePost(@PathVariable Long postId) {
+        postService.hidePost(postId);
+        return ResponseEntity.ok(Map.of("success", "Post hidden"));
+    }
+
+    @PostMapping("/posts/{postId}/unhide")
+    public ResponseEntity<Map<String, String>> unhidePost(@PathVariable Long postId) {
+        postService.unhidePost(postId);
+        return ResponseEntity.ok(Map.of("success", "Post visible"));
     }
 
     @GetMapping("/reports")

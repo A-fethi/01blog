@@ -55,6 +55,14 @@ export class AdminService {
         return this.http.delete(`${this.baseUrl}/posts/${postId}`);
     }
 
+    hidePost(postId: number): Observable<any> {
+        return this.http.post(`${this.baseUrl}/posts/${postId}/hide`, {});
+    }
+
+    unhidePost(postId: number): Observable<any> {
+        return this.http.post(`${this.baseUrl}/posts/${postId}/unhide`, {});
+    }
+
     getReports(): Observable<any[]> {
         return this.http.get<any[]>(`${this.baseUrl}/reports`);
     }

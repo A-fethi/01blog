@@ -34,6 +34,7 @@ public class PostDTO {
     private LocalDateTime createdAt;
     private LocalDateTime updateAt;
     private String authorAvatarUrl;
+    private boolean hidden;
 
     public PostDTO(Post post) {
         this.id = post.getId();
@@ -49,6 +50,7 @@ public class PostDTO {
         this.authorAvatarUrl = post.getAuthor().getAvatarUrl();
         this.likesCount = post.getLikeCount();
         this.commentsCount = post.getCommentCount();
+        this.hidden = post.isHidden();
     }
 
     @JsonProperty("isLiked")
