@@ -29,7 +29,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
         long countByAuthorId(Long authorId);
 
-        @org.springframework.data.jpa.repository.Query("SELECT p FROM Post p JOIN FETCH p.author WHERE p.author.username = :username AND p.hidden = false ORDER BY p.createdAt DESC")
+        @org.springframework.data.jpa.repository.Query("SELECT p FROM Post p JOIN FETCH p.author WHERE LOWER(p.author.username) = LOWER(:username) AND p.hidden = false ORDER BY p.createdAt DESC")
         List<Post> findVisibleByAuthorUsernameOrderByCreatedAtDesc(
                         @org.springframework.data.repository.query.Param("username") String username);
 

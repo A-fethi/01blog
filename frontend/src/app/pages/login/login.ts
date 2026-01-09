@@ -26,7 +26,7 @@ export class Login {
     this.error.set(null);
 
     this.authService.login({
-      username: this.username(),
+      username: this.username().toLowerCase(),
       password: this.password(),
     }).subscribe({
       next: () => {

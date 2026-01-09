@@ -284,8 +284,8 @@ export class Block implements OnInit {
 
     onUpdateProfile() {
         const formData = new FormData();
-        formData.append('username', this.editUsername());
-        formData.append('email', this.editEmail());
+        formData.append('username', this.editUsername().toLowerCase());
+        formData.append('email', this.editEmail().toLowerCase());
         if (this.editAvatarFile()) {
             formData.append('avatar', this.editAvatarFile()!);
         }

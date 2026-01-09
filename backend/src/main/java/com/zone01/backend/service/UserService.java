@@ -47,17 +47,20 @@ public class UserService {
                     "Password must be at least 8 characters, include uppercase, lowercase, and a number");
         }
 
-        if (userRepository.existsByUsername(registerDTO.getUsername())) {
-            throw new UsernameAlreadyExistsException(registerDTO.getUsername());
+        String username = registerDTO.getUsername().toLowerCase();
+        if (userRepository.existsByUsernameIgnoreCase(username)) {
+            throw new UsernameAlreadyExistsException(username);
         }
 
-        if (userRepository.existsByEmail(registerDTO.getEmail())) {
-            throw new EmailAlreadyExistsException(registerDTO.getEmail());
+        String email = registerDTO.getEmail().toLowerCase();
+
+        if (userRepository.existsByEmailIgnoreCase(email)) {
+            throw new EmailAlreadyExistsException(email);
         }
 
         User user = new User();
-        user.setUsername(registerDTO.getUsername());
-        user.setEmail(registerDTO.getEmail());
+        user.setUsername(username);
+        user.setEmail(email);
         user.setPassword(passwordEncoder.encode(registerDTO.getPassword()));
         user.setAvatarUrl(registerDTO.getAvatarUrl());
         user.setCreatedAt(LocalDateTime.now());
@@ -77,7 +80,7 @@ public class UserService {
         if (!ValidationUtil.isNotEmpty(username) || !ValidationUtil.isNotEmpty(password)) {
             throw new InvalidCredentialsException();
         }
-        User user = userRepository.findByUsername(username)
+        User user = userRepository.findByUsernameIgnoreCase(username)
                 .orElseThrow(() -> new InvalidCredentialsException());
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
@@ -97,16 +100,16 @@ public class UserService {
     }
 
     public User requireByUsername(String username) {
-        return userRepository.findByUsername(username)
+        return userRepository.findByUsernameIgnoreCase(username)
                 .orElseThrow(() -> new UserNotFoundException(username));
     }
 
     public Optional<User> findByUsername(String username) {
-        return userRepository.findByUsername(username);
+        return userRepository.findByUsernameIgnoreCase(username);
     }
 
     public Optional<User> findByEmail(String email) {
-        return userRepository.findByEmail(email);
+        return userRepository.findByEmailIgnoreCase(email != null ? email.toLowerCase() : null);
     }
 
     public Optional<User> findById(Long id) {
@@ -119,29 +122,35 @@ public class UserService {
     }
 
     public boolean existsByUsername(String username) {
-        return userRepository.existsByUsername(username);
+        return userRepository.existsByUsernameIgnoreCase(username);
     }
 
     public boolean existsByEmail(String email) {
-        return userRepository.existsByEmail(email);
+        return userRepository.existsByEmailIgnoreCase(email != null ? email.toLowerCase() : null);
     }
 
     @Transactional
     public User updateProfile(Long userId, String username, String email, String avatarUrl) {
         User user = requireById(userId);
 
-        if (username != null && !username.equals(user.getUsername())) {
-            if (userRepository.existsByUsername(username)) {
-                throw new UsernameAlreadyExistsException(username);
+        if (username != null) {
+            String lowerUsername = username.toLowerCase();
+            if (!lowerUsername.equals(user.getUsername())) {
+                if (userRepository.existsByUsernameIgnoreCase(lowerUsername)) {
+                    throw new UsernameAlreadyExistsException(lowerUsername);
+                }
+                user.setUsername(lowerUsername);
             }
-            user.setUsername(username);
         }
 
-        if (email != null && !email.equals(user.getEmail())) {
-            if (userRepository.existsByEmail(email)) {
-                throw new EmailAlreadyExistsException(email);
+        if (email != null) {
+            String lowerEmail = email.toLowerCase();
+            if (!lowerEmail.equals(user.getEmail())) {
+                if (userRepository.existsByEmailIgnoreCase(lowerEmail)) {
+                    throw new EmailAlreadyExistsException(lowerEmail);
+                }
+                user.setEmail(lowerEmail);
             }
-            user.setEmail(email);
         }
 
         if (avatarUrl != null) {
