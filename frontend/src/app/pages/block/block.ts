@@ -283,9 +283,30 @@ export class Block implements OnInit {
     }
 
     onUpdateProfile() {
+        const username = this.editUsername().trim().toLowerCase();
+        const email = this.editEmail().trim().toLowerCase();
+
+        if (!username || !email) {
+            this.notificationService.error('Username and email are required');
+            return;
+        }
+
+        const emailRegex = /^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+        const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
+
+        if (!usernameRegex.test(username)) {
+            this.notificationService.error('Invalid username. Must be 3-20 characters, letters, numbers, or _');
+            return;
+        }
+
+        if (!emailRegex.test(email)) {
+            this.notificationService.error('Invalid email format');
+            return;
+        }
+
         const formData = new FormData();
-        formData.append('username', this.editUsername().toLowerCase());
-        formData.append('email', this.editEmail().toLowerCase());
+        formData.append('username', username);
+        formData.append('email', email);
         if (this.editAvatarFile()) {
             formData.append('avatar', this.editAvatarFile()!);
         }
@@ -401,9 +422,17 @@ export class Block implements OnInit {
     onUpdatePost() {
         const postId = this.editingPostId();
         if (!postId) return;
+        const title = this.editPostTitle().trim();
+        const content = this.editPostContent().trim();
+
+        if (!title || !content) {
+            this.notificationService.error('Title and content are required');
+            return;
+        }
+
         const formData = new FormData();
-        formData.append('title', this.editPostTitle());
-        formData.append('content', this.editPostContent());
+        formData.append('title', title);
+        formData.append('content', content);
 
         this.postService.updatePost(postId, formData).subscribe({
             next: (updatedPost) => {
@@ -497,7 +526,12 @@ export class Block implements OnInit {
     onUpdateComment(postId: number) {
         const commentId = this.editingCommentId();
         if (!commentId) return;
-        this.commentService.updateComment(commentId, this.editCommentContent()).subscribe({
+        const content = this.editCommentContent().trim();
+        if (!content) {
+            this.notificationService.error('Comment content cannot be empty');
+            return;
+        }
+        this.commentService.updateComment(commentId, content).subscribe({
             next: (updatedComment) => {
                 const post = this.userPosts().find(p => p.id === postId);
                 if (post && post.comments) {

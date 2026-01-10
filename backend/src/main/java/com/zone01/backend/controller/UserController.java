@@ -35,11 +35,13 @@ public class UserController {
         this.fileStorageService = fileStorageService;
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping
     public ResponseEntity<List<UserDTO>> getAllUsers() {
         List<User> users = userService.getAllUsers();
         List<UserDTO> userDTOs = users.stream()
                 .map(UserDTO::new)
+                .map(UserDTO::hideSensitiveInfo)
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(userDTOs);
@@ -49,14 +51,14 @@ public class UserController {
     public ResponseEntity<UserDTO> getUserById(@PathVariable Long id) {
         User user = userService.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        UserDTO userDTO = new UserDTO(user);
+        UserDTO userDTO = new UserDTO(user).hideSensitiveInfo();
         return ResponseEntity.ok(userDTO);
     }
 
     @GetMapping("/username/{username}")
     public ResponseEntity<UserDTO> getUserByUsername(@PathVariable String username) {
         User user = userService.requireByUsername(username);
-        UserDTO userDTO = new UserDTO(user);
+        UserDTO userDTO = new UserDTO(user).hideSensitiveInfo();
         return ResponseEntity.ok(userDTO);
     }
 

@@ -239,9 +239,16 @@ export class Home implements OnInit {
         const postId = this.editingPostId();
         if (!postId) return;
 
+        const title = this.editPostTitle().trim();
+        const content = this.editPostContent().trim();
+        if (!title || !content) {
+            this.notificationService.error('Title and content are required');
+            return;
+        }
+
         const formData = new FormData();
-        formData.append('title', this.editPostTitle());
-        formData.append('content', this.editPostContent());
+        formData.append('title', title);
+        formData.append('content', content);
         if (this.editPostFile()) {
             formData.append('file', this.editPostFile()!);
         }
@@ -358,7 +365,13 @@ export class Home implements OnInit {
         const commentId = this.editingCommentId();
         if (!commentId) return;
 
-        this.commentService.updateComment(commentId, this.editCommentContent()).subscribe({
+        const content = this.editCommentContent().trim();
+        if (!content) {
+            this.notificationService.error('Comment content cannot be empty');
+            return;
+        }
+
+        this.commentService.updateComment(commentId, content).subscribe({
             next: (updatedComment) => {
                 const post = this.posts().find(p => p.id === postId);
                 if (post && post.comments) {

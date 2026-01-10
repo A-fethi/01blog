@@ -32,7 +32,7 @@ public class CommentController {
     @PostMapping("/post/{postId}")
     public ResponseEntity<CommentDTO> createComment(
             @PathVariable Long postId,
-            @RequestBody CommentDTO commentDTO,
+            @jakarta.validation.Valid @RequestBody CommentDTO commentDTO,
             @AuthenticationPrincipal AppUserDetails auth) {
         User currentUser = auth.getUser();
         Comment newComment = commentService.createComment(currentUser, postId, commentDTO);
@@ -50,7 +50,7 @@ public class CommentController {
     @PutMapping("/{commentId}")
     public ResponseEntity<CommentDTO> updateComment(
             @PathVariable Long commentId,
-            @RequestBody CommentDTO commentDTO,
+            @jakarta.validation.Valid @RequestBody CommentDTO commentDTO,
             @AuthenticationPrincipal AppUserDetails auth) {
         User currentUser = auth.getUser();
         Comment updated = commentService.updateComment(commentId, currentUser, commentDTO);

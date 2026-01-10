@@ -143,9 +143,17 @@ export class Subscriptions implements OnInit {
   onUpdatePost() {
     const postId = this.editingPostId();
     if (!postId) return;
+    const title = this.editPostTitle().trim();
+    const content = this.editPostContent().trim();
+
+    if (!title || !content) {
+      this.notificationService.error('Title and content are required');
+      return;
+    }
+
     const formData = new FormData();
-    formData.append('title', this.editPostTitle());
-    formData.append('content', this.editPostContent());
+    formData.append('title', title);
+    formData.append('content', content);
 
     this.postService.updatePost(postId, formData).subscribe({
       next: (updatedPost) => {
@@ -238,7 +246,12 @@ export class Subscriptions implements OnInit {
   onUpdateComment(postId: number) {
     const commentId = this.editingCommentId();
     if (!commentId) return;
-    this.commentService.updateComment(commentId, this.editCommentContent()).subscribe({
+    const content = this.editCommentContent().trim();
+    if (!content) {
+      this.notificationService.error('Comment content cannot be empty');
+      return;
+    }
+    this.commentService.updateComment(commentId, content).subscribe({
       next: (updatedComment) => {
         const post = this.posts().find(p => p.id === postId);
         if (post && post.comments) {

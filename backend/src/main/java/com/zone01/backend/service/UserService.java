@@ -136,6 +136,10 @@ public class UserService {
         if (username != null) {
             String lowerUsername = username.toLowerCase();
             if (!lowerUsername.equals(user.getUsername())) {
+                if (!ValidationUtil.isValidUsername(lowerUsername)) {
+                    throw new IllegalArgumentException(
+                            "Invalid username. Must be 3-20 characters, letters, numbers, or _");
+                }
                 if (userRepository.existsByUsernameIgnoreCase(lowerUsername)) {
                     throw new UsernameAlreadyExistsException(lowerUsername);
                 }
@@ -146,6 +150,9 @@ public class UserService {
         if (email != null) {
             String lowerEmail = email.toLowerCase();
             if (!lowerEmail.equals(user.getEmail())) {
+                if (!ValidationUtil.isValidEmail(lowerEmail)) {
+                    throw new IllegalArgumentException("Invalid email format");
+                }
                 if (userRepository.existsByEmailIgnoreCase(lowerEmail)) {
                     throw new EmailAlreadyExistsException(lowerEmail);
                 }

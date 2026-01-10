@@ -21,7 +21,6 @@ import com.zone01.backend.security.AppUserDetails;
 import com.zone01.backend.service.PostService;
 import com.zone01.backend.service.FileStorageService;
 
-
 @RestController
 @RequestMapping("/api/posts")
 public class PostController {
@@ -55,8 +54,8 @@ public class PostController {
 
     @PostMapping(consumes = { "multipart/form-data" })
     public ResponseEntity<PostDTO> createPost(
-            @RequestParam("title") String title,
-            @RequestParam("content") String content,
+            @RequestParam("title") @jakarta.validation.constraints.NotBlank(message = "Title is required") String title,
+            @RequestParam("content") @jakarta.validation.constraints.NotBlank(message = "Content is required") String content,
             @RequestParam(value = "file", required = false) org.springframework.web.multipart.MultipartFile file,
             @AuthenticationPrincipal AppUserDetails auth) {
 
@@ -82,8 +81,8 @@ public class PostController {
     @PutMapping(value = "/{postId}", consumes = { "multipart/form-data" })
     public ResponseEntity<PostDTO> updatePost(
             @PathVariable Long postId,
-            @RequestParam("title") String title,
-            @RequestParam("content") String content,
+            @RequestParam("title") @jakarta.validation.constraints.NotBlank(message = "Title is required") String title,
+            @RequestParam("content") @jakarta.validation.constraints.NotBlank(message = "Content is required") String content,
             @RequestParam(value = "file", required = false) org.springframework.web.multipart.MultipartFile file,
             @AuthenticationPrincipal AppUserDetails auth) {
 

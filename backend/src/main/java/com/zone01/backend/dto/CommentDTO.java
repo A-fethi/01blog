@@ -14,6 +14,9 @@ import lombok.NoArgsConstructor;
 public class CommentDTO {
 
     private Long id;
+
+    @jakarta.validation.constraints.NotBlank(message = "Comment content cannot be empty")
+    @jakarta.validation.constraints.Size(max = 1000, message = "Comment cannot exceed 1000 characters")
     private String content;
     private String commentUsername;
     private Long commentId;

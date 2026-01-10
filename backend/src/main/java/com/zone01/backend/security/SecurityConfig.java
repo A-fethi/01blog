@@ -39,7 +39,8 @@ public class SecurityConfig {
                         .requestMatchers(org.springframework.http.HttpMethod.GET,
                                 "/api/posts/**",
                                 "/api/comments/**",
-                                "/api/users/**",
+                                "/api/users/username/**",
+                                "/api/users/{id:\\d+}",
                                 "/uploads/**")
                         .permitAll()
                         .requestMatchers("/", "/api/auth/**").permitAll()

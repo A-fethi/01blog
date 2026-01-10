@@ -37,4 +37,14 @@ public class UserDTO {
         this.subscriberCount = subscribers;
         return this;
     }
+
+    public UserDTO hideSensitiveInfo() {
+        this.id = null;
+        this.email = null;
+        this.role = null;
+        this.banned = false;
+        this.createdAt = null;
+        this.updatedAt = null;
+        return this;
+    }
 }
