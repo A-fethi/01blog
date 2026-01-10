@@ -9,6 +9,7 @@ import { Subscriptions } from './pages/subscriptions/subscriptions';
 import { Discover } from './pages/discover/discover';
 import { MainLayout } from './layout/main-layout';
 import { ErrorPage } from './pages/error-page/error-page';
+import { guestGuard } from './guards/guest.guard';
 
 export const routes: Routes = [
     {
@@ -52,11 +53,13 @@ export const routes: Routes = [
     },
     {
         path: 'login',
-        component: Login
+        component: Login,
+        canActivate: [guestGuard]
     },
     {
         path: 'register',
-        component: Register
+        component: Register,
+        canActivate: [guestGuard]
     },
     {
         path: '404',
