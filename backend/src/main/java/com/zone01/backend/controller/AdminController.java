@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.zone01.backend.dto.PostDTO;
 import com.zone01.backend.dto.ReportDTO;
 import com.zone01.backend.dto.UserDTO;
-import com.zone01.backend.entity.Role;
 import com.zone01.backend.entity.User;
 import com.zone01.backend.security.AppUserDetails;
 import com.zone01.backend.service.PostService;
@@ -42,12 +40,7 @@ public class AdminController {
     }
 
     @GetMapping("/users")
-    public ResponseEntity<List<UserDTO>> getAllUsers(
-            @AuthenticationPrincipal AppUserDetails auth) {
-        if (auth == null || auth.getUser().getRole() != Role.ADMIN) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-
+    public ResponseEntity<List<UserDTO>> getAllUsers() {
         List<User> users = userService.getAllUsers();
         List<UserDTO> userDTOs = users.stream()
                 .map(UserDTO::new)
@@ -57,11 +50,7 @@ public class AdminController {
     }
 
     @GetMapping("/stats")
-    public ResponseEntity<Map<String, Object>> getDashboardStats(
-            @AuthenticationPrincipal AppUserDetails auth) {
-        if (auth == null || auth.getUser().getRole() != Role.ADMIN) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
+    public ResponseEntity<Map<String, Object>> getDashboardStats() {
         Map<String, Object> stats = new HashMap<>();
 
         long totalUsers = userService.getAllUsers().size();
@@ -77,9 +66,6 @@ public class AdminController {
     public ResponseEntity<Map<String, String>> deleteUser(
             @PathVariable Long userId,
             @AuthenticationPrincipal AppUserDetails auth) {
-        if (auth == null || auth.getUser().getRole() != Role.ADMIN) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
 
         if (auth.getUser().getId().equals(userId)) {
             Map<String, String> error = new HashMap<>();

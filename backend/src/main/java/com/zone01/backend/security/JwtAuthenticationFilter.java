@@ -58,31 +58,35 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 // Extract username from token
                 username = jwtUtil.extractUsername(jwt);
             } catch (Exception e) {
-                System.out.println("Error extracting username from JWT: " + e.getMessage());
+                // Token extraction failed
             }
         }
 
         // 3. If we have username and user is not already authenticated
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            try {
+                // Load user details from database
+                UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
 
-            // Load user details from database
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
+                // 4. Validate token
+                if (jwtUtil.validateToken(jwt, userDetails) && userDetails.isAccountNonLocked()) {
 
-            // 4. Validate token
-            if (jwtUtil.validateToken(jwt, userDetails) && userDetails.isAccountNonLocked()) {
+                    // Create authentication token
+                    UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities());
 
-                // Create authentication token
-                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities());
+                    // Set details
+                    authenticationToken.setDetails(
+                            new WebAuthenticationDetailsSource().buildDetails(request));
 
-                // Set details
-                authenticationToken.setDetails(
-                        new WebAuthenticationDetailsSource().buildDetails(request));
-
-                // 5. Set authentication in SecurityContext
-                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                    // 5. Set authentication in SecurityContext
+                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                }
+            } catch (Exception e) {
+                // If user not found or token invalid, just continue
+                // SecurityContext will remain empty, leading to 401 for protected routes
             }
         }
 

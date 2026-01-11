@@ -18,9 +18,17 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsernameIgnoreCase(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+    public UserDetails loadUserByUsername(String identifier) throws UsernameNotFoundException {
+        // Try to find by UUID first
+        if (identifier.length() == 36 && identifier.contains("-")) {
+            return userRepository.findByUuid(identifier)
+                    .map(AppUserDetails::new)
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found with UUID: " + identifier));
+        }
+
+        // Fallback to username
+        User user = userRepository.findByUsernameIgnoreCase(identifier)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + identifier));
 
         return new AppUserDetails(user);
     }

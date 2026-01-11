@@ -48,6 +48,18 @@ public class GlobalExceptionHandler {
                 return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
         }
 
+        @ExceptionHandler(org.springframework.security.core.userdetails.UsernameNotFoundException.class)
+        public ResponseEntity<Map<String, Object>> handleUsernameNotFound(
+                        org.springframework.security.core.userdetails.UsernameNotFoundException ex,
+                        WebRequest request) {
+                Map<String, Object> body = createErrorBody(
+                                HttpStatus.NOT_FOUND,
+                                "Not Found",
+                                ex.getMessage(),
+                                request);
+                return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+        }
+
         @ExceptionHandler(UsernameAlreadyExistsException.class)
         public ResponseEntity<Map<String, Object>> handleUsernameExists(
                         UsernameAlreadyExistsException ex,
@@ -104,6 +116,30 @@ public class GlobalExceptionHandler {
                                 HttpStatus.UNAUTHORIZED,
                                 "Unauthorized",
                                 ex.getMessage(),
+                                request);
+                return new ResponseEntity<>(body, HttpStatus.UNAUTHORIZED);
+        }
+
+        @ExceptionHandler(org.springframework.security.authentication.LockedException.class)
+        public ResponseEntity<Map<String, Object>> handleLocked(
+                        org.springframework.security.authentication.LockedException ex,
+                        WebRequest request) {
+                Map<String, Object> body = createErrorBody(
+                                HttpStatus.FORBIDDEN,
+                                "Forbidden",
+                                "Your account has been banned",
+                                request);
+                return new ResponseEntity<>(body, HttpStatus.FORBIDDEN);
+        }
+
+        @ExceptionHandler(org.springframework.security.authentication.BadCredentialsException.class)
+        public ResponseEntity<Map<String, Object>> handleBadCredentials(
+                        org.springframework.security.authentication.BadCredentialsException ex,
+                        WebRequest request) {
+                Map<String, Object> body = createErrorBody(
+                                HttpStatus.UNAUTHORIZED,
+                                "Unauthorized",
+                                "Invalid username or password",
                                 request);
                 return new ResponseEntity<>(body, HttpStatus.UNAUTHORIZED);
         }

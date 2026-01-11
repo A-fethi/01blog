@@ -14,17 +14,14 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
                 } else if (error.status === 500) {
                     router.navigate(['/500']);
                 } else if (error.status === 403) {
-                    router.navigate(['/403']);
+                    if (!router.url.includes('/login') && !router.url.includes('/register')) {
+                        router.navigate(['/403']);
+                    }
                 } else if (error.status === 401) {
                     if (!router.url.includes('/login')) {
                         router.navigate(['/login']);
                     }
-                } else if (error.status === 400) {
-                    router.navigate(['/400']);
                 }
-                // else if (error.status === 429) {
-                //     router.navigate(['/429']);
-                // }
             }
             return throwError(() => error);
         })

@@ -3,6 +3,7 @@ package com.zone01.backend.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,6 +30,7 @@ public class CommentController {
         this.commentService = commentService;
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/post/{postId}")
     public ResponseEntity<CommentDTO> createComment(
             @PathVariable Long postId,
@@ -47,6 +49,7 @@ public class CommentController {
         return ResponseEntity.ok(commentDTOs);
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PutMapping("/{commentId}")
     public ResponseEntity<CommentDTO> updateComment(
             @PathVariable Long commentId,
@@ -57,6 +60,7 @@ public class CommentController {
         return ResponseEntity.ok(new CommentDTO(updated));
     }
 
+    @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/{commentId}")
     public ResponseEntity<Void> deleteComment(
             @PathVariable Long commentId,

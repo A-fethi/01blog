@@ -20,6 +20,10 @@ public class AppUserDetails implements UserDetails {
         return user;
     }
 
+    public String getUuid() {
+        return user.getUuid();
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.singletonList(

@@ -31,6 +31,9 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true, nullable = false, updatable = false, length = 36)
+    private String uuid;
+
     @Column(unique = true, nullable = false, length = 20)
     private String username;
 
@@ -85,6 +88,9 @@ public class User {
 
     @PrePersist
     public void onCreate() {
+        if (this.uuid == null) {
+            this.uuid = java.util.UUID.randomUUID().toString();
+        }
         LocalDateTime now = LocalDateTime.now();
         this.createdAt = now;
         this.updatedAt = now;

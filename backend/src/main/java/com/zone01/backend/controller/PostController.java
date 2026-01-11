@@ -2,8 +2,8 @@ package com.zone01.backend.controller;
 
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -54,16 +54,13 @@ public class PostController {
         return ResponseEntity.ok(postService.getPostDetails(id, currentUser));
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PostMapping(consumes = { "multipart/form-data" })
     public ResponseEntity<PostDTO> createPost(
             @RequestParam("title") @jakarta.validation.constraints.NotBlank(message = "Title is required") @jakarta.validation.constraints.Size(max = 500, message = "Title cannot exceed 500 characters") String title,
             @RequestParam("content") @jakarta.validation.constraints.NotBlank(message = "Content is required") String content,
             @RequestParam(value = "files", required = false) org.springframework.web.multipart.MultipartFile[] files,
             @AuthenticationPrincipal AppUserDetails auth) {
-
-        if (auth == null || auth.getUser() == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
 
         User loggedUser = auth.getUser();
 
@@ -86,6 +83,7 @@ public class PostController {
         return ResponseEntity.ok(new PostDTO(newPost));
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PutMapping(value = "/{postId}", consumes = { "multipart/form-data" })
     public ResponseEntity<PostDTO> updatePost(
             @PathVariable Long postId,
@@ -124,6 +122,7 @@ public class PostController {
         return ResponseEntity.ok(new PostDTO(postService.updatePost(postId, loggedUser, postDTO)));
     }
 
+    @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/{postId}")
     public ResponseEntity<PostDTO> deletePost(
             @PathVariable long postId,

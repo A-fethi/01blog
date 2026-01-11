@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,35 +33,29 @@ public class SubscriptionController {
         this.userService = userService;
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/{targetId}")
     public ResponseEntity<SubscriptionDTO> subscribe(
             @PathVariable Long targetId,
             @AuthenticationPrincipal AppUserDetails auth) {
-        if (auth == null || auth.getUser() == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
 
         Subscription subscription = subscriptionService.subscribe(auth.getUser(), targetId);
         return ResponseEntity.status(HttpStatus.CREATED).body(new SubscriptionDTO(subscription));
     }
 
+    @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/{targetId}")
     public ResponseEntity<Map<String, String>> unsubscribe(
             @PathVariable Long targetId,
             @AuthenticationPrincipal AppUserDetails auth) {
-        if (auth == null || auth.getUser() == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
 
         subscriptionService.unsubscribe(auth.getUser(), targetId);
         return ResponseEntity.ok(Map.of("message", "Unsubscribed successfully"));
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping
     public ResponseEntity<List<SubscriptionDTO>> mySubscriptions(@AuthenticationPrincipal AppUserDetails auth) {
-        if (auth == null || auth.getUser() == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
 
         List<SubscriptionDTO> subscriptions = subscriptionService.getSubscriptions(auth.getUser())
                 .stream()

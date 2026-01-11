@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,6 +29,7 @@ public class LikeController {
         this.likeService = likeService;
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/post/{postId}")
     public ResponseEntity<LikeDTO> likePost(@PathVariable Long postId, @AuthenticationPrincipal AppUserDetails auth) {
         User currentUser = auth.getUser();
@@ -37,6 +39,7 @@ public class LikeController {
         return ResponseEntity.status(HttpStatus.CREATED).body(likeDTO);
     }
 
+    @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/post/{postId}")
     public ResponseEntity<Map<String, String>> unlikePost(@PathVariable Long postId,
             @AuthenticationPrincipal AppUserDetails auth) {

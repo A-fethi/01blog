@@ -81,40 +81,29 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginDTO loginDTO) {
-        try {
-            // 1. Authenticate username and password
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            loginDTO.getUsername(),
-                            loginDTO.getPassword()));
+        // 1. Authenticate username and password
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        loginDTO.getUsername(),
+                        loginDTO.getPassword()));
 
-            // 2. Load user details
-            UserDetails userDetails = userDetailsService.loadUserByUsername(
-                    loginDTO.getUsername());
+        // 2. Load user details
+        UserDetails userDetails = userDetailsService.loadUserByUsername(
+                loginDTO.getUsername());
 
-            // 3. Generate JWT token
-            String token = jwtUtil.generateToken(userDetails);
+        // 3. Generate JWT token
+        String token = jwtUtil.generateToken(userDetails);
 
-            // 4. Get user information
-            User user = userService.findByUsername(loginDTO.getUsername())
-                    .orElseThrow(() -> new UserNotFoundException(loginDTO.getUsername()));
+        // 4. Get user information
+        User user = userService.findByUsername(loginDTO.getUsername())
+                .orElseThrow(() -> new UserNotFoundException(loginDTO.getUsername()));
 
-            UserDTO userDTO = new UserDTO(user);
+        UserDTO userDTO = new UserDTO(user);
 
-            // 5. Return token + user info
-            AuthResponse response = new AuthResponse(token, userDTO);
+        // 5. Return token + user info
+        AuthResponse response = new AuthResponse(token, userDTO);
 
-            return ResponseEntity.ok(response);
-
-        } catch (org.springframework.security.authentication.LockedException e) {
-            Map<String, String> error = new HashMap<>();
-            error.put("error", "Your account has been banned");
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
-        } catch (BadCredentialsException e) {
-            Map<String, String> error = new HashMap<>();
-            error.put("error", "Invalid username or password");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
-        }
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/me")
