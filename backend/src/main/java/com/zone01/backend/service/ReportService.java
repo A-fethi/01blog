@@ -9,6 +9,8 @@ import com.zone01.backend.entity.Post;
 import com.zone01.backend.entity.Report;
 import com.zone01.backend.entity.ReportStatus;
 import com.zone01.backend.entity.User;
+import com.zone01.backend.exception.PostNotFoundException;
+import com.zone01.backend.exception.ReportNotFoundException;
 import com.zone01.backend.exception.UserNotFoundException;
 import com.zone01.backend.repository.PostRepository;
 import com.zone01.backend.repository.ReportRepository;
@@ -55,7 +57,7 @@ public class ReportService {
     @Transactional
     public Report createPostReport(User reporter, Long postId, String reason) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("Post not found"));
+                .orElseThrow(() -> new PostNotFoundException(postId));
 
         if (post.getAuthor().getId().equals(reporter.getId())) {
             throw new IllegalArgumentException("You cannot report your own post");
@@ -86,7 +88,7 @@ public class ReportService {
     @Transactional
     public Report updateStatus(Long reportId, ReportStatus status) {
         Report report = reportRepository.findById(reportId)
-                .orElseThrow(() -> new IllegalArgumentException("Report not found"));
+                .orElseThrow(() -> new ReportNotFoundException(reportId));
         report.setStatus(status);
         if (status == ReportStatus.RESOLVED || status == ReportStatus.REJECTED) {
             report.setResolvedAt(LocalDateTime.now());

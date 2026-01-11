@@ -48,7 +48,7 @@ public class Notification {
     @Column(nullable = false, length = 40)
     private NotificationType type = NotificationType.NEW_POST;
 
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false, length = 1000)
     private String message;
 
     @Column(name = "is_read", nullable = false)

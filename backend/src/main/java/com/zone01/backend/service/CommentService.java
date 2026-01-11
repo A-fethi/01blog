@@ -10,6 +10,8 @@ import com.zone01.backend.entity.Post;
 import com.zone01.backend.entity.User;
 import com.zone01.backend.repository.CommentRepository;
 
+import com.zone01.backend.exception.CommentNotFoundException;
+import com.zone01.backend.exception.UnauthorizedActionException;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -50,14 +52,14 @@ public class CommentService {
 
     public Comment getCommentById(Long id) {
         return commentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Comment not found: " + id));
+                .orElseThrow(() -> new CommentNotFoundException(id));
     }
 
     @Transactional
     public Comment updateComment(Long commentId, User user, CommentDTO commentDTO) {
         Comment comment = getCommentById(commentId);
         if (!comment.getAuthor().getId().equals(user.getId())) {
-            throw new RuntimeException("You cannot edit this comment");
+            throw new UnauthorizedActionException("You cannot edit this comment");
         }
         comment.setContent(commentDTO.getContent());
         comment.setUpdatedAt(java.time.LocalDateTime.now());
@@ -68,7 +70,7 @@ public class CommentService {
     public void deleteComment(Long commentId, User user) {
         Comment comment = getCommentById(commentId);
         if (!comment.getAuthor().getId().equals(user.getId())) {
-            throw new RuntimeException("You cannot delete this comment");
+            throw new UnauthorizedActionException("You cannot delete this comment");
         }
         commentRepository.delete(comment);
     }

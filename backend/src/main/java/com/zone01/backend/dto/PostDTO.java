@@ -19,7 +19,7 @@ public class PostDTO {
     private Long id;
 
     @NotBlank(message = "Title is required")
-    @Size(max = 200, message = "Title cannot exceed 200 characters")
+    @Size(max = 500, message = "Title cannot exceed 500 characters")
     private String title;
 
     @NotBlank(message = "Content is required")

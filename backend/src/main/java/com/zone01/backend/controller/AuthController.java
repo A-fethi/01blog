@@ -24,6 +24,7 @@ import com.zone01.backend.dto.LoginDTO;
 import com.zone01.backend.dto.RegisterDTO;
 import com.zone01.backend.dto.UserDTO;
 import com.zone01.backend.entity.User;
+import com.zone01.backend.exception.UserNotFoundException;
 import com.zone01.backend.security.AppUserDetails;
 import com.zone01.backend.service.UserService;
 import com.zone01.backend.util.JwtUtil;
@@ -96,7 +97,7 @@ public class AuthController {
 
             // 4. Get user information
             User user = userService.findByUsername(loginDTO.getUsername())
-                    .orElseThrow(() -> new RuntimeException("User not found"));
+                    .orElseThrow(() -> new UserNotFoundException(loginDTO.getUsername()));
 
             UserDTO userDTO = new UserDTO(user);
 

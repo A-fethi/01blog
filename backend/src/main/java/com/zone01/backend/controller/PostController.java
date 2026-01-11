@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,6 +24,7 @@ import com.zone01.backend.service.FileStorageService;
 
 @RestController
 @RequestMapping("/api/posts")
+@Validated
 public class PostController {
 
     private final PostService postService;
@@ -54,7 +56,7 @@ public class PostController {
 
     @PostMapping(consumes = { "multipart/form-data" })
     public ResponseEntity<PostDTO> createPost(
-            @RequestParam("title") @jakarta.validation.constraints.NotBlank(message = "Title is required") String title,
+            @RequestParam("title") @jakarta.validation.constraints.NotBlank(message = "Title is required") @jakarta.validation.constraints.Size(max = 500, message = "Title cannot exceed 500 characters") String title,
             @RequestParam("content") @jakarta.validation.constraints.NotBlank(message = "Content is required") String content,
             @RequestParam(value = "file", required = false) org.springframework.web.multipart.MultipartFile file,
             @AuthenticationPrincipal AppUserDetails auth) {
@@ -81,7 +83,7 @@ public class PostController {
     @PutMapping(value = "/{postId}", consumes = { "multipart/form-data" })
     public ResponseEntity<PostDTO> updatePost(
             @PathVariable Long postId,
-            @RequestParam("title") @jakarta.validation.constraints.NotBlank(message = "Title is required") String title,
+            @RequestParam("title") @jakarta.validation.constraints.NotBlank(message = "Title is required") @jakarta.validation.constraints.Size(max = 500, message = "Title cannot exceed 500 characters") String title,
             @RequestParam("content") @jakarta.validation.constraints.NotBlank(message = "Content is required") String content,
             @RequestParam(value = "file", required = false) org.springframework.web.multipart.MultipartFile file,
             @AuthenticationPrincipal AppUserDetails auth) {

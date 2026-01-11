@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.zone01.backend.dto.UserDTO;
 import com.zone01.backend.entity.User;
+import com.zone01.backend.exception.UserNotFoundException;
 import com.zone01.backend.security.AppUserDetails;
 import com.zone01.backend.service.UserService;
 import com.zone01.backend.service.FileStorageService;
@@ -50,7 +51,7 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<UserDTO> getUserById(@PathVariable Long id) {
         User user = userService.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException(id));
         UserDTO userDTO = new UserDTO(user).hideSensitiveInfo();
         return ResponseEntity.ok(userDTO);
     }
