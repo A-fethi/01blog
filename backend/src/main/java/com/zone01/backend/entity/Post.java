@@ -41,15 +41,8 @@ public class Post {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    @Column(name = "media_url", length = 500)
-    private String mediaUrl;
-
-    @Column(name = "media_preview_url", length = 500)
-    private String mediaPreviewUrl;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "media_type", length = 10)
-    private MediaType mediaType;
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PostMedia> media = new ArrayList<>();
 
     @Formula("(SELECT COUNT(*) FROM likes l WHERE l.post_id = id)")
     private long likeCount;

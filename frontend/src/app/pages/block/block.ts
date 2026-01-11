@@ -91,6 +91,9 @@ export class Block implements OnInit {
     readonly editingPostId = signal<number | null>(null);
     readonly editPostTitle = signal('');
     readonly editPostContent = signal('');
+    readonly editPostFiles = signal<File[]>([]);
+    readonly editPostFilesPreview = signal<{ url: string, type: string }[]>([]);
+    readonly existingMediaUrls = signal<string[]>([]);
 
     readonly editingCommentId = signal<number | null>(null);
     readonly editCommentContent = signal('');
@@ -282,6 +285,30 @@ export class Block implements OnInit {
         this.editAvatarFile.set(event.target.files[0] ?? null);
     }
 
+    onFileSelected(event: any) {
+        const files: FileList = event.target.files;
+        if (files && files.length > 0) {
+            const newFiles = Array.from(files);
+            this.editPostFiles.update(current => [...current, ...newFiles]);
+            newFiles.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    this.editPostFilesPreview.update(previews => [...previews, { url: reader.result as string, type: file.type }]);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+    }
+
+    removeEditFile(index: number) {
+        this.editPostFiles.update(files => files.filter((_, i) => i !== index));
+        this.editPostFilesPreview.update(previews => previews.filter((_, i) => i !== index));
+    }
+
+    removeExistingMedia(index: number) {
+        this.existingMediaUrls.update(urls => urls.filter((_, i) => i !== index));
+    }
+
     onUpdateProfile() {
         const username = this.editUsername().trim().toLowerCase();
         const email = this.editEmail().trim().toLowerCase();
@@ -413,6 +440,9 @@ export class Block implements OnInit {
         this.editingPostId.set(post.id);
         this.editPostTitle.set(post.title || '');
         this.editPostContent.set(post.content || '');
+        this.editPostFiles.set([]);
+        this.editPostFilesPreview.set([]);
+        this.existingMediaUrls.set(post.media ? post.media.map((m: any) => m.mediaUrl) : []);
     }
 
     onCancelEditPost() {
@@ -433,6 +463,14 @@ export class Block implements OnInit {
         const formData = new FormData();
         formData.append('title', title);
         formData.append('content', content);
+
+        this.existingMediaUrls().forEach(url => {
+            formData.append('existingMediaUrls', url);
+        });
+
+        this.editPostFiles().forEach(file => {
+            formData.append('files', file);
+        });
 
         this.postService.updatePost(postId, formData).subscribe({
             next: (updatedPost) => {

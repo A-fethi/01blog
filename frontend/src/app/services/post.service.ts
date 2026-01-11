@@ -2,12 +2,17 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
+export interface PostMediaDTO {
+  id?: number;
+  mediaUrl: string;
+  mediaType: 'IMAGE' | 'VIDEO';
+}
+
 export interface PostDTO {
   id: number;
   title: string;
   content: string;
-  mediaUrl?: string;
-  mediaType?: string;
+  media: PostMediaDTO[];
   createdAt: string;
   authorId: number;
   authorUsername: string;

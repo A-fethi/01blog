@@ -68,8 +68,8 @@ export class Home implements OnInit {
 
     readonly newPostTitle = signal('');
     readonly newPostContent = signal('');
-    readonly selectedFile = signal<File | null>(null);
-    readonly selectedFilePreview = signal<string | null>(null);
+    readonly selectedFiles = signal<File[]>([]);
+    readonly selectedFilesPreview = signal<{ url: string, type: string }[]>([]);
     readonly showComments = signal<Set<number>>(new Set());
     readonly commentInputs = signal<Map<number, string>>(new Map());
     readonly showUserMenu = signal(false);
@@ -81,7 +81,9 @@ export class Home implements OnInit {
     readonly editingPostId = signal<number | null>(null);
     readonly editPostTitle = signal('');
     readonly editPostContent = signal('');
-    readonly editPostFile = signal<File | null>(null);
+    readonly editPostFiles = signal<File[]>([]);
+    readonly editPostFilesPreview = signal<{ url: string, type: string }[]>([]);
+    readonly existingMediaUrls = signal<string[]>([]);
 
     readonly editingCommentId = signal<number | null>(null);
     readonly editCommentContent = signal('');
@@ -145,17 +147,44 @@ export class Home implements OnInit {
         return true;
     }
 
-    onFileSelected(event: any) {
-        const file = event.target.files[0];
-        if (file) {
-            this.selectedFile.set(file);
-            // Create a preview URL
-            const reader = new FileReader();
-            reader.onload = () => {
-                this.selectedFilePreview.set(reader.result as string);
-            };
-            reader.readAsDataURL(file);
+    onFileSelected(event: any, isEdit: boolean = false) {
+        const files: FileList = event.target.files;
+        if (files && files.length > 0) {
+            const newFiles = Array.from(files);
+            if (isEdit) {
+                this.editPostFiles.update(current => [...current, ...newFiles]);
+                newFiles.forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                        this.editPostFilesPreview.update(previews => [...previews, { url: reader.result as string, type: file.type }]);
+                    };
+                    reader.readAsDataURL(file);
+                });
+            } else {
+                this.selectedFiles.update(current => [...current, ...newFiles]);
+                newFiles.forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                        this.selectedFilesPreview.update(previews => [...previews, { url: reader.result as string, type: file.type }]);
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
         }
+    }
+
+    removeSelectedFile(index: number) {
+        this.selectedFiles.update(files => files.filter((_, i) => i !== index));
+        this.selectedFilesPreview.update(previews => previews.filter((_, i) => i !== index));
+    }
+
+    removeEditFile(index: number) {
+        this.editPostFiles.update(files => files.filter((_, i) => i !== index));
+        this.editPostFilesPreview.update(previews => previews.filter((_, i) => i !== index));
+    }
+
+    removeExistingMedia(index: number) {
+        this.existingMediaUrls.update(urls => urls.filter((_, i) => i !== index));
     }
 
     onSharePost() {
@@ -172,18 +201,17 @@ export class Home implements OnInit {
         formData.append('title', title);
         formData.append('content', content);
 
-        const file = this.selectedFile();
-        if (file) {
-            formData.append('file', file);
-        }
+        this.selectedFiles().forEach(file => {
+            formData.append('files', file);
+        });
 
         this.postService.createPost(formData).subscribe({
             next: (post) => {
                 this.posts.update(p => [post, ...p]);
                 this.newPostTitle.set('');
                 this.newPostContent.set('');
-                this.selectedFile.set(null);
-                this.selectedFilePreview.set(null);
+                this.selectedFiles.set([]);
+                this.selectedFilesPreview.set([]);
                 this.notificationService.success('Post shared!');
             },
             error: (err) => {
@@ -228,7 +256,9 @@ export class Home implements OnInit {
         this.editingPostId.set(post.id);
         this.editPostTitle.set(post.title || '');
         this.editPostContent.set(post.content || '');
-        this.editPostFile.set(null);
+        this.editPostFiles.set([]);
+        this.editPostFilesPreview.set([]);
+        this.existingMediaUrls.set(post.media ? post.media.map((m: any) => m.mediaUrl) : []);
     }
 
     onCancelEditPost() {
@@ -249,9 +279,14 @@ export class Home implements OnInit {
         const formData = new FormData();
         formData.append('title', title);
         formData.append('content', content);
-        if (this.editPostFile()) {
-            formData.append('file', this.editPostFile()!);
-        }
+
+        this.existingMediaUrls().forEach(url => {
+            formData.append('existingMediaUrls', url);
+        });
+
+        this.editPostFiles().forEach(file => {
+            formData.append('files', file);
+        });
 
         this.postService.updatePost(postId, formData).subscribe({
             next: (updatedPost) => {

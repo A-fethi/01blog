@@ -226,9 +226,12 @@
             <div class="post-preview-content">
                 <h3 *ngIf="post.title">{{ post.title }}</h3>
                 <p>{{ post.content }}</p>
-                <div *ngIf="post.mediaUrl" class="post-media">
-                    <img *ngIf="post.mediaType === 'IMAGE'" [src]="post.mediaUrl">
-                    <video *ngIf="post.mediaType === 'VIDEO'" [src]="post.mediaUrl" controls></video>
+                <div *ngIf="post.media && post.media.length > 0" class="post-media-grid"
+                    [class.multiple]="post.media.length > 1">
+                    <div *ngFor="let m of post.media" class="media-item">
+                        <img *ngIf="m.mediaType === 'IMAGE'" [src]="m.mediaUrl">
+                        <video *ngIf="m.mediaType === 'VIDEO'" [src]="m.mediaUrl" controls></video>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">

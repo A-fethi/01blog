@@ -52,18 +52,20 @@ public class PostService {
         Post post = new Post();
         post.setTitle(postDTO.getTitle());
         post.setContent(postDTO.getContent());
-        post.setMediaUrl(postDTO.getMediaUrl());
-        post.setMediaPreviewUrl(postDTO.getMediaPreviewUrl());
-
-        MediaType type = postDTO.getMediaType();
-        if (type == null && postDTO.getMediaUrl() != null) {
-            type = guessMediaType(postDTO.getMediaUrl());
-        }
-        post.setMediaType(type);
-
         post.setAuthor(author);
         post.setCreatedAt(LocalDateTime.now());
-        post.setUpdatedAt(java.time.LocalDateTime.now());
+        post.setUpdatedAt(LocalDateTime.now());
+
+        if (postDTO.getMedia() != null) {
+            for (com.zone01.backend.dto.PostMediaDTO mDto : postDTO.getMedia()) {
+                com.zone01.backend.entity.PostMedia media = new com.zone01.backend.entity.PostMedia();
+                media.setMediaUrl(mDto.getMediaUrl());
+                media.setMediaType(
+                        mDto.getMediaType() != null ? mDto.getMediaType() : guessMediaType(mDto.getMediaUrl()));
+                media.setPost(post);
+                post.getMedia().add(media);
+            }
+        }
 
         Post saved = postRepository.save(post);
         notificationService.notifySubscribers(saved, subscriptionService.getSubscriberUsers(author));
@@ -81,13 +83,18 @@ public class PostService {
 
         post.setTitle(postDTO.getTitle());
         post.setContent(postDTO.getContent());
-        if (postDTO.getMediaUrl() != null) {
-            post.setMediaUrl(postDTO.getMediaUrl());
-            MediaType type = postDTO.getMediaType();
-            if (type == null) {
-                type = guessMediaType(postDTO.getMediaUrl());
+
+        // Update media: for simplicity, we replace all media
+        if (postDTO.getMedia() != null) {
+            post.getMedia().clear();
+            for (com.zone01.backend.dto.PostMediaDTO mDto : postDTO.getMedia()) {
+                com.zone01.backend.entity.PostMedia media = new com.zone01.backend.entity.PostMedia();
+                media.setMediaUrl(mDto.getMediaUrl());
+                media.setMediaType(
+                        mDto.getMediaType() != null ? mDto.getMediaType() : guessMediaType(mDto.getMediaUrl()));
+                media.setPost(post);
+                post.getMedia().add(media);
             }
-            post.setMediaType(type);
         }
         post.setUpdatedAt(LocalDateTime.now());
 
@@ -199,9 +206,6 @@ public class PostService {
 
     private PostDTO toDto(Post post, java.util.Set<Long> likedPostIds) {
         PostDTO postDTO = new PostDTO(post);
-        if (postDTO.getMediaType() == null && postDTO.getMediaUrl() != null) {
-            postDTO.setMediaType(guessMediaType(postDTO.getMediaUrl()));
-        }
         return postDTO.withIsLiked(likedPostIds.contains(post.getId()));
     }
 

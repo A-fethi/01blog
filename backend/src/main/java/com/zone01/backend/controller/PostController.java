@@ -58,7 +58,7 @@ public class PostController {
     public ResponseEntity<PostDTO> createPost(
             @RequestParam("title") @jakarta.validation.constraints.NotBlank(message = "Title is required") @jakarta.validation.constraints.Size(max = 500, message = "Title cannot exceed 500 characters") String title,
             @RequestParam("content") @jakarta.validation.constraints.NotBlank(message = "Content is required") String content,
-            @RequestParam(value = "file", required = false) org.springframework.web.multipart.MultipartFile file,
+            @RequestParam(value = "files", required = false) org.springframework.web.multipart.MultipartFile[] files,
             @AuthenticationPrincipal AppUserDetails auth) {
 
         if (auth == null || auth.getUser() == null) {
@@ -71,9 +71,15 @@ public class PostController {
         postDTO.setTitle(title);
         postDTO.setContent(content);
 
-        if (file != null && !file.isEmpty()) {
-            String fileName = fileStorageService.storeFile(file);
-            postDTO.setMediaUrl("http://localhost:8080/uploads/" + fileName);
+        if (files != null && files.length > 0) {
+            for (org.springframework.web.multipart.MultipartFile file : files) {
+                if (!file.isEmpty()) {
+                    String fileName = fileStorageService.storeFile(file);
+                    com.zone01.backend.dto.PostMediaDTO mediaDTO = new com.zone01.backend.dto.PostMediaDTO();
+                    mediaDTO.setMediaUrl("http://localhost:8080/uploads/" + fileName);
+                    postDTO.getMedia().add(mediaDTO);
+                }
+            }
         }
 
         Post newPost = postService.createPost(loggedUser.getId(), postDTO);
@@ -85,7 +91,8 @@ public class PostController {
             @PathVariable Long postId,
             @RequestParam("title") @jakarta.validation.constraints.NotBlank(message = "Title is required") @jakarta.validation.constraints.Size(max = 500, message = "Title cannot exceed 500 characters") String title,
             @RequestParam("content") @jakarta.validation.constraints.NotBlank(message = "Content is required") String content,
-            @RequestParam(value = "file", required = false) org.springframework.web.multipart.MultipartFile file,
+            @RequestParam(value = "files", required = false) org.springframework.web.multipart.MultipartFile[] files,
+            @RequestParam(value = "existingMediaUrls", required = false) String[] existingMediaUrls,
             @AuthenticationPrincipal AppUserDetails auth) {
 
         User loggedUser = auth.getUser();
@@ -93,9 +100,25 @@ public class PostController {
         postDTO.setTitle(title);
         postDTO.setContent(content);
 
-        if (file != null && !file.isEmpty()) {
-            String fileName = fileStorageService.storeFile(file);
-            postDTO.setMediaUrl("http://localhost:8080/uploads/" + fileName);
+        // Keep existing media
+        if (existingMediaUrls != null) {
+            for (String url : existingMediaUrls) {
+                com.zone01.backend.dto.PostMediaDTO mediaDTO = new com.zone01.backend.dto.PostMediaDTO();
+                mediaDTO.setMediaUrl(url);
+                postDTO.getMedia().add(mediaDTO);
+            }
+        }
+
+        // Add new media
+        if (files != null && files.length > 0) {
+            for (org.springframework.web.multipart.MultipartFile file : files) {
+                if (!file.isEmpty()) {
+                    String fileName = fileStorageService.storeFile(file);
+                    com.zone01.backend.dto.PostMediaDTO mediaDTO = new com.zone01.backend.dto.PostMediaDTO();
+                    mediaDTO.setMediaUrl("http://localhost:8080/uploads/" + fileName);
+                    postDTO.getMedia().add(mediaDTO);
+                }
+            }
         }
 
         return ResponseEntity.ok(new PostDTO(postService.updatePost(postId, loggedUser, postDTO)));

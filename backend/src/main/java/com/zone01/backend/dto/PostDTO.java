@@ -26,9 +26,7 @@ public class PostDTO {
     private String content;
     private Long authorId;
     private String authorUsername;
-    private String mediaUrl;
-    private String mediaPreviewUrl;
-    private MediaType mediaType;
+    private java.util.List<PostMediaDTO> media = new java.util.ArrayList<>();
     private Long likesCount;
     private Long commentsCount;
     private LocalDateTime createdAt;
@@ -42,9 +40,11 @@ public class PostDTO {
         this.content = post.getContent();
         this.authorId = post.getAuthor().getId();
         this.authorUsername = post.getAuthor().getUsername();
-        this.mediaUrl = post.getMediaUrl();
-        this.mediaPreviewUrl = post.getMediaPreviewUrl();
-        this.mediaType = post.getMediaType();
+        if (post.getMedia() != null) {
+            this.media = post.getMedia().stream()
+                    .map(PostMediaDTO::new)
+                    .collect(java.util.stream.Collectors.toList());
+        }
         this.createdAt = post.getCreatedAt();
         this.updateAt = post.getUpdatedAt();
         this.authorAvatarUrl = post.getAuthor().getAvatarUrl();

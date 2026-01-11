@@ -124,11 +124,14 @@
             <div class="post-content" *ngIf="editingPostId() !== post.id">
                 <h3 *ngIf="post.title && post.title !== 'Untitled Post'" class="post-title">{{ post.title }}</h3>
                 <p>{{ post.content }}</p>
-                <div *ngIf="post.mediaUrl" class="post-media">
-                    <img *ngIf="post.mediaType === 'IMAGE'" [src]="post.mediaUrl" class="clickable-media"
-                        (click)="openLightbox(post.mediaUrl, 'IMAGE')">
-                    <video *ngIf="post.mediaType === 'VIDEO'" [src]="post.mediaUrl" controls class="clickable-media"
-                        (click)="openLightbox(post.mediaUrl, 'VIDEO')"></video>
+                <div *ngIf="post.media && post.media.length > 0" class="post-media-grid"
+                    [class.multiple]="post.media.length > 1">
+                    <div *ngFor="let m of post.media" class="media-item">
+                        <img *ngIf="m.mediaType === 'IMAGE'" [src]="m.mediaUrl" class="clickable-media"
+                            (click)="openLightbox(m.mediaUrl, 'IMAGE')">
+                        <video *ngIf="m.mediaType === 'VIDEO'" [src]="m.mediaUrl" controls class="clickable-media"
+                            (click)="openLightbox(m.mediaUrl, 'VIDEO')"></video>
+                    </div>
                 </div>
             </div>
 
@@ -138,7 +141,33 @@
                     placeholder="Title">
                 <textarea [ngModel]="editPostContent()" (ngModelChange)="editPostContent.set($event)"
                     placeholder="Content"></textarea>
+
+                <!-- Media Previews in Edit -->
+                <div class="edit-media-previews"
+                    *ngIf="existingMediaUrls().length > 0 || editPostFilesPreview().length > 0">
+                    <!-- Existing Media -->
+                    <div class="media-preview-item" *ngFor="let url of existingMediaUrls(); let i = index">
+                        <button class="remove-media" (click)="removeExistingMedia(i)">
+                            <mat-icon>close</mat-icon>
+                        </button>
+                        <img [src]="url" alt="Existing Media">
+                    </div>
+                    <!-- New Media -->
+                    <div class="media-preview-item" *ngFor="let preview of editPostFilesPreview(); let i = index">
+                        <button class="remove-media" (click)="removeEditFile(i)">
+                            <mat-icon>close</mat-icon>
+                        </button>
+                        <img *ngIf="preview.type.startsWith('image/')" [src]="preview.url" alt="New Preview">
+                        <video *ngIf="preview.type.startsWith('video/')" [src]="preview.url" controls></video>
+                    </div>
+                </div>
+
                 <div class="edit-actions">
+                    <input type="file" #editFileInput (change)="onFileSelected($event)" accept="image/*,video/*"
+                        style="display: none;" multiple>
+                    <button class="action-btn" (click)="editFileInput.click()">
+                        <mat-icon>add_photo_alternate</mat-icon> Add Media
+                    </button>
                     <button class="save-btn" (click)="onUpdatePost()"
                         [disabled]="!editPostTitle().trim() || !editPostContent().trim()">Save</button>
                     <button class="cancel-btn" (click)="onCancelEditPost()">Cancel</button>
