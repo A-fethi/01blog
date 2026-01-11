@@ -1,7 +1,8 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
     selector: 'app-user-list-modal',
@@ -15,7 +16,19 @@ export class UserListModal {
     @Input() users: any[] = [];
     @Output() close = new EventEmitter<void>();
 
+    private readonly authService = inject(AuthService);
+    private readonly router = inject(Router);
+
     onClose() {
         this.close.emit();
+    }
+
+    viewUserProfile(username: string) {
+        this.onClose();
+        if (this.authService.currentUser()?.username === username) {
+            this.router.navigate(['/block']);
+        } else {
+            this.router.navigate(['/block', username]);
+        }
     }
 }

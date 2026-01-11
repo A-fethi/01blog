@@ -615,4 +615,12 @@ export class Block implements OnInit {
         this.confirmAction = null;
         this.showConfirmModal.set(false);
     }
+
+    viewUserProfile(username: string) {
+        if (this.authService.currentUser()?.username === username) {
+            this.router.navigate(['/block']);
+        } else {
+            this.router.navigate(['/block', username]);
+        }
+    }
 }

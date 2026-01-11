@@ -91,7 +91,8 @@
                     <mat-icon>account_circle</mat-icon>
                 </div>
                 <div class="post-meta">
-                    <h4>{{ post.authorUsername }}</h4>
+                    <h4 class="clickable-username" (click)="viewUserProfile(post.authorUsername)">{{ post.authorUsername
+                        }}</h4>
                     <span class="timestamp">{{ post.createdAt | date:'short' }}</span>
                 </div>
 
@@ -195,7 +196,9 @@
             <div class="comments-section" *ngIf="showComments().has(post.id)">
                 <div class="comment-item" *ngFor="let c of post.comments">
                     <div class="comment-header">
-                        <div class="comment-author">{{ c.commentUsername }}</div>
+                        <div class="comment-author clickable-username" (click)="viewUserProfile(c.commentUsername)">
+                            {{ c.commentUsername }}
+                        </div>
                         <div class="comment-actions"
                             *ngIf="authService.isLoggedIn() && c.commentUsername === authService.currentUser()?.username">
                             <button (click)="onEditComment(c)">Edit</button>

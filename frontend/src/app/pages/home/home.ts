@@ -465,4 +465,12 @@ export class Home implements OnInit {
         this.authService.logout();
         this.showUserMenu.set(false);
     }
+
+    viewUserProfile(username: string) {
+        if (this.authService.currentUser()?.username === username) {
+            this.router.navigate(['/block']);
+        } else {
+            this.router.navigate(['/block', username]);
+        }
+    }
 }

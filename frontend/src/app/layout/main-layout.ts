@@ -156,7 +156,11 @@ export class MainLayout implements OnInit {
     }
 
     viewUserProfile(username: string) {
-        this.router.navigate(['/block', username]);
+        if (this.authService.currentUser()?.username === username) {
+            this.router.navigate(['/block']);
+        } else {
+            this.router.navigate(['/block', username]);
+        }
     }
 
     onProfileClick() {

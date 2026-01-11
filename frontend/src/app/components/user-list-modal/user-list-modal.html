@@ -13,8 +13,7 @@
             <div class="user-item" *ngFor="let user of users">
                 <!-- Handle both SubscriptionDTO (target/subscriber fields) and UserDTO -->
                 <div class="user-info"
-                    [routerLink]="['/block', user.targetUsername || user.subscriberUsername || user.username]"
-                    (click)="onClose()">
+                    (click)="viewUserProfile(user.targetUsername || user.subscriberUsername || user.username)">
                     <img *ngIf="user.targetAvatarUrl || user.subscriberAvatarUrl || user.avatarUrl"
                         [src]="user.targetAvatarUrl || user.subscriberAvatarUrl || user.avatarUrl" class="avatar">
                     <div *ngIf="!(user.targetAvatarUrl || user.subscriberAvatarUrl || user.avatarUrl)"
