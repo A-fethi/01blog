@@ -38,13 +38,17 @@ public class UserDTO {
         return this;
     }
 
-    public UserDTO hideSensitiveInfo() {
-        // this.id = null;
-        // this.email = null;
-        this.role = null;
-        this.banned = false;
-        this.createdAt = null;
-        this.updatedAt = null;
+    public UserDTO hideSensitiveInfo(User requester) {
+        boolean isOwner = requester != null && requester.getId().equals(this.id);
+        boolean isAdmin = requester != null && requester.getRole().name().equals("ADMIN");
+
+        if (!isOwner && !isAdmin) {
+            this.email = null;
+            this.role = null;
+            this.banned = false;
+            this.createdAt = null;
+            this.updatedAt = null;
+        }
         return this;
     }
 }

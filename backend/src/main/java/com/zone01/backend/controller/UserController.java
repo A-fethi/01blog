@@ -38,34 +38,43 @@ public class UserController {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping
-    public ResponseEntity<List<UserDTO>> getAllUsers() {
+    public ResponseEntity<List<UserDTO>> getAllUsers(@AuthenticationPrincipal AppUserDetails auth) {
+        User currentUser = (auth != null) ? auth.getUser() : null;
         List<User> users = userService.getAllUsers();
         List<UserDTO> userDTOs = users.stream()
                 .map(UserDTO::new)
-                .map(UserDTO::hideSensitiveInfo)
+                .map(dto -> dto.hideSensitiveInfo(currentUser))
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(userDTOs);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDTO> getUserById(@PathVariable Long id) {
+    public ResponseEntity<UserDTO> getUserById(@PathVariable Long id, @AuthenticationPrincipal AppUserDetails auth) {
+        User currentUser = (auth != null) ? auth.getUser() : null;
         User user = userService.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
-        UserDTO userDTO = new UserDTO(user).hideSensitiveInfo();
+        UserDTO userDTO = new UserDTO(user).hideSensitiveInfo(currentUser);
         return ResponseEntity.ok(userDTO);
     }
 
     @GetMapping("/username/{username}")
-    public ResponseEntity<UserDTO> getUserByUsername(@PathVariable String username) {
+    public ResponseEntity<UserDTO> getUserByUsername(@PathVariable String username,
+            @AuthenticationPrincipal AppUserDetails auth) {
+        User currentUser = (auth != null) ? auth.getUser() : null;
         User user = userService.requireByUsername(username);
-        UserDTO userDTO = new UserDTO(user).hideSensitiveInfo();
+        UserDTO userDTO = new UserDTO(user).hideSensitiveInfo(currentUser);
         return ResponseEntity.ok(userDTO);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Map<String, String>> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<Map<String, String>> deleteUser(@PathVariable Long id,
+            @AuthenticationPrincipal AppUserDetails auth) {
+        if (auth.getUser().getId().equals(id)) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "Admins cannot delete their own accounts."));
+        }
         userService.deleteUser(id);
 
         Map<String, String> response = new HashMap<>();
@@ -77,6 +86,10 @@ public class UserController {
     @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/me")
     public ResponseEntity<Map<String, String>> deleteMe(@AuthenticationPrincipal AppUserDetails auth) {
+        if (auth.getUser().getRole().name().equals("ADMIN")) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "Admins cannot delete their own accounts."));
+        }
         userService.deleteUser(auth.getUser().getId());
 
         Map<String, String> response = new HashMap<>();

@@ -86,13 +86,19 @@ public class AdminController {
     }
 
     @PostMapping("/users/{userId}/ban")
-    public ResponseEntity<UserDTO> banUser(@PathVariable Long userId) {
+    public ResponseEntity<?> banUser(@PathVariable Long userId, @AuthenticationPrincipal AppUserDetails auth) {
+        if (auth.getUser().getId().equals(userId)) {
+            return ResponseEntity.badRequest().body(Map.of("error", "You cannot ban yourself"));
+        }
         User user = userService.banUser(userId);
         return ResponseEntity.ok(new UserDTO(user));
     }
 
     @PostMapping("/users/{userId}/unban")
-    public ResponseEntity<UserDTO> unbanUser(@PathVariable Long userId) {
+    public ResponseEntity<?> unbanUser(@PathVariable Long userId, @AuthenticationPrincipal AppUserDetails auth) {
+        if (auth.getUser().getId().equals(userId)) {
+            return ResponseEntity.badRequest().body(Map.of("error", "You cannot unban yourself"));
+        }
         User user = userService.unbanUser(userId);
         return ResponseEntity.ok(new UserDTO(user));
     }
