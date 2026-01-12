@@ -33,7 +33,7 @@ export class Subscriptions implements OnInit {
           this.notificationService.success('Post hidden');
           this.posts.update(posts => posts.filter(p => p.id !== postId));
         },
-        error: () => this.notificationService.error('Failed to hide post')
+        error: (err) => this.notificationService.error(err.error?.message || err.error?.error || 'Failed to hide post')
       });
     };
     this.confirmModalTitle.set('Hide Post');
@@ -48,7 +48,7 @@ export class Subscriptions implements OnInit {
           this.notificationService.success('Post is now visible');
           this.loadFollowedPosts();
         },
-        error: () => this.notificationService.error('Failed to unhide post')
+        error: (err) => this.notificationService.error(err.error?.message || err.error?.error || 'Failed to unhide post')
       });
     };
     this.confirmModalTitle.set('Unhide Post');
@@ -99,14 +99,14 @@ export class Subscriptions implements OnInit {
             this.posts.set(filteredPosts);
             this.loading.set(false);
           },
-          error: () => {
-            this.notificationService.error('Failed to load posts');
+          error: (err) => {
+            this.notificationService.error(err.error?.message || err.error?.error || 'Failed to load posts');
             this.loading.set(false);
           }
         });
       },
-      error: () => {
-        this.notificationService.error('Failed to load subscriptions');
+      error: (err) => {
+        this.notificationService.error(err.error?.message || err.error?.error || 'Failed to load subscriptions');
         this.loading.set(false);
       }
     });
@@ -199,7 +199,7 @@ export class Subscriptions implements OnInit {
         this.editingPostId.set(null);
         this.notificationService.success('Post updated!');
       },
-      error: () => this.notificationService.error('Failed to update post')
+      error: (err) => this.notificationService.error(err.error?.message || err.error?.error || 'Failed to update post')
     });
   }
 
@@ -210,7 +210,7 @@ export class Subscriptions implements OnInit {
           this.posts.update(posts => posts.filter(p => p.id !== postId));
           this.notificationService.success('Post deleted!');
         },
-        error: () => this.notificationService.error('Failed to delete post')
+        error: (err) => this.notificationService.error(err.error?.message || err.error?.error || 'Failed to delete post')
       });
     };
     this.confirmModalTitle.set('Delete Post');
@@ -257,7 +257,10 @@ export class Subscriptions implements OnInit {
     if (!this.authService.isLoggedIn()) return;
 
     const content = this.getCommentInput(postId);
-    if (!content.trim()) return;
+    if (!content.trim()) {
+      this.notificationService.error('Comment content cannot be empty');
+      return;
+    }
 
     this.commentService.addComment(postId, content).subscribe(comment => {
       const post = this.posts().find(p => p.id === postId);
@@ -299,7 +302,7 @@ export class Subscriptions implements OnInit {
         this.posts.update(p => [...p]);
         this.notificationService.success('Comment updated!');
       },
-      error: () => this.notificationService.error('Failed to update comment')
+      error: (err) => this.notificationService.error(err.error?.message || err.error?.error || 'Failed to update comment')
     });
   }
 
@@ -315,7 +318,7 @@ export class Subscriptions implements OnInit {
           this.posts.update(p => [...p]);
           this.notificationService.success('Comment deleted!');
         },
-        error: () => this.notificationService.error('Failed to delete comment')
+        error: (err) => this.notificationService.error(err.error?.message || err.error?.error || 'Failed to delete comment')
       });
     };
     this.confirmModalTitle.set('Delete Comment');

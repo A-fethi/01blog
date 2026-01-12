@@ -130,12 +130,12 @@ export class AdminPanel implements OnInit {
 
         this.adminService.getAllPosts().subscribe({
             next: posts => this.posts.set(posts),
-            error: () => this.notificationService.error('Failed to load posts')
+            error: (err) => this.notificationService.error(err.error?.message || err.error?.error || 'Failed to load posts')
         });
 
         this.adminService.getReports().subscribe({
             next: reports => this.reports.set(reports),
-            error: () => this.notificationService.error('Failed to load reports')
+            error: (err) => this.notificationService.error(err.error?.message || err.error?.error || 'Failed to load reports')
         });
     }
 
@@ -156,7 +156,7 @@ export class AdminPanel implements OnInit {
                     this.loadDashboardData();
                 },
                 error: err => {
-                    this.notificationService.error(err.error?.error || 'Failed to delete user');
+                    this.notificationService.error(err.error?.message || err.error?.error || 'Failed to delete user');
                 }
             });
         };
@@ -173,7 +173,7 @@ export class AdminPanel implements OnInit {
                     this.loadDashboardData();
                 },
                 error: err => {
-                    this.notificationService.error('Failed to ban user');
+                    this.notificationService.error(err.error?.message || err.error?.error || 'Failed to ban user');
                 }
             });
         };
@@ -190,7 +190,7 @@ export class AdminPanel implements OnInit {
                     this.loadDashboardData();
                 },
                 error: err => {
-                    this.notificationService.error('Failed to unban user');
+                    this.notificationService.error(err.error?.message || err.error?.error || 'Failed to unban user');
                 }
             });
         };
@@ -206,7 +206,7 @@ export class AdminPanel implements OnInit {
                     this.notificationService.success('Post removed successfully');
                     this.loadDashboardData();
                 },
-                error: () => this.notificationService.error('Failed to remove post')
+                error: (err) => this.notificationService.error(err.error?.message || err.error?.error || 'Failed to remove post')
             });
         };
         this.confirmModalTitle.set('Remove Post');
@@ -221,7 +221,7 @@ export class AdminPanel implements OnInit {
                     this.notificationService.success('Post hidden successfully');
                     this.loadDashboardData();
                 },
-                error: () => this.notificationService.error('Failed to hide post')
+                error: (err) => this.notificationService.error(err.error?.message || err.error?.error || 'Failed to hide post')
             });
         };
         this.confirmModalTitle.set('Hide Post');
@@ -236,7 +236,7 @@ export class AdminPanel implements OnInit {
                     this.notificationService.success('Post is now visible');
                     this.loadDashboardData();
                 },
-                error: () => this.notificationService.error('Failed to unhide post')
+                error: (err) => this.notificationService.error(err.error?.message || err.error?.error || 'Failed to unhide post')
             });
         };
         this.confirmModalTitle.set('Unhide Post');
@@ -250,7 +250,7 @@ export class AdminPanel implements OnInit {
                 this.notificationService.success('Report marked as resolved');
                 this.loadDashboardData();
             },
-            error: () => this.notificationService.error('Failed to update report status')
+            error: (err) => this.notificationService.error(err.error?.message || err.error?.error || 'Failed to update report status')
         });
     }
 
@@ -260,7 +260,7 @@ export class AdminPanel implements OnInit {
                 this.notificationService.success('Report rejected');
                 this.loadDashboardData();
             },
-            error: () => this.notificationService.error('Failed to update report status')
+            error: (err) => this.notificationService.error(err.error?.message || err.error?.error || 'Failed to update report status')
         });
     }
 

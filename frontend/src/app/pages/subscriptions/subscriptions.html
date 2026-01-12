@@ -88,8 +88,7 @@
                 <button class="action-btn" (click)="editFileInput.click()">
                     <mat-icon>add_photo_alternate</mat-icon> Add Media
                 </button>
-                <button class="save-btn" (click)="onUpdatePost()"
-                    [disabled]="!editPostTitle().trim() || !editPostContent().trim()">Save</button>
+                <button class="save-btn" (click)="onUpdatePost()">Save</button>
                 <button class="cancel-btn" (click)="onCancelEditPost()">Cancel</button>
             </div>
         </div>
@@ -133,8 +132,7 @@
                     <textarea [ngModel]="editCommentContent()"
                         (ngModelChange)="editCommentContent.set($event)"></textarea>
                     <div class="edit-actions">
-                        <button class="save-btn" (click)="onUpdateComment(post.id)"
-                            [disabled]="!editCommentContent().trim()">Save</button>
+                        <button class="save-btn" (click)="onUpdateComment(post.id)">Save</button>
                         <button class="cancel-btn" (click)="onCancelEditComment()">Cancel</button>
                     </div>
                 </div>
@@ -143,8 +141,7 @@
             <div class="add-comment" *ngIf="authService.isLoggedIn()">
                 <input type="text" placeholder="Write a comment..." [ngModel]="getCommentInput(post.id)"
                     (ngModelChange)="setCommentInput(post.id, $event)" (keyup.enter)="onSubmitComment(post.id)" />
-                <button class="comment-submit-btn" (click)="onSubmitComment(post.id)"
-                    [disabled]="!getCommentInput(post.id).trim()">
+                <button class="comment-submit-btn" (click)="onSubmitComment(post.id)">
                     Comment
                 </button>
             </div>

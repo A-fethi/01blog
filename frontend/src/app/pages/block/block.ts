@@ -43,7 +43,7 @@ export class Block implements OnInit {
                     this.notificationService.success('Post hidden');
                     this.userPosts.update(posts => posts.filter(p => p.id !== postId));
                 },
-                error: () => this.notificationService.error('Failed to hide post')
+                error: (err) => this.notificationService.error(err.error?.message || err.error?.error || 'Failed to hide post')
             });
         };
         this.confirmModalTitle.set('Hide Post');
@@ -59,7 +59,7 @@ export class Block implements OnInit {
                     const username = this.profileUser()?.username;
                     if (username) this.loadUserData(username);
                 },
-                error: () => this.notificationService.error('Failed to unhide post')
+                error: (err) => this.notificationService.error(err.error?.message || err.error?.error || 'Failed to unhide post')
             });
         };
         this.confirmModalTitle.set('Unhide Post');
@@ -150,8 +150,8 @@ export class Block implements OnInit {
                 this.loadUserData(username);
                 this.checkIfFollowing(user.id);
             },
-            error: () => {
-                this.notificationService.error('User not found');
+            error: (err) => {
+                this.notificationService.error(err.error?.message || err.error?.error || 'User not found');
                 this.router.navigate(['/home']);
                 this.loading.set(false);
             }
@@ -239,7 +239,7 @@ export class Block implements OnInit {
             if (reason) {
                 this.reportService.reportUser(user.id, reason).subscribe({
                     next: () => this.notificationService.success('Report submitted successfully'),
-                    error: () => this.notificationService.error('Failed to submit report')
+                    error: (err) => this.notificationService.error(err.error?.message || err.error?.error || 'Failed to submit report')
                 });
             }
         });
@@ -262,7 +262,7 @@ export class Block implements OnInit {
                         this.notificationService.success('Report submitted successfully');
                         post.showMenu = false;
                     },
-                    error: () => this.notificationService.error('Failed to submit report')
+                    error: (err) => this.notificationService.error(err.error?.message || err.error?.error || 'Failed to submit report')
                 });
             }
         });
@@ -362,7 +362,7 @@ export class Block implements OnInit {
                     this.authService.logout();
                     this.router.navigate(['/home']);
                 },
-                error: () => this.notificationService.error('Failed to delete profile')
+                error: (err) => this.notificationService.error(err.error?.message || err.error?.error || 'Failed to delete profile')
             });
         };
         this.confirmModalTitle.set('Delete Profile');
@@ -479,7 +479,7 @@ export class Block implements OnInit {
                 this.editingPostId.set(null);
                 this.notificationService.success('Post updated!');
             },
-            error: () => this.notificationService.error('Failed to update post')
+            error: (err) => this.notificationService.error(err.error?.message || err.error?.error || 'Failed to update post')
         });
     }
 
@@ -490,7 +490,7 @@ export class Block implements OnInit {
                     this.userPosts.update(posts => posts.filter(p => p.id !== postId));
                     this.notificationService.success('Post deleted!');
                 },
-                error: () => this.notificationService.error('Failed to delete post')
+                error: (err) => this.notificationService.error(err.error?.message || err.error?.error || 'Failed to delete post')
             });
         };
         this.confirmModalTitle.set('Delete Post');
@@ -539,7 +539,10 @@ export class Block implements OnInit {
             return;
         }
         const content = this.getCommentInput(postId);
-        if (!content.trim()) return;
+        if (!content.trim()) {
+            this.notificationService.error('Comment content cannot be empty');
+            return;
+        }
         this.commentService.addComment(postId, content).subscribe(comment => {
             const post = this.userPosts().find(p => p.id === postId);
             if (post) {
@@ -580,7 +583,7 @@ export class Block implements OnInit {
                 this.userPosts.update(p => [...p]);
                 this.notificationService.success('Comment updated!');
             },
-            error: () => this.notificationService.error('Failed to update comment')
+            error: (err) => this.notificationService.error(err.error?.message || err.error?.error || 'Failed to update comment')
         });
     }
 
@@ -596,7 +599,7 @@ export class Block implements OnInit {
                     this.userPosts.update(p => [...p]);
                     this.notificationService.success('Comment deleted!');
                 },
-                error: () => this.notificationService.error('Failed to delete comment')
+                error: (err) => this.notificationService.error(err.error?.message || err.error?.error || 'Failed to delete comment')
             });
         };
         this.confirmModalTitle.set('Delete Comment');

@@ -39,7 +39,7 @@ export class Home implements OnInit {
                     this.notificationService.success('Post hidden');
                     this.posts.update(posts => posts.filter(p => p.id !== postId));
                 },
-                error: () => this.notificationService.error('Failed to hide post')
+                error: (err) => this.notificationService.error(err.error?.message || err.error?.error || 'Failed to hide post')
             });
         };
         this.confirmModalTitle.set('Hide Post');
@@ -54,7 +54,7 @@ export class Home implements OnInit {
                     this.notificationService.success('Post is now visible');
                     this.loadFeed();
                 },
-                error: () => this.notificationService.error('Failed to unhide post')
+                error: (err) => this.notificationService.error(err.error?.message || err.error?.error || 'Failed to unhide post')
             });
         };
         this.confirmModalTitle.set('Unhide Post');
@@ -215,7 +215,7 @@ export class Home implements OnInit {
                 this.notificationService.success('Post shared!');
             },
             error: (err) => {
-                this.notificationService.error('Failed to share post');
+                this.notificationService.error(err.error?.message || err.error?.error || 'Failed to share post');
             }
         });
     }
@@ -294,7 +294,7 @@ export class Home implements OnInit {
                 this.editingPostId.set(null);
                 this.notificationService.success('Post updated!');
             },
-            error: () => this.notificationService.error('Failed to update post')
+            error: (err) => this.notificationService.error(err.error?.message || err.error?.error || 'Failed to update post')
         });
     }
 
@@ -305,7 +305,7 @@ export class Home implements OnInit {
                     this.posts.update(posts => posts.filter(p => p.id !== postId));
                     this.notificationService.success('Post deleted!');
                 },
-                error: () => this.notificationService.error('Failed to delete post')
+                error: (err) => this.notificationService.error(err.error?.message || err.error?.error || 'Failed to delete post')
             });
         };
         this.confirmModalTitle.set('Delete Post');
@@ -327,7 +327,7 @@ export class Home implements OnInit {
                         this.notificationService.success('Report submitted successfully');
                         post.showMenu = false;
                     },
-                    error: () => this.notificationService.error('Failed to submit report')
+                    error: (err) => this.notificationService.error(err.error?.message || err.error?.error || 'Failed to submit report')
                 });
             }
         });
@@ -372,7 +372,10 @@ export class Home implements OnInit {
         if (!this.requireLogin()) return;
 
         const content = this.getCommentInput(postId);
-        if (!content.trim()) return;
+        if (!content.trim()) {
+            this.notificationService.error('Comment content cannot be empty');
+            return;
+        }
 
         this.commentService.addComment(postId, content).subscribe(comment => {
             const post = this.posts().find(p => p.id === postId);
@@ -416,7 +419,7 @@ export class Home implements OnInit {
                 this.posts.update(p => [...p]);
                 this.notificationService.success('Comment updated!');
             },
-            error: () => this.notificationService.error('Failed to update comment')
+            error: (err) => this.notificationService.error(err.error?.message || err.error?.error || 'Failed to update comment')
         });
     }
 
@@ -432,7 +435,7 @@ export class Home implements OnInit {
                     this.posts.update(p => [...p]);
                     this.notificationService.success('Comment deleted!');
                 },
-                error: () => this.notificationService.error('Failed to delete comment')
+                error: (err) => this.notificationService.error(err.error?.message || err.error?.error || 'Failed to delete comment')
             });
         };
         this.confirmModalTitle.set('Delete Comment');
