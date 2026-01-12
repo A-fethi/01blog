@@ -48,6 +48,10 @@ public class ReportService {
             throw new IllegalArgumentException("Reason is required");
         }
 
+        if (reason.length() > 200) {
+            throw new IllegalArgumentException("Reason cannot exceed 200 characters");
+        }
+
         Report report = new Report(reporter, reported, reason.strip());
         Report savedReport = reportRepository.save(report);
         notificationService.createReportNotification(reporter, reportedUserId, "profile", userService.getAllAdmins());
@@ -65,6 +69,10 @@ public class ReportService {
 
         if (reason == null || reason.strip().isEmpty()) {
             throw new IllegalArgumentException("Reason is required");
+        }
+
+        if (reason.length() > 200) {
+            throw new IllegalArgumentException("Reason cannot exceed 200 characters");
         }
 
         Report report = new Report(reporter, post, reason.strip());

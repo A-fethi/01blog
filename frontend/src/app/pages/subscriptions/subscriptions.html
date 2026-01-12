@@ -115,10 +115,12 @@
             <div class="comment-item" *ngFor="let c of post.comments">
                 <div class="comment-header">
                     <div class="comment-author">{{ c.commentUsername }}</div>
-                    <div class="comment-actions"
-                        *ngIf="authService.isLoggedIn() && c.commentUsername === authService.currentUser()?.username">
-                        <button (click)="onEditComment(c)">Edit</button>
-                        <button (click)="onDeleteComment(post.id, c.id)" class="delete-btn">Delete</button>
+                    <div class="comment-actions" *ngIf="authService.isLoggedIn()">
+                        <button *ngIf="c.commentUsername === authService.currentUser()?.username"
+                            (click)="onEditComment(c)">Edit</button>
+                        <button
+                            *ngIf="c.commentUsername === authService.currentUser()?.username || authService.isAdmin()"
+                            (click)="onDeleteComment(post.id, c.id)" class="delete-btn">Delete</button>
                     </div>
                 </div>
 

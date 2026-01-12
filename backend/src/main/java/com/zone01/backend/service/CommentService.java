@@ -34,7 +34,7 @@ public class CommentService {
         if (commentDTO.getContent() == null || commentDTO.getContent().trim().isEmpty()) {
             throw new IllegalArgumentException("Comment content cannot be empty");
         }
-         
+
         if (post.isHidden()) {
             throw new IllegalArgumentException("Post Hidden");
         }
@@ -72,7 +72,7 @@ public class CommentService {
     @Transactional
     public void deleteComment(Long commentId, User user) {
         Comment comment = getCommentById(commentId);
-        if (!comment.getAuthor().getId().equals(user.getId())) {
+        if (!comment.getAuthor().getId().equals(user.getId()) && user.getRole() != com.zone01.backend.entity.Role.ADMIN) {
             throw new UnauthorizedActionException("You cannot delete this comment");
         }
         commentRepository.delete(comment);

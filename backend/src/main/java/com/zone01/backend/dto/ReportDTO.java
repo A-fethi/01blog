@@ -6,6 +6,7 @@ import com.zone01.backend.entity.Report;
 import com.zone01.backend.entity.ReportStatus;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -22,6 +23,7 @@ public class ReportDTO {
     private LocalDateTime resolvedAt;
 
     @NotBlank(message = "Reason is required")
+    @Size(max = 200, message = "Reason cannot exceed 200 characters")
     private String reason;
 
     public ReportDTO(Report report) {

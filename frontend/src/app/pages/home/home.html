@@ -1,207 +1,199 @@
-<!-- Create Post Widget -->
-<div class="create-post-card">
-    <div class="create-post-top">
-        <img *ngIf="currentUser().avatarUrl" [src]="currentUser().avatarUrl" class="avatar">
-        <div *ngIf="!currentUser().avatarUrl" class="avatar-placeholder">
-            <mat-icon>account_circle</mat-icon>
-        </div>
-        <div class="create-post-inputs">
-            <input type="text" class="post-title-input" placeholder="Title" [ngModel]="newPostTitle()"
-                (ngModelChange)="newPostTitle.set($event)" [disabled]="!authService.isLoggedIn()" />
-            <textarea
-                [placeholder]="authService.isLoggedIn() ? 'Share your learning journey' : 'You must log in to post'"
-                [ngModel]="newPostContent()" (ngModelChange)="newPostContent.set($event)"
-                [disabled]="!authService.isLoggedIn()"></textarea>
-
-            <!-- Media Preview -->
-            <div class="selected-media-previews" *ngIf="selectedFilesPreview().length > 0">
-                <div class="media-preview-item" *ngFor="let preview of selectedFilesPreview(); let i = index">
-                    <button class="remove-media" (click)="removeSelectedFile(i)">
-                        <mat-icon>close</mat-icon>
-                    </button>
-                    <img *ngIf="preview.type.startsWith('image/')" [src]="preview.url" alt="Preview">
-                    <video *ngIf="preview.type.startsWith('video/')" [src]="preview.url" controls></video>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="create-post-actions">
-        <div class="media-upload">
-            <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*,video/*"
-                style="display: none;" multiple>
-            <button class="action-btn" (click)="fileInput.click()" [disabled]="!authService.isLoggedIn()">
-                <i class="icon"><mat-icon>add_photo_alternate</mat-icon></i>
-                {{ selectedFiles().length > 0 ? selectedFiles().length + ' files' : 'Media' }}
-            </button>
-        </div>
-        <button class="share-post-btn" (click)="onSharePost()" [disabled]="!authService.isLoggedIn()">Share</button>
-    </div>
-</div>
-
-<!-- Posts Feed -->
-<div class="posts-list">
-    <div *ngIf="loading()" class="loading-feed">
-        <mat-icon class="spin">refresh</mat-icon> Loading feed...
-    </div>
-
-    <div class="post-card" *ngFor="let post of posts()" [id]="'post-' + post.id">
-        <div class="post-header">
-            <img *ngIf="post.authorAvatarUrl" [src]="post.authorAvatarUrl" class="avatar">
-            <div *ngIf="!post.authorAvatarUrl" class="avatar-placeholder">
+<div class="home-container">
+    <!-- Create Post Widget -->
+    <div class="create-post-card" *ngIf="authService.isLoggedIn()">
+        <div class="create-post-top">
+            <img *ngIf="authService.currentUser()?.avatarUrl" [src]="authService.currentUser()?.avatarUrl"
+                class="avatar">
+            <div *ngIf="!authService.currentUser()?.avatarUrl" class="avatar-placeholder">
                 <mat-icon>account_circle</mat-icon>
             </div>
-            <div class="post-meta">
-                <h4 class="clickable-username" (click)="viewUserProfile(post.authorUsername)">
-                    {{post.authorUsername}}
-                </h4>
-                <span class="timestamp">{{post.createdAt | date:'short'}}</span>
+            <div class="create-post-inputs">
+                <input type="text" class="post-title-input" [ngModel]="newPostTitle()"
+                    (ngModelChange)="newPostTitle.set($event)" placeholder="Post Title">
+                <textarea [ngModel]="newPostContent()" (ngModelChange)="newPostContent.set($event)"
+                    placeholder="What's on your mind?"></textarea>
             </div>
+        </div>
 
-            <div class="post-actions-menu" *ngIf="authService.isLoggedIn()">
-                <button class="more-options" (click)="post.showMenu = !post.showMenu">
-                    <mat-icon>more_horiz</mat-icon>
+        <!-- Media Previews -->
+        <div class="selected-media-previews" *ngIf="selectedFilesPreview().length > 0">
+            <div class="media-preview-item" *ngFor="let preview of selectedFilesPreview(); let i = index">
+                <button class="remove-media" (click)="removeSelectedFile(i)">
+                    <mat-icon>close</mat-icon>
                 </button>
-                <div class="menu-dropdown" *ngIf="post.showMenu">
-                    <ng-container *ngIf="post.authorId === authService.currentUser()?.id">
-                        <button (click)="onEditPost(post); post.showMenu = false">Edit</button>
-                        <button (click)="onDeletePost(post.id); post.showMenu = false"
-                            class="delete-btn">Delete</button>
-                    </ng-container>
-
-                    <!-- Admin Options (if not owner) -->
-                    <ng-container *ngIf="authService.isAdmin() && post.authorId !== authService.currentUser()?.id">
-                        <button (click)="onHidePost(post.id); post.showMenu = false">Hide</button>
-                        <button (click)="onDeletePost(post.id); post.showMenu = false"
-                            class="delete-btn">Delete</button>
-                    </ng-container>
-
-                    <!-- Report Option (if not owner and not admin) -->
-                    <button *ngIf="!authService.isAdmin() && post.authorId !== authService.currentUser()?.id"
-                        (click)="onReportPost(post); post.showMenu = false">Report</button>
-
-                </div>
+                <img *ngIf="preview.type.startsWith('image/')" [src]="preview.url" alt="Preview">
+                <video *ngIf="preview.type.startsWith('video/')" [src]="preview.url" controls></video>
             </div>
         </div>
 
-        <div class="post-content" *ngIf="editingPostId() !== post.id">
-            <h3 *ngIf="post.title" class="post-title">{{post.title}}</h3>
-            <p>{{post.content}}</p>
-            <div *ngIf="post.media && post.media.length > 0" class="post-media-grid"
-                [class.multiple]="post.media.length > 1">
-                <div *ngFor="let m of post.media" class="media-item">
-                    <img *ngIf="m.mediaType === 'IMAGE'" [src]="m.mediaUrl" class="clickable-media"
-                        (click)="openLightbox(m.mediaUrl, 'IMAGE')">
-                    <video *ngIf="m.mediaType === 'VIDEO'" [src]="m.mediaUrl" controls class="clickable-media"
-                        (click)="openLightbox(m.mediaUrl, 'VIDEO')"></video>
-                </div>
-            </div>
-        </div>
-
-        <!-- Edit Post Form -->
-        <div class="edit-post-form" *ngIf="editingPostId() === post.id">
-            <input type="text" [ngModel]="editPostTitle()" (ngModelChange)="editPostTitle.set($event)"
-                placeholder="Title">
-            <textarea [ngModel]="editPostContent()" (ngModelChange)="editPostContent.set($event)"
-                placeholder="Content"></textarea>
-
-            <!-- Media Previews in Edit -->
-            <div class="edit-media-previews"
-                *ngIf="existingMediaUrls().length > 0 || editPostFilesPreview().length > 0">
-                <!-- Existing Media -->
-                <div class="media-preview-item" *ngFor="let url of existingMediaUrls(); let i = index">
-                    <button class="remove-media" (click)="removeExistingMedia(i)">
-                        <mat-icon>close</mat-icon>
-                    </button>
-                    <img [src]="url" alt="Existing Media">
-                </div>
-                <!-- New Media -->
-                <div class="media-preview-item" *ngFor="let preview of editPostFilesPreview(); let i = index">
-                    <button class="remove-media" (click)="removeEditFile(i)">
-                        <mat-icon>close</mat-icon>
-                    </button>
-                    <img *ngIf="preview.type.startsWith('image/')" [src]="preview.url" alt="New Preview">
-                    <video *ngIf="preview.type.startsWith('video/')" [src]="preview.url" controls></video>
-                </div>
-            </div>
-
-            <div class="edit-actions">
-                <input type="file" #editFileInput (change)="onFileSelected($event, true)" accept="image/*,video/*"
-                    style="display: none;" multiple>
-                <button class="action-btn" (click)="editFileInput.click()">
-                    <mat-icon>add_photo_alternate</mat-icon> Add Media
-                </button>
-                <button class="save-btn" (click)="onUpdatePost()">Save</button>
-                <button class="cancel-btn" (click)="onCancelEditPost()">Cancel</button>
-            </div>
-        </div>
-
-        <div class="post-stats">
-            <span>{{post.likesCount || 0}} Likes</span>
-            <span>{{post.commentsCount || 0}} Comments</span>
-        </div>
-
-        <div class="post-actions">
-            <button class="action-btn" (click)="onLike(post)" [class.liked]="post.isLiked">
-                <i class="icon">
-                    <mat-icon>{{post.isLiked ? 'favorite' : 'favorite_border'}}</mat-icon>
-                </i>
-                Like
+        <div class="create-post-actions">
+            <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*,video/*"
+                style="display: none;" multiple>
+            <button class="action-btn" (click)="fileInput.click()">
+                <mat-icon>add_photo_alternate</mat-icon> Media
             </button>
-            <button class="action-btn" (click)="toggleComments(post.id)">
-                <i class="icon"><mat-icon>comment</mat-icon></i> Comment
-            </button>
+            <button class="share-post-btn" (click)="onSharePost()">Post</button>
+        </div>
+    </div>
+
+    <!-- Feed -->
+    <div class="feed">
+        <div *ngIf="loading()" class="loading-state">
+            <mat-icon class="spin">refresh</mat-icon>
+            <p>Loading posts...</p>
         </div>
 
-        <!-- Comments section (visible to everyone) -->
-        <div class="comments-section" *ngIf="showComments().has(post.id)">
-            <div class="comment-item" *ngFor="let c of post.comments">
-                <div class="comment-header">
-                    <div class="comment-author clickable-username" (click)="viewUserProfile(c.commentUsername)">
-                        {{ c.commentUsername }}
-                    </div>
-                    <div class="comment-actions"
-                        *ngIf="authService.isLoggedIn() && c.commentUsername === authService.currentUser()?.username">
-                        <button (click)="onEditComment(c)">Edit</button>
-                        <button (click)="onDeleteComment(post.id, c.id)" class="delete-btn">Delete</button>
-                    </div>
+        <div class="post-card" *ngFor="let post of posts()" [id]="'post-' + post.id">
+            <div class="post-header">
+                <img *ngIf="post.authorAvatarUrl" [src]="post.authorAvatarUrl" class="avatar">
+                <div *ngIf="!post.authorAvatarUrl" class="avatar-placeholder">
+                    <mat-icon>account_circle</mat-icon>
+                </div>
+                <div class="post-meta">
+                    <h4 class="clickable-username" (click)="viewUserProfile(post.authorUsername)">{{ post.authorUsername
+                        }}</h4>
+                    <span class="timestamp">{{ post.createdAt | date:'short' }}</span>
                 </div>
 
-                <div class="comment-body" *ngIf="editingCommentId() !== c.id">
-                    <div class="comment-text">{{ c.content }}</div>
-                    <div class="comment-time">{{ c.createdAt | date:'short' }}</div>
-                </div>
+                <div class="post-actions-menu" *ngIf="authService.isLoggedIn()">
+                    <button class="more-options" (click)="post.showMenu = !post.showMenu">
+                        <mat-icon>more_horiz</mat-icon>
+                    </button>
+                    <div class="menu-dropdown" *ngIf="post.showMenu">
+                        <ng-container *ngIf="post.authorId === authService.currentUser()?.id">
+                            <button (click)="onEditPost(post); post.showMenu = false">Edit</button>
+                            <button (click)="onDeletePost(post.id); post.showMenu = false"
+                                class="delete-btn">Delete</button>
+                        </ng-container>
 
-                <!-- Edit Comment Form -->
-                <div class="edit-comment-form" *ngIf="editingCommentId() === c.id">
-                    <textarea [ngModel]="editCommentContent()"
-                        (ngModelChange)="editCommentContent.set($event)"></textarea>
-                    <div class="edit-actions">
-                        <button class="save-btn" (click)="onUpdateComment(post.id)">Save</button>
-                        <button class="cancel-btn" (click)="onCancelEditComment()">Cancel</button>
+                        <!-- Admin Options (if not owner) -->
+                        <ng-container *ngIf="authService.isAdmin() && post.authorId !== authService.currentUser()?.id">
+                            <button (click)="onHidePost(post.id); post.showMenu = false">Hide</button>
+                            <button (click)="onDeletePost(post.id); post.showMenu = false"
+                                class="delete-btn">Delete</button>
+                        </ng-container>
+
+                        <!-- Report Option (if not owner and not admin) -->
+                        <button *ngIf="!authService.isAdmin() && post.authorId !== authService.currentUser()?.id"
+                            (click)="onReportPost(post); post.showMenu = false">Report</button>
+
                     </div>
                 </div>
             </div>
 
-            <!-- Comment input only for logged-in users -->
-            <div class="add-comment" *ngIf="authService.isLoggedIn(); else loginToComment">
-                <input type="text" placeholder="Write a comment..." [ngModel]="getCommentInput(post.id)"
-                    (ngModelChange)="setCommentInput(post.id, $event)" (keyup.enter)="onSubmitComment(post.id)" />
-                <button class="comment-submit-btn" (click)="onSubmitComment(post.id)">
-                    Comment
+            <div class="post-content" *ngIf="editingPostId() !== post.id">
+                <h3 *ngIf="post.title" class="post-title">{{ post.title }}</h3>
+                <p>{{ post.content }}</p>
+                <div *ngIf="post.media && post.media.length > 0" class="post-media-grid"
+                    [class.multiple]="post.media.length > 1">
+                    <div *ngFor="let m of post.media" class="media-item">
+                        <img *ngIf="m.mediaType === 'IMAGE'" [src]="m.mediaUrl" class="clickable-media"
+                            (click)="openLightbox(m.mediaUrl, 'IMAGE')">
+                        <video *ngIf="m.mediaType === 'VIDEO'" [src]="m.mediaUrl" controls class="clickable-media"
+                            (click)="openLightbox(m.mediaUrl, 'VIDEO')"></video>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Edit Post Form -->
+            <div class="edit-post-form" *ngIf="editingPostId() === post.id">
+                <input type="text" [ngModel]="editPostTitle()" (ngModelChange)="editPostTitle.set($event)"
+                    placeholder="Title">
+                <textarea [ngModel]="editPostContent()" (ngModelChange)="editPostContent.set($event)"
+                    placeholder="Content"></textarea>
+
+                <!-- Media Previews in Edit -->
+                <div class="edit-media-previews"
+                    *ngIf="existingMediaUrls().length > 0 || editPostFilesPreview().length > 0">
+                    <!-- Existing Media -->
+                    <div class="media-preview-item" *ngFor="let url of existingMediaUrls(); let i = index">
+                        <button class="remove-media" (click)="removeExistingMedia(i)">
+                            <mat-icon>close</mat-icon>
+                        </button>
+                        <img [src]="url" alt="Existing Media">
+                    </div>
+                    <!-- New Media -->
+                    <div class="media-preview-item" *ngFor="let preview of editPostFilesPreview(); let i = index">
+                        <button class="remove-media" (click)="removeEditFile(i)">
+                            <mat-icon>close</mat-icon>
+                        </button>
+                        <img *ngIf="preview.type.startsWith('image/')" [src]="preview.url" alt="New Preview">
+                        <video *ngIf="preview.type.startsWith('video/')" [src]="preview.url" controls></video>
+                    </div>
+                </div>
+
+                <div class="edit-actions">
+                    <input type="file" #editFileInput (change)="onFileSelected($event, true)" accept="image/*,video/*"
+                        style="display: none;" multiple>
+                    <button class="action-btn" (click)="editFileInput.click()">
+                        <mat-icon>add_photo_alternate</mat-icon> Add Media
+                    </button>
+                    <button class="save-btn" (click)="onUpdatePost()">Save</button>
+                    <button class="cancel-btn" (click)="onCancelEditPost()">Cancel</button>
+                </div>
+            </div>
+
+            <div class="post-stats">
+                <span>{{ post.likesCount || 0 }} Likes</span>
+                <span>{{ post.commentsCount || 0 }} Comments</span>
+            </div>
+
+            <div class="post-actions">
+                <button class="action-btn" (click)="onLike(post)" [class.liked]="post.isLiked">
+                    <i class="icon">
+                        <mat-icon>{{ post.isLiked ? 'favorite' : 'favorite_border' }}</mat-icon>
+                    </i>
+                    Like
+                </button>
+                <button class="action-btn" (click)="toggleComments(post.id)">
+                    <i class="icon"><mat-icon>comment</mat-icon></i> Comment
                 </button>
             </div>
 
-            <!-- Message for guests -->
-            <ng-template #loginToComment>
-                <div class="login-to-comment">
-                    Log in to add a comment.
+            <!-- Comments section -->
+            <div class="comments-section" *ngIf="showComments().has(post.id)">
+                <div class="comment-item" *ngFor="let c of post.comments">
+                    <div class="comment-header">
+                        <div class="comment-author clickable-username" (click)="viewUserProfile(c.commentUsername)">
+                            {{ c.commentUsername }}
+                        </div>
+                        <div class="comment-actions" *ngIf="authService.isLoggedIn()">
+                            <button *ngIf="c.commentUsername === authService.currentUser()?.username"
+                                (click)="onEditComment(c)">Edit</button>
+                            <button
+                                *ngIf="c.commentUsername === authService.currentUser()?.username || authService.isAdmin()"
+                                (click)="onDeleteComment(post.id, c.id)" class="delete-btn">Delete</button>
+                        </div>
+                    </div>
+
+                    <div class="comment-body" *ngIf="editingCommentId() !== c.id">
+                        <div class="comment-text">{{ c.content }}</div>
+                        <div class="comment-time">{{ c.createdAt | date:'short' }}</div>
+                    </div>
+
+                    <!-- Edit Comment Form -->
+                    <div class="edit-comment-form" *ngIf="editingCommentId() === c.id">
+                        <textarea [ngModel]="editCommentContent()"
+                            (ngModelChange)="editCommentContent.set($event)"></textarea>
+                        <div class="edit-actions">
+                            <button class="save-btn" (click)="onUpdateComment(post.id)">Save</button>
+                            <button class="cancel-btn" (click)="onCancelEditComment()">Cancel</button>
+                        </div>
+                    </div>
                 </div>
-            </ng-template>
+
+                <div class="add-comment" *ngIf="authService.isLoggedIn()">
+                    <input type="text" placeholder="Write a comment..." [ngModel]="getCommentInput(post.id)"
+                        (ngModelChange)="setCommentInput(post.id, $event)" (keyup.enter)="onSubmitComment(post.id)" />
+                    <button class="comment-submit-btn" (click)="onSubmitComment(post.id)">
+                        Comment
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-<!-- Confirmation Modal -->
 <app-confirm-modal *ngIf="showConfirmModal()" [title]="confirmModalTitle()" [message]="confirmModalMessage()"
     (confirm)="onConfirmAction()" (cancel)="onCancelConfirm()">
 </app-confirm-modal>

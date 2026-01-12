@@ -1,0 +1,39 @@
+<div class="report-dialog-container">
+    <div class="dialog-header">
+        <mat-icon class="report-icon">report_problem</mat-icon>
+        <h2 mat-dialog-title>Report {{ data.type === 'user' ? 'Profile' : 'Post' }}</h2>
+    </div>
+
+    <mat-dialog-content>
+        <p class="description">
+            Help us understand what's happening. Why are you reporting
+            <strong class="title">{{ data.targetName }}</strong>?
+        </p>
+
+        <mat-form-field appearance="outline" class="full-width custom-select">
+            <mat-label>Select a reason</mat-label>
+            <mat-select [(ngModel)]="selectedReason" panelClass="report-select-panel">
+                <mat-option *ngFor="let reason of reasons" [value]="reason">
+                    {{ reason }}
+                </mat-option>
+                <mat-option value="Other">Other (Please specify)</mat-option>
+            </mat-select>
+        </mat-form-field>
+
+        <div class="other-reason-container" *ngIf="selectedReason === 'Other'">
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Details</mat-label>
+                <textarea matInput [(ngModel)]="otherReason" rows="4"
+                    placeholder="Provide more details about the issue..." maxlength="200"></textarea>
+                <mat-hint align="end">{{ otherReason.length }}/200</mat-hint>
+            </mat-form-field>
+        </div>
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end">
+        <button mat-button (click)="onCancel()" class="cancel-btn">Cancel</button>
+        <button mat-flat-button color="warn" [disabled]="!isValid()" (click)="onConfirm()" class="submit-btn">
+            Submit Report
+        </button>
+    </mat-dialog-actions>
+</div>

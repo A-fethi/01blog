@@ -34,8 +34,8 @@ export class Discover implements OnInit {
     }
 
     loadData() {
-        const username = this.authService.currentUser()?.username;
-        if (!username) return;
+        const currentUser = this.authService.currentUser();
+        if (!currentUser) return;
 
         this.userService.getMySubscriptions().subscribe(subs => {
             const followedIds = new Set(subs.map((s: any) => s.targetId));
@@ -48,7 +48,7 @@ export class Discover implements OnInit {
             }));
             this.followingUsers.set(following);
 
-            this.userService.getFollowers(username).subscribe(followers => {
+            this.userService.getFollowers(currentUser.username).subscribe(followers => {
                 const mappedFollowers = followers.map((f: any) => ({
                     id: f.subscriberId,
                     username: f.subscriberUsername,
@@ -59,7 +59,7 @@ export class Discover implements OnInit {
 
             this.userService.getAllUsers().subscribe({
                 next: (users) => {
-                    const currentUserId = this.authService.currentUser()?.id;
+                    const currentUserId = currentUser.id;
                     const suggested = users
                         .filter(u => u.id !== currentUserId && !followedIds.has(u.id));
                     this.suggestedUsers.set(suggested);

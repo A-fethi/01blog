@@ -1,0 +1,107 @@
+.report-dialog-container {
+    padding: 16px;
+    max-width: 450px;
+    background: #fff;
+    border-radius: 12px;
+}
+
+.dialog-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.report-icon {
+    color: #f44336;
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+}
+
+h2 {
+    margin: 0 !important;
+    font-size: 20px;
+    font-weight: 700;
+    color: #050505;
+}
+
+.description {
+    color: #65676b;
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+
+.full-width {
+    width: 100%;
+}
+
+.custom-select {
+    margin-top: 8px;
+}
+
+.other-reason-container {
+    margin-top: 16px;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+mat-dialog-content {
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible;
+}
+
+mat-dialog-actions {
+    padding: 16px 0 0 0 !important;
+    margin: 0 !important;
+}
+
+.title {
+    word-wrap: break-word;
+}
+
+.cancel-btn {
+    font-weight: 600;
+    color: #65676b;
+}
+
+.submit-btn {
+    font-weight: 600;
+    border-radius: 8px;
+    padding: 0 24px;
+}
+
+/* Styling for the select panel to ensure it looks good and is NOT transparent */
+::ng-deep .report-select-panel {
+    background-color: white !important;
+    border-radius: 8px !important;
+    margin-top: 4px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    opacity: 1 !important;
+}
+
+::ng-deep .report-select-panel .mat-mdc-option {
+    background-color: white !important;
+    opacity: 1 !important;
+}
+
+::ng-deep .report-select-panel .mat-mdc-option:hover {
+    background-color: #f0f2f5 !important;
+}
+
+::ng-deep .cdk-overlay-pane {
+    opacity: 1 !important;
+}

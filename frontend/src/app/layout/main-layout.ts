@@ -70,7 +70,8 @@ export class MainLayout implements OnInit {
     }
 
     loadData() {
-        if (!this.authService.isLoggedIn()) return;
+        const currentUser = this.authService.currentUser();
+        if (!currentUser) return;
 
         this.inAppNotificationService.refreshUnreadCount();
 
@@ -90,7 +91,7 @@ export class MainLayout implements OnInit {
             // Load Suggestions
             this.userService.getAllUsers().subscribe({
                 next: (users) => {
-                    const currentUserId = this.authService.currentUser()?.id;
+                    const currentUserId = currentUser.id;
                     const suggested = users
                         .filter(u => u.id !== currentUserId && !followedIds.has(u.id));
                     this.suggestedUsers.set(suggested);

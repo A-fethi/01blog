@@ -106,7 +106,8 @@ public class PostService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostNotFoundException(postId));
 
-        if (!post.getAuthor().getId().equals(loggedUser.getId())) {
+        if (!post.getAuthor().getId().equals(loggedUser.getId())
+                && loggedUser.getRole() != com.zone01.backend.entity.Role.ADMIN) {
             throw new UnauthorizedActionException("You cannot delete this post");
         }
 
