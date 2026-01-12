@@ -190,10 +190,10 @@ export class Home implements OnInit {
     onSharePost() {
         if (!this.requireLogin()) return;
 
-        const title = this.newPostTitle().trim() || 'Untitled Post';
+        const title = this.newPostTitle().trim();
         const content = this.newPostContent().trim();
-        if (!content) {
-            this.notificationService.error('Content is required');
+        if (!title || !content) {
+            this.notificationService.error('Title and content are required');
             return;
         }
 

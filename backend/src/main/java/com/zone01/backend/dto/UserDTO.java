@@ -39,8 +39,8 @@ public class UserDTO {
     }
 
     public UserDTO hideSensitiveInfo() {
-        this.id = null;
-        this.email = null;
+        // this.id = null;
+        // this.email = null;
         this.role = null;
         this.banned = false;
         this.createdAt = null;

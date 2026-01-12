@@ -133,7 +133,7 @@
                                 {{ post.authorUsername }}
                             </span>
                         </td>
-                        <td>{{ post.title || 'Untitled' }}</td>
+                        <td>{{ post.title }}</td>
                         <td>{{ post.content | slice:0:50 }}{{ post.content.length > 50 ? '...' : '' }}</td>
                         <td>{{ formatDate(post.createdAt) }}</td>
                         <td>

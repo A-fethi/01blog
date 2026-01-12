@@ -123,7 +123,7 @@
             </div>
 
             <div class="post-content" *ngIf="editingPostId() !== post.id">
-                <h3 *ngIf="post.title && post.title !== 'Untitled Post'" class="post-title">{{ post.title }}</h3>
+                <h3 *ngIf="post.title" class="post-title">{{ post.title }}</h3>
                 <p>{{ post.content }}</p>
                 <div *ngIf="post.media && post.media.length > 0" class="post-media-grid"
                     [class.multiple]="post.media.length > 1">

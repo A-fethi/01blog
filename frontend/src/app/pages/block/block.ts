@@ -211,6 +211,7 @@ export class Block implements OnInit {
                 error: () => this.togglingFollow = false
             });
         } else {
+
             this.userService.followUser(user.id).subscribe({
                 next: () => {
                     this.isFollowing.set(true);

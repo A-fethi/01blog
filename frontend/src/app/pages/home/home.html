@@ -6,7 +6,7 @@
             <mat-icon>account_circle</mat-icon>
         </div>
         <div class="create-post-inputs">
-            <input type="text" class="post-title-input" placeholder="Title (optional)" [ngModel]="newPostTitle()"
+            <input type="text" class="post-title-input" placeholder="Title" [ngModel]="newPostTitle()"
                 (ngModelChange)="newPostTitle.set($event)" [disabled]="!authService.isLoggedIn()" />
             <textarea
                 [placeholder]="authService.isLoggedIn() ? 'Share your learning journey' : 'You must log in to post'"
@@ -35,7 +35,7 @@
             </button>
         </div>
         <button class="share-post-btn" (click)="onSharePost()"
-            [disabled]="!authService.isLoggedIn() || !newPostContent().trim()">Share</button>
+            [disabled]="!authService.isLoggedIn() || !newPostTitle().trim() || !newPostContent().trim()">Share</button>
     </div>
 </div>
 
@@ -85,7 +85,7 @@
         </div>
 
         <div class="post-content" *ngIf="editingPostId() !== post.id">
-            <h3 *ngIf="post.title && post.title !== 'Untitled Post'" class="post-title">{{post.title}}</h3>
+            <h3 *ngIf="post.title" class="post-title">{{post.title}}</h3>
             <p>{{post.content}}</p>
             <div *ngIf="post.media && post.media.length > 0" class="post-media-grid"
                 [class.multiple]="post.media.length > 1">

@@ -34,7 +34,10 @@ public class CommentService {
         if (commentDTO.getContent() == null || commentDTO.getContent().trim().isEmpty()) {
             throw new IllegalArgumentException("Comment content cannot be empty");
         }
-
+         
+        if (post.isHidden()) {
+            throw new IllegalArgumentException("Post Hidden");
+        }
         Comment comment = new Comment();
         comment.setContent(commentDTO.getContent());
         comment.setPost(post);
