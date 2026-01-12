@@ -245,7 +245,10 @@ export class Home implements OnInit {
                     this.posts.update(p => [...p]);
                     this.likingPosts.delete(post.id);
                 },
-                error: () => this.likingPosts.delete(post.id)
+                error: (err) => {
+                    this.likingPosts.delete(post.id);
+                    this.notificationService.error(err.error?.message || err.error?.error || 'Failed to unlike post');
+                }
             });
         } else {
             this.postService.likePost(post.id).subscribe({
@@ -255,7 +258,10 @@ export class Home implements OnInit {
                     this.posts.update(p => [...p]);
                     this.likingPosts.delete(post.id);
                 },
-                error: () => this.likingPosts.delete(post.id)
+                error: (err) => {
+                    this.likingPosts.delete(post.id);
+                    this.notificationService.error(err.error?.message || err.error?.error || 'Failed to like post');
+                }
             });
         }
     }
@@ -385,15 +391,20 @@ export class Home implements OnInit {
             return;
         }
 
-        this.commentService.addComment(postId, content).subscribe(comment => {
-            const post = this.posts().find(p => p.id === postId);
-            if (post) {
-                if (!post.comments) post.comments = [];
-                post.comments.push(comment);
-                post.commentsCount = (post.commentsCount || 0) + 1;
-                this.setCommentInput(postId, '');
-                this.posts.update(p => [...p]);
-                this.notificationService.success('Comment added!');
+        this.commentService.addComment(postId, content).subscribe({
+            next: (comment) => {
+                const post = this.posts().find(p => p.id === postId);
+                if (post) {
+                    if (!post.comments) post.comments = [];
+                    post.comments.push(comment);
+                    post.commentsCount = (post.commentsCount || 0) + 1;
+                    this.setCommentInput(postId, '');
+                    this.posts.update(p => [...p]);
+                    this.notificationService.success('Comment added!');
+                }
+            },
+            error: (err) => {
+                this.notificationService.error(err.error?.message || err.error?.error || 'Failed to add comment');
             }
         });
     }

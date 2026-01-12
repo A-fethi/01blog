@@ -27,6 +27,10 @@ public class LikeService {
     public Like likePost(Long postId, User user) {
         Post post = postService.getPostById(postId);
 
+        if (post.isHidden()) {
+            throw new IllegalArgumentException("Cannot like a hidden post");
+        }
+
         return likeRepository.findByUserAndPost(user, post)
                 .orElseGet(() -> {
                     Like like = new Like(user, post);
@@ -39,6 +43,11 @@ public class LikeService {
     @Transactional
     public void unlikePost(Long postId, User user) {
         Post post = postService.getPostById(postId);
+
+        if (post.isHidden()) {
+            throw new IllegalArgumentException("Cannot unlike a hidden post");
+        }
+
         likeRepository.findByUserAndPost(user, post)
                 .ifPresent(likeRepository::delete);
     }

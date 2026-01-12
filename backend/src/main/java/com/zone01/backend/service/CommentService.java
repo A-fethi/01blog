@@ -36,7 +36,7 @@ public class CommentService {
         }
 
         if (post.isHidden()) {
-            throw new IllegalArgumentException("Post Hidden");
+            throw new IllegalArgumentException("Cannot comment on a hidden post");
         }
         Comment comment = new Comment();
         comment.setContent(commentDTO.getContent());
@@ -72,7 +72,8 @@ public class CommentService {
     @Transactional
     public void deleteComment(Long commentId, User user) {
         Comment comment = getCommentById(commentId);
-        if (!comment.getAuthor().getId().equals(user.getId()) && user.getRole() != com.zone01.backend.entity.Role.ADMIN) {
+        if (!comment.getAuthor().getId().equals(user.getId())
+                && user.getRole() != com.zone01.backend.entity.Role.ADMIN) {
             throw new UnauthorizedActionException("You cannot delete this comment");
         }
         commentRepository.delete(comment);

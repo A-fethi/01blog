@@ -81,6 +81,10 @@ public class PostService {
             throw new UnauthorizedActionException("You cannot edit this post");
         }
 
+        if (post.isHidden()) {
+            throw new IllegalArgumentException("Cannot edit a hidden post");
+        }
+
         post.setTitle(postDTO.getTitle());
         post.setContent(postDTO.getContent());
 
@@ -109,6 +113,10 @@ public class PostService {
         if (!post.getAuthor().getId().equals(loggedUser.getId())
                 && loggedUser.getRole() != com.zone01.backend.entity.Role.ADMIN) {
             throw new UnauthorizedActionException("You cannot delete this post");
+        }
+
+        if (post.isHidden() && loggedUser.getRole() != com.zone01.backend.entity.Role.ADMIN) {
+            throw new IllegalArgumentException("Cannot delete a hidden post");
         }
 
         postRepository.delete(post);
