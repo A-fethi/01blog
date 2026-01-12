@@ -110,6 +110,9 @@ public class UserController {
         String avatarUrl = null;
 
         if (avatar != null && !avatar.isEmpty()) {
+            if (!fileStorageService.isValidMediaType(avatar, "image/")) {
+                throw new RuntimeException("Only images are allowed for avatars");
+            }
             String fileName = fileStorageService.storeFile(avatar);
             avatarUrl = "http://localhost:8080/uploads/" + fileName;
         }

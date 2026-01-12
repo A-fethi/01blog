@@ -27,7 +27,13 @@ export class Register {
   ) { }
 
   onFileSelected(event: any) {
-    this.selectedFile = event.target.files[0] ?? null;
+    const file = event.target.files[0];
+    if (file && !file.type.startsWith('image/')) {
+      this.notificationService.error('Only images are allowed for avatars');
+      event.target.value = '';
+      return;
+    }
+    this.selectedFile = file ?? null;
   }
 
   onSubmit() {

@@ -151,9 +151,17 @@ export class Home implements OnInit {
         const files: FileList = event.target.files;
         if (files && files.length > 0) {
             const newFiles = Array.from(files);
+            const validFiles = newFiles.filter(file => file.type.startsWith('image/') || file.type.startsWith('video/'));
+
+            if (validFiles.length < newFiles.length) {
+                this.notificationService.error('Some files were skipped. Only images and videos are allowed.');
+            }
+
+            if (validFiles.length === 0) return;
+
             if (isEdit) {
-                this.editPostFiles.update(current => [...current, ...newFiles]);
-                newFiles.forEach(file => {
+                this.editPostFiles.update(current => [...current, ...validFiles]);
+                validFiles.forEach(file => {
                     const reader = new FileReader();
                     reader.onload = () => {
                         this.editPostFilesPreview.update(previews => [...previews, { url: reader.result as string, type: file.type }]);
@@ -161,8 +169,8 @@ export class Home implements OnInit {
                     reader.readAsDataURL(file);
                 });
             } else {
-                this.selectedFiles.update(current => [...current, ...newFiles]);
-                newFiles.forEach(file => {
+                this.selectedFiles.update(current => [...current, ...validFiles]);
+                validFiles.forEach(file => {
                     const reader = new FileReader();
                     reader.onload = () => {
                         this.selectedFilesPreview.update(previews => [...previews, { url: reader.result as string, type: file.type }]);

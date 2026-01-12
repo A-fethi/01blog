@@ -71,6 +71,9 @@ public class PostController {
         if (files != null && files.length > 0) {
             for (org.springframework.web.multipart.MultipartFile file : files) {
                 if (!file.isEmpty()) {
+                    if (!fileStorageService.isValidMediaType(file, "image/", "video/")) {
+                        throw new RuntimeException("Only images and videos are allowed: " + file.getOriginalFilename());
+                    }
                     String fileName = fileStorageService.storeFile(file);
                     com.zone01.backend.dto.PostMediaDTO mediaDTO = new com.zone01.backend.dto.PostMediaDTO();
                     mediaDTO.setMediaUrl("http://localhost:8080/uploads/" + fileName);
@@ -111,6 +114,9 @@ public class PostController {
         if (files != null && files.length > 0) {
             for (org.springframework.web.multipart.MultipartFile file : files) {
                 if (!file.isEmpty()) {
+                    if (!fileStorageService.isValidMediaType(file, "image/", "video/")) {
+                        throw new RuntimeException("Only images and videos are allowed: " + file.getOriginalFilename());
+                    }
                     String fileName = fileStorageService.storeFile(file);
                     com.zone01.backend.dto.PostMediaDTO mediaDTO = new com.zone01.backend.dto.PostMediaDTO();
                     mediaDTO.setMediaUrl("http://localhost:8080/uploads/" + fileName);

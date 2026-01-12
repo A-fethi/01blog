@@ -283,15 +283,29 @@ export class Block implements OnInit {
     }
 
     onAvatarSelected(event: any) {
-        this.editAvatarFile.set(event.target.files[0] ?? null);
+        const file = event.target.files[0];
+        if (file && !file.type.startsWith('image/')) {
+            this.notificationService.error('Only images are allowed for avatars');
+            event.target.value = '';
+            return;
+        }
+        this.editAvatarFile.set(file ?? null);
     }
 
     onFileSelected(event: any) {
         const files: FileList = event.target.files;
         if (files && files.length > 0) {
             const newFiles = Array.from(files);
-            this.editPostFiles.update(current => [...current, ...newFiles]);
-            newFiles.forEach(file => {
+            const validFiles = newFiles.filter(file => file.type.startsWith('image/') || file.type.startsWith('video/'));
+
+            if (validFiles.length < newFiles.length) {
+                this.notificationService.error('Some files were skipped. Only images and videos are allowed.');
+            }
+
+            if (validFiles.length === 0) return;
+
+            this.editPostFiles.update(current => [...current, ...validFiles]);
+            validFiles.forEach(file => {
                 const reader = new FileReader();
                 reader.onload = () => {
                     this.editPostFilesPreview.update(previews => [...previews, { url: reader.result as string, type: file.type }]);

@@ -39,4 +39,17 @@ public class FileStorageService {
             throw new RuntimeException("Could not store file " + fileName + ". Please try again!", ex);
         }
     }
+
+    public boolean isValidMediaType(MultipartFile file, String... allowedPrefixes) {
+        String contentType = file.getContentType();
+        if (contentType == null)
+            return false;
+
+        for (String prefix : allowedPrefixes) {
+            if (contentType.startsWith(prefix)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
