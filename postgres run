@@ -1,6 +1,15 @@
+# Linux/MacOS
 docker run --name 01blogdb \
   -e POSTGRES_USER=bloguser \
   -e POSTGRES_PASSWORD=blogpass \
   -e POSTGRES_DB=blogdb \
   -p 5432:5432 \
+  -d postgres:15
+---------------------------------------
+# Windows
+docker run --name 01blogdb `
+  -e POSTGRES_USER=bloguser `
+  -e POSTGRES_PASSWORD=blogpass `
+  -e POSTGRES_DB=blogdb `
+  -p 5432:5432 `
   -d postgres:15

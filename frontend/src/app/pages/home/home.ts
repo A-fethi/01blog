@@ -214,8 +214,7 @@ export class Home implements OnInit {
         });
 
         this.postService.createPost(formData).subscribe({
-            next: (post) => {
-                this.posts.update(p => [post, ...p]);
+            next: () => {
                 this.newPostTitle.set('');
                 this.newPostContent.set('');
                 this.selectedFiles.set([]);

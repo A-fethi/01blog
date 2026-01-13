@@ -374,7 +374,6 @@ export class Block implements OnInit {
                 next: () => {
                     this.notificationService.success('Your profile has been deleted.');
                     this.authService.logout();
-                    this.router.navigate(['/home']);
                 },
                 error: (err) => this.notificationService.error(err.error?.message || err.error?.error || 'Failed to delete profile')
             });
