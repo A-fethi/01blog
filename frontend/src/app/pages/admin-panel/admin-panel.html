@@ -127,17 +127,20 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let post of filteredPosts()">
+                    <tr *ngFor="let post of filteredPosts()" (click)="viewPost(post.id)" class="clickable-row">
                         <td>
-                            <span class="username-link" [routerLink]="['/block', post.authorUsername]">
+                            <span class="username-link" [routerLink]="['/block', post.authorUsername]"
+                                (click)="$event.stopPropagation()">
                                 {{ post.authorUsername }}
                             </span>
                         </td>
-                        <td>{{ post.title }}</td>
-                        <td>{{ post.content | slice:0:50 }}{{ post.content.length > 50 ? '...' : '' }}</td>
+                        <td [title]="post.title">{{ post.title | slice:0:30 }}{{ post.title.length > 30 ? '...' : '' }}
+                        </td>
+                        <td [title]="post.content">{{ post.content | slice:0:50 }}{{ post.content.length > 50 ? '...' :
+                            '' }}</td>
                         <td>{{ formatDate(post.createdAt) }}</td>
                         <td>
-                            <div class="action-buttons">
+                            <div class="action-buttons" (click)="$event.stopPropagation()">
                                 <button *ngIf="!post.hidden" class="action-btn ban-btn" (click)="hidePost(post.id)"
                                     title="Hide Post">
                                     <mat-icon>visibility_off</mat-icon>
@@ -179,7 +182,8 @@
                                     }})</span>
                             </div>
                         </td>
-                        <td>{{ report.reason }}</td>
+                        <td [title]="report.reason">{{ report.reason | slice:0:50 }}{{ report.reason.length > 50 ? '...'
+                            : '' }}</td>
                         <td>
                             <span class="status-badge" [class.pending]="report.status === 'PENDING'"
                                 [class.resolved]="report.status === 'RESOLVED'"
@@ -211,7 +215,7 @@
 <div class="modal-backdrop" *ngIf="showPostModal()" (click)="closePostModal()">
     <div class="modal-content post-view-modal" (click)="$event.stopPropagation()">
         <div class="modal-header">
-            <h2>Reported Post</h2>
+            <h2>Post Details</h2>
             <button class="close-btn" (click)="closePostModal()">
                 <mat-icon>close</mat-icon>
             </button>

@@ -162,6 +162,11 @@
             <mat-icon>explore</mat-icon>
             <span>Discover</span>
         </a>
+        <a routerLink="/admin" class="bottom-nav-item" routerLinkActive="active"
+            *ngIf="authService.isLoggedIn() && authService.isAdmin()">
+            <mat-icon>admin_panel_settings</mat-icon>
+            <span>Admin</span>
+        </a>
     </nav>
 
     <!-- Media Lightbox Overlay -->

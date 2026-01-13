@@ -166,6 +166,22 @@ td {
   vertical-align: middle;
 }
 
+.clickable-row {
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.clickable-row:hover {
+  background-color: #f0f2f5;
+}
+
+.truncate-text {
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .user-cell {
   display: flex;
   align-items: center;
