@@ -10,11 +10,13 @@ import { Discover } from './pages/discover/discover';
 import { MainLayout } from './layout/main-layout';
 import { ErrorPage } from './pages/error-page/error-page';
 import { guestGuard } from './guards/guest.guard';
+import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
     {
         path: '',
         component: MainLayout,
+        canActivate: [authGuard],
         children: [
             {
                 path: '',

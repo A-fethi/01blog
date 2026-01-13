@@ -115,7 +115,7 @@ export class Home implements OnInit {
 
     loadFeed() {
         this.loading.set(true);
-        this.postService.getAllPosts().subscribe({
+        this.postService.getFeedPosts().subscribe({
             next: (posts) => {
                 this.posts.set(posts);
                 this.loading.set(false);

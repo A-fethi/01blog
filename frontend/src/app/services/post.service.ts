@@ -36,6 +36,10 @@ export class PostService {
     return this.http.get<PostDTO[]>(this.baseUrl);
   }
 
+  getFeedPosts(): Observable<PostDTO[]> {
+    return this.http.get<PostDTO[]>(`${this.baseUrl}/feed`);
+  }
+
   createPost(formData: FormData): Observable<PostDTO> {
     return this.http.post<PostDTO>(this.baseUrl, formData);
   }

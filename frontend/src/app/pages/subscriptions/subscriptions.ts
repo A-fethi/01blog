@@ -89,24 +89,13 @@ export class Subscriptions implements OnInit {
 
     this.loading.set(true);
 
-    this.userService.getMySubscriptions().subscribe({
-      next: (subs) => {
-        const followedIds = new Set(subs.map((s: any) => s.targetId));
-
-        this.postService.getAllPosts().subscribe({
-          next: (allPosts) => {
-            const filteredPosts = allPosts.filter(post => followedIds.has(post.authorId));
-            this.posts.set(filteredPosts);
-            this.loading.set(false);
-          },
-          error: (err) => {
-            this.notificationService.error(err.error?.message || err.error?.error || 'Failed to load posts');
-            this.loading.set(false);
-          }
-        });
+    this.postService.getFeedPosts().subscribe({
+      next: (posts) => {
+        this.posts.set(posts);
+        this.loading.set(false);
       },
       error: (err) => {
-        this.notificationService.error(err.error?.message || err.error?.error || 'Failed to load subscriptions');
+        this.notificationService.error(err.error?.message || err.error?.error || 'Failed to load posts');
         this.loading.set(false);
       }
     });

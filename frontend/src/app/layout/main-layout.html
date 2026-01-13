@@ -72,10 +72,6 @@
                 <a routerLink="/block" class="nav-item" routerLinkActive="active" *ngIf="authService.isLoggedIn()">
                     <i class="icon"><mat-icon>account_circle</mat-icon></i> My Block
                 </a>
-                <a routerLink="/subscriptions" class="nav-item" routerLinkActive="active"
-                    *ngIf="authService.isLoggedIn()">
-                    <i class="icon"><mat-icon>diversity_3</mat-icon></i> Subscriptions
-                </a>
                 <a routerLink="/admin" class="nav-item admin-link"
                     *ngIf="authService.isLoggedIn() && authService.isAdmin()" routerLinkActive="active">
                     <i class="icon"><mat-icon>admin_panel_settings</mat-icon></i> Admin Panel
@@ -161,11 +157,6 @@
         <a routerLink="/block" class="bottom-nav-item" routerLinkActive="active" *ngIf="authService.isLoggedIn()">
             <mat-icon>account_circle</mat-icon>
             <span>Profile</span>
-        </a>
-        <a routerLink="/subscriptions" class="bottom-nav-item" routerLinkActive="active"
-            *ngIf="authService.isLoggedIn()">
-            <mat-icon>diversity_3</mat-icon>
-            <span>Follows</span>
         </a>
         <a routerLink="/discover" class="bottom-nav-item" routerLinkActive="active" *ngIf="authService.isLoggedIn()">
             <mat-icon>explore</mat-icon>

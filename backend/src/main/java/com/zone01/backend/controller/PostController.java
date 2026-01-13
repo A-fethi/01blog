@@ -41,6 +41,12 @@ public class PostController {
         return ResponseEntity.ok(postService.getAllPostsDTO(currentUser));
     }
 
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/feed")
+    public ResponseEntity<List<PostDTO>> getFeedPosts(@AuthenticationPrincipal AppUserDetails auth) {
+        return ResponseEntity.ok(postService.getFeedPosts(auth.getUser()));
+    }
+
     @GetMapping("/user/{username}")
     public ResponseEntity<List<PostDTO>> getPostsByUsername(@PathVariable String username,
             @AuthenticationPrincipal AppUserDetails auth) {
